@@ -16,7 +16,7 @@ cd "$SCRIPT_DIR/../.."
 
 # Build NATIVE
 echo "Building native for $CRATE_NAME..."
-cargo build --release --lib --manifest-path "$SCRIPT_DIR/../crates/$CRATE_NAME/Cargo.toml"  --features rayon 
+cargo build --release --lib --manifest-path "$SCRIPT_DIR/../crates/$CRATE_NAME/Cargo.toml" 
 
 # Copy .dylib
 mkdir -p "$TARGET_DIR/native"
