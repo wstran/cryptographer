@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPT_DIR=$(dirname "$(realpath "$0")")
-mkdir -p "$SCRIPT_DIR/packages"
+mkdir -p "$SCRIPT_DIR/../packages"
 
 # ------- BLAKE3 WASM -------
 CRATE_NAME="blake3_wasm"
