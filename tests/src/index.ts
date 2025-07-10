@@ -1,9 +1,23 @@
 import * as blake3 from '../../packages/blake3_wasm';
+import * as sha2_wasm from '../../packages/sha2_wasm';
 import { CryptoHasher } from 'bun';
 import SHA256 from 'crypto-js/sha256';
 import * as blake3_wasm_import from 'blake3';
 
 await blake3_wasm_import.load();
+
+function testSHA2WASMHash(input: Buffer, expectedLen: number, options: { keyed?: Uint8Array; derive_key?: string; hash_length?: number }): boolean {
+  try {
+    const outBuf = sha2_wasm.hash(input, { algo: 'sha256' });
+    if (outBuf.length !== expectedLen) {
+      throw new Error(`WASM hash failed: returned len=${outBuf.length}, expected=${expectedLen}`);
+    }
+    return true;
+  } catch (e) {
+    console.error(`testSingleWasmHash failed: ${e}`);
+    return false;
+  }
+}
 
 function testBlake3ImportHash(input: Buffer, expectedLen: number, options: { keyed?: Uint8Array; derive_key?: string; hash_length?: number }): boolean {
   try {
@@ -89,6 +103,12 @@ async function benchmark() {
 
 
   // WASM BLAKE3
+  console.time('SHA2 256 WASM (SHA2 256, small)');
+  for (let i = 0; i < iterations; i++) {
+    testSHA2WASMHash(inputSmall, 32, {});
+  }
+  console.timeEnd('SHA2 256 WASM (SHA2 256, small)');
+
   console.time('Blake3 Import (BLAKE3, small)');
   for (let i = 0; i < iterations; i++) {
     testBlake3ImportHash(inputSmall, 32, {});
