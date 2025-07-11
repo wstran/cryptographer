@@ -24,6 +24,7 @@ pub fn hash(input: Uint8Array, options: JsValue) -> Result<Box<[u8]>, JsValue> {
         if key_bytes.len() != 32 {
             return Err(JsValue::from_str("Key must be 32 bytes"));
         }
+        
         Hasher::new_keyed(
             &key_bytes
                 .try_into()
@@ -33,6 +34,7 @@ pub fn hash(input: Uint8Array, options: JsValue) -> Result<Box<[u8]>, JsValue> {
         if context.is_empty() {
             return Err(JsValue::from_str("Derive key cannot be empty"));
         }
+
         Hasher::new_derive_key(&context)
     } else {
         Hasher::new()
@@ -44,9 +46,13 @@ pub fn hash(input: Uint8Array, options: JsValue) -> Result<Box<[u8]>, JsValue> {
         if len > 1024 {
             return Err(JsValue::from_str("Hash length must be <= 1024"));
         }
+        
         let mut reader = hasher.finalize_xof();
+
         let mut buf = vec![0u8; len];
+
         reader.fill(&mut buf);
+
         Ok(buf.into_boxed_slice())
     } else {
         Ok(hasher.finalize().as_bytes().to_vec().into_boxed_slice())
@@ -101,9 +107,13 @@ impl StreamingHasher {
         if length > 1024 {
             return Err(JsValue::from_str("Hash length must be <= 1024"));
         }
+
         let mut reader = self.inner.finalize_xof();
+
         let mut buf = vec![0u8; length];
+
         reader.fill(&mut buf);
+
         Ok(buf.into_boxed_slice())
     }
 }

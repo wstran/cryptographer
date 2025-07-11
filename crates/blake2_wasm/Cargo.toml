@@ -1,0 +1,29 @@
+[package]
+name = "blake2_wasm"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+blake2 = "0.10.6"
+digest = "0.10.7"
+wasm-bindgen = { version = "0.2.100", optional = true }
+js-sys = { version = "0.3.72", optional = true }
+serde = { version = "1.0", features = ["derive"], optional = true }
+serde-wasm-bindgen = { version = "0.6", optional = true }
+
+[features]
+default = []
+wasm = ["wasm-bindgen", "js-sys", "serde", "serde-wasm-bindgen"]
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = false
