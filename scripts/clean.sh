@@ -15,3 +15,6 @@ rm -rf "$SCRIPT_DIR/../crates/blake2_wasm/target" "$SCRIPT_DIR/../crates/blake2_
 
 # clean up the build artifacts and directories of the MD5 WASM crate
 rm -rf "$SCRIPT_DIR/../crates/md5_wasm/target" "$SCRIPT_DIR/../crates/md5_wasm/Cargo.lock" "$SCRIPT_DIR/../packages/md5_wasm"
+
+# clean up the build artifacts and directories of the SHA1 WASM crate
+rm -rf "$SCRIPT_DIR/../crates/sha1_wasm/target" "$SCRIPT_DIR/../crates/sha1_wasm/Cargo.lock" "$SCRIPT_DIR/../packages/sha1_wasm"
