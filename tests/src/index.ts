@@ -2,7 +2,7 @@ import * as blake3 from '../../packages/blake3_wasm';
 import * as sha2_wasm from '../../packages/sha2_wasm';
 import { CryptoHasher } from 'bun';
 import SHA256 from 'crypto-js/sha256';
-import * as blake3_wasm_import from 'blake3';
+import * as blake3_wasm_import from 'blake3-wasm';
 
 await blake3_wasm_import.load();
 
