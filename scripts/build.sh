@@ -72,3 +72,13 @@ mkdir -p "$TARGET_DIR"
 echo "Building WASM for $CRATE_NAME..."
 cd "$SCRIPT_DIR/../crates/$CRATE_NAME"
 wasm-pack build --target nodejs --release --out-dir "$TARGET_DIR" -- --features wasm
+
+# ------- WHIRLPOOL WASM -------
+CRATE_NAME="whirlpool_wasm"
+TARGET_DIR="$SCRIPT_DIR/../packages/$CRATE_NAME"
+
+mkdir -p "$TARGET_DIR"
+
+echo "Building WASM for $CRATE_NAME..."
+cd "$SCRIPT_DIR/../crates/$CRATE_NAME"
+wasm-pack build --target nodejs --release --out-dir "$TARGET_DIR" -- --features wasm

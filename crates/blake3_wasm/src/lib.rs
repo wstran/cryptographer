@@ -46,12 +46,10 @@ pub fn hash(input: Uint8Array, options: JsValue) -> Result<Box<[u8]>, JsValue> {
         if len > 1024 {
             return Err(JsValue::from_str("Hash length must be <= 1024"));
         }
-        
-        let mut reader = hasher.finalize_xof();
 
         let mut buf = vec![0u8; len];
 
-        reader.fill(&mut buf);
+        hasher.finalize_xof().fill(&mut buf);
 
         Ok(buf.into_boxed_slice())
     } else {
@@ -108,11 +106,9 @@ impl StreamingHasher {
             return Err(JsValue::from_str("Hash length must be <= 1024"));
         }
 
-        let mut reader = self.inner.finalize_xof();
-
         let mut buf = vec![0u8; length];
 
-        reader.fill(&mut buf);
+        self.inner.finalize_xof().fill(&mut buf);
 
         Ok(buf.into_boxed_slice())
     }

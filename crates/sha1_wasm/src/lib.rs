@@ -7,11 +7,9 @@ use wasm_bindgen::prelude::*;
 
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
 pub fn hash(input: Uint8Array) -> Box<[u8]> {
-    let bytes = input.to_vec();
-    
     let mut hasher = Sha1::new();
 
-    hasher.update(&bytes);
+    hasher.update(input.to_vec());
 
     hasher.finalize().to_vec().into_boxed_slice()
 }

@@ -21,3 +21,6 @@ rm -rf "$SCRIPT_DIR/../crates/sha1_wasm/target" "$SCRIPT_DIR/../crates/sha1_wasm
 
 # clean up the build artifacts and directories of the RIPEMD160 WASM crate
 rm -rf "$SCRIPT_DIR/../crates/ripemd160_wasm/target" "$SCRIPT_DIR/../crates/ripemd160_wasm/Cargo.lock" "$SCRIPT_DIR/../packages/ripemd160_wasm"
+
+# clean up the build artifacts and directories of the WHIRLPOOL WASM crate
+rm -rf "$SCRIPT_DIR/../crates/whirlpool_wasm/target" "$SCRIPT_DIR/../crates/whirlpool_wasm/Cargo.lock" "$SCRIPT_DIR/../packages/whirlpool_wasm"
