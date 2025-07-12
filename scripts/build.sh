@@ -12,7 +12,6 @@ mkdir -p "$TARGET_DIR"
 echo "Building WASM for $CRATE_NAME..."
 cd "$SCRIPT_DIR/../crates/$CRATE_NAME"
 wasm-pack build --target nodejs --release --out-dir "$TARGET_DIR" -- --features wasm
-cd "$SCRIPT_DIR/../.."
 
 # ------- SHA2 WASM -------
 CRATE_NAME="sha2_wasm"
@@ -23,7 +22,6 @@ mkdir -p "$TARGET_DIR"
 echo "Building WASM for $CRATE_NAME..."
 cd "$SCRIPT_DIR/../crates/$CRATE_NAME"
 wasm-pack build --target nodejs --release --out-dir "$TARGET_DIR" -- --features wasm
-cd "$SCRIPT_DIR/../.."
 
 # ------- SHA3 WASM -------
 CRATE_NAME="sha3_wasm"
@@ -34,7 +32,6 @@ mkdir -p "$TARGET_DIR"
 echo "Building WASM for $CRATE_NAME..."
 cd "$SCRIPT_DIR/../crates/$CRATE_NAME"
 wasm-pack build --target nodejs --release --out-dir "$TARGET_DIR" -- --features wasm
-cd "$SCRIPT_DIR/../.."
 
 # ------- BLAKE2 WASM -------
 CRATE_NAME="blake2_wasm"
@@ -45,7 +42,6 @@ mkdir -p "$TARGET_DIR"
 echo "Building WASM for $CRATE_NAME..."
 cd "$SCRIPT_DIR/../crates/$CRATE_NAME"
 wasm-pack build --target nodejs --release --out-dir "$TARGET_DIR" -- --features wasm
-cd "$SCRIPT_DIR/../.."
 
 # ------- MD5 WASM -------
 CRATE_NAME="md5_wasm"
@@ -56,7 +52,6 @@ mkdir -p "$TARGET_DIR"
 echo "Building WASM for $CRATE_NAME..."
 cd "$SCRIPT_DIR/../crates/$CRATE_NAME"
 wasm-pack build --target nodejs --release --out-dir "$TARGET_DIR" -- --features wasm
-cd "$SCRIPT_DIR/../.."
 
 # ------- SHA1 WASM -------
 CRATE_NAME="sha1_wasm"
@@ -67,4 +62,13 @@ mkdir -p "$TARGET_DIR"
 echo "Building WASM for $CRATE_NAME..."
 cd "$SCRIPT_DIR/../crates/$CRATE_NAME"
 wasm-pack build --target nodejs --release --out-dir "$TARGET_DIR" -- --features wasm
-cd "$SCRIPT_DIR/../.."
+
+# ------- RIPEMD160 WASM -------
+CRATE_NAME="ripemd160_wasm"
+TARGET_DIR="$SCRIPT_DIR/../packages/$CRATE_NAME"
+
+mkdir -p "$TARGET_DIR"
+
+echo "Building WASM for $CRATE_NAME..."
+cd "$SCRIPT_DIR/../crates/$CRATE_NAME"
+wasm-pack build --target nodejs --release --out-dir "$TARGET_DIR" -- --features wasm
