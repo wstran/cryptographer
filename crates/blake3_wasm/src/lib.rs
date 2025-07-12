@@ -24,7 +24,7 @@ pub fn hash(input: Uint8Array, options: JsValue) -> Result<Box<[u8]>, JsValue> {
         if key_bytes.len() != 32 {
             return Err(JsValue::from_str("Key must be 32 bytes"));
         }
-        
+
         Hasher::new_keyed(
             &key_bytes
                 .try_into()
@@ -59,7 +59,7 @@ pub fn hash(input: Uint8Array, options: JsValue) -> Result<Box<[u8]>, JsValue> {
 
 #[wasm_bindgen]
 pub struct StreamingHasher {
-    inner: Hasher,
+    inner: Option<Hasher>,
 }
 
 #[wasm_bindgen]
@@ -89,26 +89,41 @@ impl StreamingHasher {
             Hasher::new()
         };
 
-        Ok(StreamingHasher { inner })
+        Ok(StreamingHasher { inner: Some(inner) })
     }
 
     pub fn update(&mut self, data: Uint8Array) -> Result<(), JsValue> {
-        self.inner.update(&data.to_vec());
-        Ok(())
+        if let Some(ref mut hasher) = self.inner {
+            hasher.update(&data.to_vec());
+
+            Ok(())
+        } else {
+            Err(JsValue::from_str("Hasher has been finalized"))
+        }
     }
 
-    pub fn finalize(&self) -> Box<[u8]> {
-        self.inner.finalize().as_bytes().to_vec().into_boxed_slice()
+    pub fn finalize(&mut self) -> Result<Box<[u8]>, JsValue> {
+        let hasher = self
+            .inner
+            .take()
+            .ok_or_else(|| JsValue::from_str("Already finalized"))?;
+
+        Ok(hasher.finalize().as_bytes().to_vec().into_boxed_slice())
     }
 
-    pub fn finalize_xof(&self, length: usize) -> Result<Box<[u8]>, JsValue> {
+    pub fn finalize_xof(&mut self, length: usize) -> Result<Box<[u8]>, JsValue> {
         if length > 1024 {
             return Err(JsValue::from_str("Hash length must be <= 1024"));
         }
 
+        let hasher = self
+            .inner
+            .take()
+            .ok_or_else(|| JsValue::from_str("Already finalized"))?;
+
         let mut buf = vec![0u8; length];
 
-        self.inner.finalize_xof().fill(&mut buf);
+        hasher.finalize_xof().fill(&mut buf);
 
         Ok(buf.into_boxed_slice())
     }

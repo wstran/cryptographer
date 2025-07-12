@@ -31,10 +31,14 @@ pub fn hash(input: Uint8Array, options: JsValue) -> Result<Box<[u8]>, JsValue> {
     Ok(hash.into_boxed_slice())
 }
 
+enum Blake2Impl {
+    Blake2b(Blake2b512),
+    Blake2s(Blake2s256),
+}
+
 #[wasm_bindgen]
 pub struct StreamingHasher {
-    hasher_b2b: Option<Blake2b512>,
-    hasher_b2s: Option<Blake2s256>,
+    inner: Option<Blake2Impl>,
 }
 
 #[wasm_bindgen]
@@ -44,45 +48,40 @@ impl StreamingHasher {
         let opts: Blake2Options = serde_wasm_bindgen::from_value(options)
             .map_err(|e| JsValue::from_str(&e.to_string()))?;
 
-        let hasher_b2b = if let Blake2Type::Blake2b = opts.algo {
-            Some(Blake2b512::new())
-        } else {
-            None
+        let inner = match opts.algo {
+            Blake2Type::Blake2b => Blake2Impl::Blake2b(Blake2b512::new()),
+            Blake2Type::Blake2s => Blake2Impl::Blake2s(Blake2s256::new()),
         };
 
-        let hasher_b2s = if let Blake2Type::Blake2s = opts.algo {
-            Some(Blake2s256::new())
-        } else {
-            None
-        };
-
-        Ok(StreamingHasher {
-            hasher_b2b,
-            hasher_b2s,
-        })
+        Ok(StreamingHasher { inner: Some(inner) })
     }
 
-    #[wasm_bindgen]
     pub fn update(&mut self, data: Uint8Array) -> Result<(), JsValue> {
-        if let Some(ref mut hasher) = self.hasher_b2b {
-            hasher.update(&data.to_vec());
-        } else if let Some(ref mut hasher) = self.hasher_b2s {
-            hasher.update(&data.to_vec());
+        let bytes = data.to_vec();
+        match &mut self.inner {
+            Some(Blake2Impl::Blake2b(h)) => {
+                h.update(&bytes);
+                Ok(())
+            }
+            Some(Blake2Impl::Blake2s(h)) => {
+                h.update(&bytes);
+                Ok(())
+            }
+            None => Err(JsValue::from_str("Hasher has been finalized")),
         }
-
-        Ok(())
     }
 
-    #[wasm_bindgen]
-    pub fn finalize(&self) -> Result<Box<[u8]>, JsValue> {
-        let result = if let Some(ref hasher) = self.hasher_b2b {
-            hasher.clone().finalize().to_vec()
-        } else if let Some(ref hasher) = self.hasher_b2s {
-            hasher.clone().finalize().to_vec()
-        } else {
-            return Err(JsValue::from_str("Hasher not initialized"));
+    pub fn finalize(&mut self) -> Result<Box<[u8]>, JsValue> {
+        let inner = self
+            .inner
+            .take()
+            .ok_or_else(|| JsValue::from_str("Already finalized"))?;
+
+        let res = match inner {
+            Blake2Impl::Blake2b(h) => h.finalize().to_vec(),
+            Blake2Impl::Blake2s(h) => h.finalize().to_vec(),
         };
 
-        Ok(result.into_boxed_slice())
+        Ok(res.into_boxed_slice())
     }
 }

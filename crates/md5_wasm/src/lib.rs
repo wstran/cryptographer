@@ -23,8 +23,10 @@ impl StreamingMd5 {
         StreamingMd5 { hasher: Md5::new() }
     }
 
-    pub fn update(&mut self, input: Uint8Array) {
+    pub fn update(&mut self, input: Uint8Array) -> Result<(), JsValue> {
         self.hasher.update(input.to_vec());
+        
+        Ok(())
     }
 
     pub fn finalize(&mut self) -> Box<[u8]> {

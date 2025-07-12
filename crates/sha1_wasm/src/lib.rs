@@ -26,8 +26,10 @@ impl StreamingSha1 {
         StreamingSha1 { inner: Sha1::new() }
     }
 
-    pub fn update(&mut self, data: Uint8Array) {
-        self.inner.update(&data.to_vec());
+    pub fn update(&mut self, data: Uint8Array) -> Result<(), JsValue> {
+        self.inner.update(data.to_vec());
+
+        Ok(())
     }
 
     pub fn finalize(&self) -> Box<[u8]> {

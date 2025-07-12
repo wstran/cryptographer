@@ -28,8 +28,10 @@ impl StreamingHasher {
     }
 
     #[wasm_bindgen]
-    pub fn update(&mut self, data: Uint8Array) {
+    pub fn update(&mut self, data: Uint8Array) -> Result<(), JsValue> {
         self.hasher.update(data.to_vec());
+
+        Ok(())
     }
 
     #[wasm_bindgen]

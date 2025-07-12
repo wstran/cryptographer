@@ -21,11 +21,11 @@ pub fn hash(input: Uint8Array, options: JsValue) -> Result<Box<[u8]>, JsValue> {
     let hash_output = hasher.finalize().to_vec();
 
     if let Some(len) = opts.hash_length {
-        if len > 128 {
-            return Err(JsValue::from_str("Hash length must be <= 128"));
+        if len > 16 {
+            return Err(JsValue::from_str("Hash length must be <= 16 for MD4"));
         }
 
-        Ok(hash_output.into_boxed_slice())
+        Ok(hash_output[..len].to_vec().into_boxed_slice())
     } else {
         Ok(hash_output.into_boxed_slice())
     }
@@ -59,14 +59,12 @@ impl StreamingHasher {
     }
 
     pub fn finalize_xof(&self, length: usize) -> Result<Box<[u8]>, JsValue> {
-        if length > 128 {
-            return Err(JsValue::from_str("Hash length must be <= 128"));
+        if length > 16 {
+            return Err(JsValue::from_str("Length must be <= 16 for MD4"));
         }
 
-        let mut buf = vec![0u8; length];
-
-        buf.copy_from_slice(self.inner.clone().finalize()[..length]);
-
-        Ok(buf.into_boxed_slice())
+        let full = self.inner.clone().finalize().to_vec();
+        
+        Ok(full[..length].to_vec().into_boxed_slice())
     }
 }
