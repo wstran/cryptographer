@@ -10,3 +10,24 @@ pub fn hash(input: Uint8Array) -> Box<[u8]> {
 
     hasher.finalize().to_vec().into_boxed_slice()
 }
+
+#[wasm_bindgen]
+pub struct StreamingMd5 {
+    hasher: Md5,
+}
+
+#[wasm_bindgen]
+impl StreamingMd5 {
+    #[wasm_bindgen(constructor)]
+    pub fn new() -> StreamingMd5 {
+        StreamingMd5 { hasher: Md5::new() }
+    }
+
+    pub fn update(&mut self, input: Uint8Array) {
+        self.hasher.update(input.to_vec());
+    }
+
+    pub fn finalize(&mut self) -> Box<[u8]> {
+        self.hasher.clone().finalize().to_vec().into_boxed_slice()
+    }
+}

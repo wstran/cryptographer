@@ -1,17 +1,14 @@
 [package]
-name = "blake2_wasm"
+name = "md4_wasm"
 version = "0.1.0"
 edition = "2021"
 
-[lib]
-crate-type = ["cdylib", "rlib"]
-
 [dependencies]
-blake2 = "0.10.6"
+md4 = "0.10.2"
 wasm-bindgen = { version = "0.2.100", optional = true }
 js-sys = { version = "0.3.72", optional = true }
-serde = { version = "1.0", features = ["derive"], optional = true }
-serde-wasm-bindgen = { version = "0.6", optional = true }
+serde = { version = "1.0.219", features = ["derive"], optional = true }
+serde-wasm-bindgen = { version = "0.6.5", optional = true }
 
 [features]
 default = []
@@ -23,6 +20,3 @@ lto = true
 codegen-units = 1
 panic = "abort"
 strip = true
-
-[package.metadata.wasm-pack.profile.release]
-wasm-opt = false
