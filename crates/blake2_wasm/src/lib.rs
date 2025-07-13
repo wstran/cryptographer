@@ -6,6 +6,7 @@ use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 #[derive(Deserialize)]
+#[serde(rename_all = "lowercase")]
 pub enum Blake2Type {
     Blake2b,
     Blake2s,

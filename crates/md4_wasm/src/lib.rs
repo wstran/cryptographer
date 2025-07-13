@@ -39,13 +39,10 @@ pub struct StreamingHasher {
 #[wasm_bindgen]
 impl StreamingHasher {
     #[wasm_bindgen(constructor)]
-    pub fn new(options: JsValue) -> Result<StreamingHasher, JsValue> {
-        let opts: HashOptions = serde_wasm_bindgen::from_value(options)
-            .map_err(|e| JsValue::from_str(&e.to_string()))?;
-
+    pub fn new() -> StreamingHasher {
         let inner = Md4::new();
 
-        Ok(StreamingHasher { inner })
+        StreamingHasher { inner }
     }
 
     pub fn update(&mut self, data: Uint8Array) -> Result<(), JsValue> {

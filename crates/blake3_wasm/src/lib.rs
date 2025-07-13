@@ -5,11 +5,8 @@ use wasm_bindgen::prelude::*;
 
 #[derive(Deserialize)]
 struct HashOptions {
-    #[serde(default)]
     keyed: Option<Vec<u8>>,
-    #[serde(default)]
     derive_key: Option<String>,
-    #[serde(default)]
     hash_length: Option<usize>,
 }
 
@@ -69,22 +66,23 @@ impl StreamingHasher {
         let opts: HashOptions = serde_wasm_bindgen::from_value(options)
             .map_err(|e| JsValue::from_str(&e.to_string()))?;
 
-        let inner = if let Some(key_bytes) = opts.keyed {
+        let inner = if let Some(key_bytes) = opts.keyed.as_ref() {
             if key_bytes.len() != 32 {
                 return Err(JsValue::from_str("Key must be 32 bytes"));
             }
 
             let key_array: [u8; 32] = key_bytes
+                .as_slice()
                 .try_into()
                 .map_err(|_| JsValue::from_str("Invalid key format"))?;
 
             Hasher::new_keyed(&key_array)
-        } else if let Some(context) = opts.derive_key {
+        } else if let Some(context) = opts.derive_key.as_ref() {
             if context.is_empty() {
                 return Err(JsValue::from_str("Derive key cannot be empty"));
             }
 
-            Hasher::new_derive_key(&context)
+            Hasher::new_derive_key(context)
         } else {
             Hasher::new()
         };

@@ -8,14 +8,9 @@
     "@types/crypto-js": "^4.2.2"
   },
   "peerDependencies": {
-    "typescript": "^5",
-    "blake3": "^3.0.0"
+    "typescript": "^5"
   },
   "dependencies": {
     "crypto-js": "^4.2.0"
-  },
-  "overrides": {
-    "blake3-wasm": "^3.0.0",
-    "@c4312/blake3-internal": "^3.0.0"
   }
 }
