@@ -1,12 +1,12 @@
-import * as blake2_wasm from '../../packages/blake2_wasm';
-import * as blake3_wasm from '../../packages/blake3_wasm';
-import * as md4_wasm from '../../packages/md4_wasm';
-import * as md5_wasm from '../../packages/md5_wasm';
-import * as ripemd160_wasm from '../../packages/ripemd160_wasm';
-import * as sha1_wasm from '../../packages/sha1_wasm';
-import * as sha2_wasm from '../../packages/sha2_wasm';
-import * as sha3_wasm from '../../packages/sha3_wasm';
-import * as whirlpool_wasm from '../../packages/whirlpool_wasm';
+import * as blake2_wasm from '../../packages/sha/blake2_wasm';
+import * as blake3_wasm from '../../packages/sha/blake3_wasm';
+import * as md4_wasm from '../../packages/sha/md4_wasm';
+import * as md5_wasm from '../../packages/sha/md5_wasm';
+import * as ripemd160_wasm from '../../packages/sha/ripemd160_wasm';
+import * as sha1_wasm from '../../packages/sha/sha1_wasm';
+import * as sha2_wasm from '../../packages/sha/sha2_wasm';
+import * as sha3_wasm from '../../packages/sha/sha3_wasm';
+import * as whirlpool_wasm from '../../packages/sha/whirlpool_wasm';
 import { CryptoHasher } from 'bun';
 import SHA256 from 'crypto-js/sha256';
 
@@ -306,7 +306,7 @@ function testCryptoJsSha256(input: Buffer, expectedLen: number): boolean {
 async function benchmark() {
   const inputSmall = Buffer.from('Hello, Bun.js!');
   const input1MB = Buffer.alloc(1_000_000, 0x42); // 1MB
-  const iterations = 10_000;
+  const iterations = 1;
   const keyed = new Uint8Array(32).fill(0x42);
   const derive_key = 'context';
 

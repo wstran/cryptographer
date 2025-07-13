@@ -2,28 +2,28 @@ SCRIPT_DIR=$(dirname "$(realpath "$0")")
 mkdir -p "$SCRIPT_DIR/../packages"
 
 # clean up the build artifacts and directories of the BLAKE2 WASM crate
-rm -rf "$SCRIPT_DIR/../crates/blake2_wasm/target" "$SCRIPT_DIR/../crates/blake2_wasm/Cargo.lock" "$SCRIPT_DIR/../packages/blake2_wasm"
+rm -rf "$SCRIPT_DIR/../crates/sha/blake2_wasm/target" "$SCRIPT_DIR/../crates/sha/blake2_wasm/Cargo.lock" "$SCRIPT_DIR/../packages/sha/blake2_wasm"
 
 # clean up the build artifacts and directories of the BLAKE3 WASM crate
-rm -rf "$SCRIPT_DIR/../crates/blake3_wasm/target" "$SCRIPT_DIR/../crates/blake3_wasm/Cargo.lock" "$SCRIPT_DIR/../packages/blake3_wasm"
+rm -rf "$SCRIPT_DIR/../crates/sha/blake3_wasm/target" "$SCRIPT_DIR/../crates/sha/blake3_wasm/Cargo.lock" "$SCRIPT_DIR/../packages/sha/blake3_wasm"
 
 # clean up the build artifacts and directories of the MD4 WASM crate
-rm -rf "$SCRIPT_DIR/../crates/md4_wasm/target" "$SCRIPT_DIR/../crates/md4_wasm/Cargo.lock" "$SCRIPT_DIR/../packages/md4_wasm"
+rm -rf "$SCRIPT_DIR/../crates/sha/md4_wasm/target" "$SCRIPT_DIR/../crates/sha/md4_wasm/Cargo.lock" "$SCRIPT_DIR/../packages/sha/md4_wasm"
 
 # clean up the build artifacts and directories of the MD5 WASM crate
-rm -rf "$SCRIPT_DIR/../crates/md5_wasm/target" "$SCRIPT_DIR/../crates/md5_wasm/Cargo.lock" "$SCRIPT_DIR/../packages/md5_wasm"
+rm -rf "$SCRIPT_DIR/../crates/sha/md5_wasm/target" "$SCRIPT_DIR/../crates/sha/md5_wasm/Cargo.lock" "$SCRIPT_DIR/../packages/sha/md5_wasm"
 
 # clean up the build artifacts and directories of the RIPEMD160 WASM crate
-rm -rf "$SCRIPT_DIR/../crates/ripemd160_wasm/target" "$SCRIPT_DIR/../crates/ripemd160_wasm/Cargo.lock" "$SCRIPT_DIR/../packages/ripemd160_wasm"
+rm -rf "$SCRIPT_DIR/../crates/sha/ripemd160_wasm/target" "$SCRIPT_DIR/../crates/sha/ripemd160_wasm/Cargo.lock" "$SCRIPT_DIR/../packages/sha/ripemd160_wasm"
 
 # clean up the build artifacts and directories of the SHA1 WASM crate
-rm -rf "$SCRIPT_DIR/../crates/sha1_wasm/target" "$SCRIPT_DIR/../crates/sha1_wasm/Cargo.lock" "$SCRIPT_DIR/../packages/sha1_wasm"
+rm -rf "$SCRIPT_DIR/../crates/sha/sha1_wasm/target" "$SCRIPT_DIR/../crates/sha/sha1_wasm/Cargo.lock" "$SCRIPT_DIR/../packages/sha/sha1_wasm"
 
 # clean up the build artifacts and directories of the SHA2 WASM crate
-rm -rf "$SCRIPT_DIR/../crates/sha2_wasm/target" "$SCRIPT_DIR/../crates/sha2_wasm/Cargo.lock" "$SCRIPT_DIR/../packages/sha2_wasm"
+rm -rf "$SCRIPT_DIR/../crates/sha/sha2_wasm/target" "$SCRIPT_DIR/../crates/sha/sha2_wasm/Cargo.lock" "$SCRIPT_DIR/../packages/sha/sha2_wasm"
 
 # clean up the build artifacts and directories of the SHA3 WASM crate
-rm -rf "$SCRIPT_DIR/../crates/sha3_wasm/target" "$SCRIPT_DIR/../crates/sha3_wasm/Cargo.lock" "$SCRIPT_DIR/../packages/sha3_wasm"
+rm -rf "$SCRIPT_DIR/../crates/sha/sha3_wasm/target" "$SCRIPT_DIR/../crates/sha/sha3_wasm/Cargo.lock" "$SCRIPT_DIR/../packages/sha/sha3_wasm"
 
 # clean up the build artifacts and directories of the WHIRLPOOL WASM crate
-rm -rf "$SCRIPT_DIR/../crates/whirlpool_wasm/target" "$SCRIPT_DIR/../crates/whirlpool_wasm/Cargo.lock" "$SCRIPT_DIR/../packages/whirlpool_wasm"
+rm -rf "$SCRIPT_DIR/../crates/sha/whirlpool_wasm/target" "$SCRIPT_DIR/../crates/sha/whirlpool_wasm/Cargo.lock" "$SCRIPT_DIR/../packages/sha/whirlpool_wasm"
