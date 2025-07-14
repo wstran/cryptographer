@@ -7,7 +7,15 @@ use js_sys::Uint8Array;
 pub fn hash(input: Uint8Array) -> Box<[u8]> {
     let mut hasher = Whirlpool::new();
 
-    hasher.update(input.to_vec());
+    let offset = input.byte_offset() as usize;
+
+    let len = input.length() as usize;
+
+    let ptr = offset as *const u8;
+
+    let input_slice = unsafe { std::slice::from_raw_parts(ptr, len) };
+
+    hasher.update(input_slice);
 
     hasher.finalize_fixed().as_slice().to_vec().into_boxed_slice()
 }
@@ -27,8 +35,16 @@ impl StreamingHasher {
     }
 
     #[wasm_bindgen]
-    pub fn update(&mut self, data: Uint8Array) -> Result<(), JsValue> {
-        self.inner.update(data.to_vec());
+    pub fn update(&mut self, input: Uint8Array) -> Result<(), JsValue> {
+        let offset = input.byte_offset() as usize;
+
+        let len = input.length() as usize;
+
+        let ptr = offset as *const u8;
+
+        let input_slice = unsafe { std::slice::from_raw_parts(ptr, len) };
+        
+        self.inner.update(input_slice);
 
         Ok(())
     }

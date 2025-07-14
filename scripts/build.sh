@@ -1,7 +1,8 @@
 #!/bin/bash
-
 SCRIPT_DIR=$(dirname "$(realpath "$0")")
 mkdir -p "$SCRIPT_DIR/../packages"
+
+####### SHA #######
 
 # ------- BLAKE2 WASM -------
 CRATE_NAME="blake2_wasm"
@@ -91,4 +92,16 @@ mkdir -p "$TARGET_DIR"
 
 echo "Building WASM for $CRATE_NAME..."
 cd "$SCRIPT_DIR/../crates/sha/$CRATE_NAME"
+wasm-pack build --target nodejs --release --out-dir "$TARGET_DIR" -- --features wasm
+
+####### HMAC #######
+
+# ------- HMAC WASM -------
+CRATE_NAME="hmac_wasm"
+TARGET_DIR="$SCRIPT_DIR/../packages/hmac/$CRATE_NAME"
+
+mkdir -p "$TARGET_DIR"
+
+echo "Building WASM for $CRATE_NAME..."
+cd "$SCRIPT_DIR/../crates/hmac/$CRATE_NAME"
 wasm-pack build --target nodejs --release --out-dir "$TARGET_DIR" -- --features wasm

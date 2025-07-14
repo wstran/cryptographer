@@ -6,7 +6,15 @@ use wasm_bindgen::prelude::*;
 pub fn hash(input: Uint8Array) -> Box<[u8]> {
     let mut hasher = Md5::new();
 
-    hasher.update(input.to_vec());
+    let offset = input.byte_offset() as usize;
+
+    let len = input.length() as usize;
+
+    let ptr = offset as *const u8;
+
+    let input_slice = unsafe { std::slice::from_raw_parts(ptr, len) };
+
+    hasher.update(input_slice);
 
     hasher.finalize().to_vec().into_boxed_slice()
 }
@@ -24,8 +32,16 @@ impl StreamingMd5 {
     }
 
     pub fn update(&mut self, input: Uint8Array) -> Result<(), JsValue> {
-        self.hasher.update(input.to_vec());
-        
+        let offset = input.byte_offset() as usize;
+
+        let len = input.length() as usize;
+
+        let ptr = offset as *const u8;
+
+        let input_slice = unsafe { std::slice::from_raw_parts(ptr, len) };
+
+        self.hasher.update(input_slice);
+
         Ok(())
     }
 

@@ -1,6 +1,8 @@
 SCRIPT_DIR=$(dirname "$(realpath "$0")")
 mkdir -p "$SCRIPT_DIR/../packages"
 
+# ------- SHA WASM -------
+
 # clean up the build artifacts and directories of the BLAKE2 WASM crate
 rm -rf "$SCRIPT_DIR/../crates/sha/blake2_wasm/target" "$SCRIPT_DIR/../crates/sha/blake2_wasm/Cargo.lock" "$SCRIPT_DIR/../packages/sha/blake2_wasm"
 
@@ -27,3 +29,8 @@ rm -rf "$SCRIPT_DIR/../crates/sha/sha3_wasm/target" "$SCRIPT_DIR/../crates/sha/s
 
 # clean up the build artifacts and directories of the WHIRLPOOL WASM crate
 rm -rf "$SCRIPT_DIR/../crates/sha/whirlpool_wasm/target" "$SCRIPT_DIR/../crates/sha/whirlpool_wasm/Cargo.lock" "$SCRIPT_DIR/../packages/sha/whirlpool_wasm"
+
+# ------- HMAC WASM -------
+
+# clean up the build artifacts and directories of the HMAC WASM crate
+rm -rf "$SCRIPT_DIR/../crates/hmac/hmac_wasm/target" "$SCRIPT_DIR/../crates/hmac/hmac_wasm/Cargo.lock" "$SCRIPT_DIR/../packages/hmac/hmac_wasm"

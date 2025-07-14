@@ -25,15 +25,21 @@ pub fn hash(input: Uint8Array, options: JsValue) -> Result<Box<[u8]>, JsValue> {
     let opts: HashOptions =
         serde_wasm_bindgen::from_value(options).map_err(|e| JsValue::from(e.to_string()))?;
 
-    let input_bytes = input.to_vec();
+    let offset = input.byte_offset() as usize;
+
+    let len = input.length() as usize;
+
+    let ptr = offset as *const u8;
+
+    let input_slice = unsafe { std::slice::from_raw_parts(ptr, len) };
 
     let output = match opts.algo.unwrap_or(ShaType::Sha256) {
-        ShaType::Sha224 => Sha224::digest(&input_bytes).to_vec(),
-        ShaType::Sha256 => Sha256::digest(&input_bytes).to_vec(),
-        ShaType::Sha384 => Sha384::digest(&input_bytes).to_vec(),
-        ShaType::Sha512 => Sha512::digest(&input_bytes).to_vec(),
-        ShaType::Sha512_224 => Sha512_224::digest(&input_bytes).to_vec(),
-        ShaType::Sha512_256 => Sha512_256::digest(&input_bytes).to_vec(),
+        ShaType::Sha224 => Sha224::digest(input_slice).to_vec(),
+        ShaType::Sha256 => Sha256::digest(input_slice).to_vec(),
+        ShaType::Sha384 => Sha384::digest(input_slice).to_vec(),
+        ShaType::Sha512 => Sha512::digest(input_slice).to_vec(),
+        ShaType::Sha512_224 => Sha512_224::digest(input_slice).to_vec(),
+        ShaType::Sha512_256 => Sha512_256::digest(input_slice).to_vec(),
     };
 
     Ok(output.into_boxed_slice())
@@ -73,31 +79,37 @@ impl StreamingHasher {
     }
 
     pub fn update(&mut self, input: Uint8Array) -> Result<(), JsValue> {
-        let data = input.to_vec();
+        let offset = input.byte_offset() as usize;
+
+        let len = input.length() as usize;
+
+        let ptr = offset as *const u8;
+
+        let input_slice = unsafe { std::slice::from_raw_parts(ptr, len) };
 
         match &mut self.inner {
             Some(Sha2Impl::Sha224(h)) => {
-                h.update(&data);
+                h.update(input_slice);
                 Ok(())
             }
             Some(Sha2Impl::Sha256(h)) => {
-                h.update(&data);
+                h.update(input_slice);
                 Ok(())
             }
             Some(Sha2Impl::Sha384(h)) => {
-                h.update(&data);
+                h.update(input_slice);
                 Ok(())
             }
             Some(Sha2Impl::Sha512(h)) => {
-                h.update(&data);
+                h.update(input_slice);
                 Ok(())
             }
             Some(Sha2Impl::Sha512_224(h)) => {
-                h.update(&data);
+                h.update(input_slice);
                 Ok(())
             }
             Some(Sha2Impl::Sha512_256(h)) => {
-                h.update(&data);
+                h.update(input_slice);
                 Ok(())
             }
             None => Err(JsValue::from_str("Hasher has been finalized")),

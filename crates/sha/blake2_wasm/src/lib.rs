@@ -22,11 +22,17 @@ pub fn hash(input: Uint8Array, options: JsValue) -> Result<Box<[u8]>, JsValue> {
     let opts: Blake2Options =
         serde_wasm_bindgen::from_value(options).map_err(|e| JsValue::from_str(&e.to_string()))?;
 
-    let bytes = input.to_vec();
+    let offset = input.byte_offset() as usize;
+
+    let len = input.length() as usize;
+
+    let ptr = offset as *const u8;
+
+    let input_slice = unsafe { std::slice::from_raw_parts(ptr, len) };
 
     let hash = match opts.algo {
-        Blake2Type::Blake2b => Blake2b512::digest(&bytes).to_vec(),
-        Blake2Type::Blake2s => Blake2s256::digest(&bytes).to_vec(),
+        Blake2Type::Blake2b => Blake2b512::digest(input_slice).to_vec(),
+        Blake2Type::Blake2s => Blake2s256::digest(input_slice).to_vec(),
     };
 
     Ok(hash.into_boxed_slice())
@@ -57,15 +63,22 @@ impl StreamingHasher {
         Ok(StreamingHasher { inner: Some(inner) })
     }
 
-    pub fn update(&mut self, data: Uint8Array) -> Result<(), JsValue> {
-        let bytes = data.to_vec();
+    pub fn update(&mut self, input: Uint8Array) -> Result<(), JsValue> {
+        let offset = input.byte_offset() as usize;
+
+        let len = input.length() as usize;
+
+        let ptr = offset as *const u8;
+
+        let input_slice = unsafe { std::slice::from_raw_parts(ptr, len) };
+
         match &mut self.inner {
             Some(Blake2Impl::Blake2b(h)) => {
-                h.update(&bytes);
+                h.update(input_slice);
                 Ok(())
             }
             Some(Blake2Impl::Blake2s(h)) => {
-                h.update(&bytes);
+                h.update(input_slice);
                 Ok(())
             }
             None => Err(JsValue::from_str("Hasher has been finalized")),

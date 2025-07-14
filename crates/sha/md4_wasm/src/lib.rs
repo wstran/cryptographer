@@ -16,7 +16,15 @@ pub fn hash(input: Uint8Array, options: JsValue) -> Result<Box<[u8]>, JsValue> {
 
     let mut hasher = Md4::new();
 
-    hasher.update(input.to_vec());
+    let offset = input.byte_offset() as usize;
+
+    let len = input.length() as usize;
+
+    let ptr = offset as *const u8;
+
+    let input_slice = unsafe { std::slice::from_raw_parts(ptr, len) };
+
+    hasher.update(input_slice);
 
     let hash_output = hasher.finalize().to_vec();
 
@@ -45,8 +53,16 @@ impl StreamingHasher {
         StreamingHasher { inner }
     }
 
-    pub fn update(&mut self, data: Uint8Array) -> Result<(), JsValue> {
-        self.inner.update(&data.to_vec());
+    pub fn update(&mut self, input: Uint8Array) -> Result<(), JsValue> {
+        let offset = input.byte_offset() as usize;
+
+        let len = input.length() as usize;
+
+        let ptr = offset as *const u8;
+
+        let input_slice = unsafe { std::slice::from_raw_parts(ptr, len) };
+
+        self.inner.update(input_slice);
 
         Ok(())
     }

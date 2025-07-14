@@ -73,18 +73,18 @@ impl StreamingHasher {
         })
     }
 
-    pub fn update(&mut self, data: Uint8Array) -> Result<(), JsValue> {
+    pub fn update(&mut self, input: Uint8Array) -> Result<(), JsValue> {
         if let Some(ref mut hasher) = self.inner {
-            let offset = data.byte_offset() as usize;
+            let offset = input.byte_offset() as usize;
 
-            let len = data.length() as usize;
+            let len = input.length() as usize;
 
             let ptr = offset as *const u8;
 
-            let slice = unsafe { std::slice::from_raw_parts(ptr, len) };
-            
-            hasher.update(slice);
-            
+            let input_slice = unsafe { std::slice::from_raw_parts(ptr, len) };
+
+            hasher.update(input_slice);
+
             Ok(())
         } else {
             Err(JsValue::from_str("Hasher has been finalized"))

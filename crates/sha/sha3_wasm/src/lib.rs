@@ -34,23 +34,29 @@ pub fn hash(input: Uint8Array, options: JsValue) -> Result<Box<[u8]>, JsValue> {
     let opts: HashOptions =
         serde_wasm_bindgen::from_value(options).map_err(|e| JsValue::from_str(&e.to_string()))?;
 
-    let input_bytes = input.to_vec();
+    let offset = input.byte_offset() as usize;
+
+    let len = input.length() as usize;
+
+    let ptr = offset as *const u8;
+
+    let input_slice = unsafe { std::slice::from_raw_parts(ptr, len) };
 
     let output = match opts.algo {
-        Sha3Type::Sha3_224 => Sha3_224::digest(&input_bytes).to_vec(),
-        Sha3Type::Sha3_256 => Sha3_256::digest(&input_bytes).to_vec(),
-        Sha3Type::Sha3_384 => Sha3_384::digest(&input_bytes).to_vec(),
-        Sha3Type::Sha3_512 => Sha3_512::digest(&input_bytes).to_vec(),
-        Sha3Type::Keccak224 => Keccak224::digest(&input_bytes).to_vec(),
-        Sha3Type::Keccak256 => Keccak256::digest(&input_bytes).to_vec(),
-        Sha3Type::Keccak384 => Keccak384::digest(&input_bytes).to_vec(),
-        Sha3Type::Keccak512 => Keccak512::digest(&input_bytes).to_vec(),
+        Sha3Type::Sha3_224 => Sha3_224::digest(input_slice).to_vec(),
+        Sha3Type::Sha3_256 => Sha3_256::digest(input_slice).to_vec(),
+        Sha3Type::Sha3_384 => Sha3_384::digest(input_slice).to_vec(),
+        Sha3Type::Sha3_512 => Sha3_512::digest(input_slice).to_vec(),
+        Sha3Type::Keccak224 => Keccak224::digest(input_slice).to_vec(),
+        Sha3Type::Keccak256 => Keccak256::digest(input_slice).to_vec(),
+        Sha3Type::Keccak384 => Keccak384::digest(input_slice).to_vec(),
+        Sha3Type::Keccak512 => Keccak512::digest(input_slice).to_vec(),
         Sha3Type::Shake128 => {
             let len = opts.hash_length.ok_or("Shake128 requires hash_length")?;
 
             let mut hasher = Shake128::default();
 
-            hasher.update(&input_bytes);
+            hasher.update(input_slice);
 
             let mut buf = vec![0u8; len];
 
@@ -63,7 +69,7 @@ pub fn hash(input: Uint8Array, options: JsValue) -> Result<Box<[u8]>, JsValue> {
             
             let mut hasher = Shake256::default();
 
-            hasher.update(&input_bytes);
+            hasher.update(input_slice);
 
             let mut buf = vec![0u8; len];
 
@@ -125,23 +131,29 @@ impl StreamingHasher {
         Ok(Self { inner })
     }
 
-    pub fn update(&mut self, data: Uint8Array) {
-        let buf = data.to_vec();
+    pub fn update(&mut self, input: Uint8Array) {
+        let offset = input.byte_offset() as usize;
+
+        let len = input.length() as usize;
+
+        let ptr = offset as *const u8;
+
+        let input_slice = unsafe { std::slice::from_raw_parts(ptr, len) };
 
         match &mut self.inner {
             StreamingInner::Digest(d) => match d {
-                DigestImpl::Sha3_224(h) => Digest::update(h, &buf),
-                DigestImpl::Sha3_256(h) => Digest::update(h, &buf),
-                DigestImpl::Sha3_384(h) => Digest::update(h, &buf),
-                DigestImpl::Sha3_512(h) => Digest::update(h, &buf),
-                DigestImpl::Keccak224(h) => Digest::update(h, &buf),
-                DigestImpl::Keccak256(h) => Digest::update(h, &buf),
-                DigestImpl::Keccak384(h) => Digest::update(h, &buf),
-                DigestImpl::Keccak512(h) => Digest::update(h, &buf),
+                DigestImpl::Sha3_224(h) => Digest::update(h, input_slice),
+                DigestImpl::Sha3_256(h) => Digest::update(h, input_slice),
+                DigestImpl::Sha3_384(h) => Digest::update(h, input_slice),
+                DigestImpl::Sha3_512(h) => Digest::update(h, input_slice),
+                DigestImpl::Keccak224(h) => Digest::update(h, input_slice),
+                DigestImpl::Keccak256(h) => Digest::update(h, input_slice),
+                DigestImpl::Keccak384(h) => Digest::update(h, input_slice),
+                DigestImpl::Keccak512(h) => Digest::update(h, input_slice),
             },
             StreamingInner::Xof(x) => match x {
-                XofImpl::Shake128(h) => h.update(&buf),
-                XofImpl::Shake256(h) => h.update(&buf),
+                XofImpl::Shake128(h) => h.update(input_slice),
+                XofImpl::Shake256(h) => h.update(input_slice),
             },
         }
     }
