@@ -24,10 +24,15 @@ function testBlake2WASMHash(input: Buffer, expectedLen: number, options: { algo:
   }
 }
 
-function testBlake2StreamingHash(input: Buffer, expectedLen: number, options: { algo: 'blake2b' | 'blake2s' }): boolean {
+function testBlake2StreamingHash(input: Buffer, expectedLen: number, options: { algo: 'blake2b' | 'blake2s' }, chunkSize: number): boolean {
   try {
     const hasher = new blake2_wasm.StreamingHasher(options);
-    hasher.update(input);
+    let pos = 0;
+    while (pos < input.length) {
+      const end = Math.min(pos + chunkSize, input.length);
+      hasher.update(input.subarray(pos, end));
+      pos = end;
+    }
     const outBuf = hasher.finalize();
     if (outBuf.length !== expectedLen) {
       throw new Error(`BLAKE2 streaming hash failed: returned len=${outBuf.length}, expected=${expectedLen}`);
@@ -53,10 +58,15 @@ function testBlake3WASMHash(input: Buffer, expectedLen: number, options: { keyed
   }
 }
 
-function testBlake3StreamingHash(input: Buffer, expectedLen: number, options: { keyed?: Uint8Array; derive_key?: string; hash_length?: number }): boolean {
+function testBlake3StreamingHash(input: Buffer, expectedLen: number, options: { keyed?: Uint8Array; derive_key?: string; hash_length?: number }, chunkSize: number): boolean {
   try {
     const hasher = new blake3_wasm.StreamingHasher(options);
-    hasher.update(input);
+    let pos = 0;
+    while (pos < input.length) {
+      const end = Math.min(pos + chunkSize, input.length);
+      hasher.update(input.subarray(pos, end));
+      pos = end;
+    }
     const outBuf = options.hash_length ? hasher.finalize_xof(options.hash_length) : hasher.finalize();
     if (outBuf.length !== expectedLen) {
       throw new Error(`BLAKE3 streaming hash failed: returned len=${outBuf.length}, expected=${expectedLen}`);
@@ -82,11 +92,16 @@ function testMD4WASMHash(input: Buffer, expectedLen: number, options: { hash_len
   }
 }
 
-function testMD4StreamingHash(input: Buffer, expectedLen: number): boolean {
+function testMD4StreamingHash(input: Buffer, expectedLen: number, chunkSize: number): boolean {
   try {
     const hasher = new md4_wasm.StreamingHasher();
-    hasher.update(input);
-    const outBuf = expectedLen ? hasher.finalize_xof(expectedLen) : hasher.finalize();
+    let pos = 0;
+    while (pos < input.length) {
+      const end = Math.min(pos + chunkSize, input.length);
+      hasher.update(input.subarray(pos, end));
+      pos = end;
+    }
+    const outBuf = hasher.finalize();
     if (outBuf.length !== expectedLen) {
       throw new Error(`MD4 streaming hash failed: returned len=${outBuf.length}, expected=${expectedLen}`);
     }
@@ -111,10 +126,15 @@ function testMD5WASMHash(input: Buffer, expectedLen: number): boolean {
   }
 }
 
-function testMD5StreamingHash(input: Buffer, expectedLen: number): boolean {
+function testMD5StreamingHash(input: Buffer, expectedLen: number, chunkSize: number): boolean {
   try {
     const hasher = new md5_wasm.StreamingMd5();
-    hasher.update(input);
+    let pos = 0;
+    while (pos < input.length) {
+      const end = Math.min(pos + chunkSize, input.length);
+      hasher.update(input.subarray(pos, end));
+      pos = end;
+    }
     const outBuf = hasher.finalize();
     if (outBuf.length !== expectedLen) {
       throw new Error(`MD5 streaming hash failed: returned len=${outBuf.length}, expected=${expectedLen}`);
@@ -140,10 +160,15 @@ function testRIPEMD160WASMHash(input: Buffer, expectedLen: number): boolean {
   }
 }
 
-function testRIPEMD160StreamingHash(input: Buffer, expectedLen: number): boolean {
+function testRIPEMD160StreamingHash(input: Buffer, expectedLen: number, chunkSize: number): boolean {
   try {
     const hasher = new ripemd160_wasm.StreamingHasher();
-    hasher.update(input);
+    let pos = 0;
+    while (pos < input.length) {
+      const end = Math.min(pos + chunkSize, input.length);
+      hasher.update(input.subarray(pos, end));
+      pos = end;
+    }
     const outBuf = hasher.finalize();
     if (outBuf.length !== expectedLen) {
       throw new Error(`RIPEMD160 streaming hash failed: returned len=${outBuf.length}, expected=${expectedLen}`);
@@ -169,10 +194,15 @@ function testSHA1WASMHash(input: Buffer, expectedLen: number): boolean {
   }
 }
 
-function testSHA1StreamingHash(input: Buffer, expectedLen: number): boolean {
+function testSHA1StreamingHash(input: Buffer, expectedLen: number, chunkSize: number): boolean {
   try {
     const hasher = new sha1_wasm.StreamingSha1();
-    hasher.update(input);
+    let pos = 0;
+    while (pos < input.length) {
+      const end = Math.min(pos + chunkSize, input.length);
+      hasher.update(input.subarray(pos, end));
+      pos = end;
+    }
     const outBuf = hasher.finalize();
     if (outBuf.length !== expectedLen) {
       throw new Error(`SHA1 streaming hash failed: returned len=${outBuf.length}, expected=${expectedLen}`);
@@ -198,10 +228,15 @@ function testSHA2WASMHash(input: Buffer, expectedLen: number, options: { algo?: 
   }
 }
 
-function testSHA2StreamingHash(input: Buffer, expectedLen: number, options: { algo?: 'sha224' | 'sha256' | 'sha384' | 'sha512' | 'sha512_224' | 'sha512_256' }): boolean {
+function testSHA2StreamingHash(input: Buffer, expectedLen: number, options: { algo?: 'sha224' | 'sha256' | 'sha384' | 'sha512' | 'sha512_224' | 'sha512_256' }, chunkSize: number): boolean {
   try {
     const hasher = new sha2_wasm.StreamingHasher(options);
-    hasher.update(input);
+    let pos = 0;
+    while (pos < input.length) {
+      const end = Math.min(pos + chunkSize, input.length);
+      hasher.update(input.subarray(pos, end));
+      pos = end;
+    }
     const outBuf = hasher.finalize();
     if (outBuf.length !== expectedLen) {
       throw new Error(`SHA2 streaming hash failed: returned len=${outBuf.length}, expected=${expectedLen}`);
@@ -227,10 +262,15 @@ function testSHA3WASMHash(input: Buffer, expectedLen: number, options: { algo: '
   }
 }
 
-function testSHA3StreamingHash(input: Buffer, expectedLen: number, options: { algo: 'sha3_224' | 'sha3_256' | 'sha3_384' | 'sha3_512' | 'shake128' | 'shake256' | 'keccak224' | 'keccak256' | 'keccak384' | 'keccak512'; hash_length?: number }): boolean {
+function testSHA3StreamingHash(input: Buffer, expectedLen: number, options: { algo: 'sha3_224' | 'sha3_256' | 'sha3_384' | 'sha3_512' | 'shake128' | 'shake256' | 'keccak224' | 'keccak256' | 'keccak384' | 'keccak512'; hash_length?: number }, chunkSize: number): boolean {
   try {
     const hasher = new sha3_wasm.StreamingHasher(options);
-    hasher.update(input);
+    let pos = 0;
+    while (pos < input.length) {
+      const end = Math.min(pos + chunkSize, input.length);
+      hasher.update(input.subarray(pos, end));
+      pos = end;
+    }
     const outBuf = hasher.finalize(options.hash_length);
     if (outBuf.length !== expectedLen) {
       throw new Error(`SHA3 streaming hash failed: returned len=${outBuf.length}, expected=${expectedLen}`);
@@ -256,10 +296,15 @@ function testWhirlpoolWASMHash(input: Buffer, expectedLen: number): boolean {
   }
 }
 
-function testWhirlpoolStreamingHash(input: Buffer, expectedLen: number): boolean {
+function testWhirlpoolStreamingHash(input: Buffer, expectedLen: number, chunkSize: number): boolean {
   try {
     const hasher = new whirlpool_wasm.StreamingHasher();
-    hasher.update(input);
+    let pos = 0;
+    while (pos < input.length) {
+      const end = Math.min(pos + chunkSize, input.length);
+      hasher.update(input.subarray(pos, end));
+      pos = end;
+    }
     const outBuf = hasher.finalize();
     if (outBuf.length !== expectedLen) {
       throw new Error(`Whirlpool streaming hash failed: returned len=${outBuf.length}, expected=${expectedLen}`);
@@ -306,7 +351,8 @@ function testCryptoJsSha256(input: Buffer, expectedLen: number): boolean {
 async function benchmark() {
   const inputSmall = Buffer.from('Hello, Bun.js!');
   const input1MB = Buffer.alloc(1_000_000, 0x42); // 1MB
-  const iterations = 1;
+  const iterations = 10_000;
+  const chunkSize = 65536; // 64KB
   const keyed = new Uint8Array(32).fill(0x42);
   const derive_key = 'context';
 
@@ -319,7 +365,7 @@ async function benchmark() {
 
   console.time('BLAKE2b WASM (streaming, small)');
   for (let i = 0; i < iterations; i++) {
-    testBlake2StreamingHash(inputSmall, 64, { algo: 'blake2b' });
+    testBlake2StreamingHash(inputSmall, 64, { algo: 'blake2b' }, chunkSize);
   }
   console.timeEnd('BLAKE2b WASM (streaming, small)');
 
@@ -331,7 +377,7 @@ async function benchmark() {
 
   console.time('BLAKE2s WASM (streaming, small)');
   for (let i = 0; i < iterations; i++) {
-    testBlake2StreamingHash(inputSmall, 32, { algo: 'blake2s' });
+    testBlake2StreamingHash(inputSmall, 32, { algo: 'blake2s' }, chunkSize);
   }
   console.timeEnd('BLAKE2s WASM (streaming, small)');
 
@@ -344,7 +390,7 @@ async function benchmark() {
 
   console.time('BLAKE3 WASM (streaming, small)');
   for (let i = 0; i < iterations; i++) {
-    testBlake3StreamingHash(inputSmall, 32, {});
+    testBlake3StreamingHash(inputSmall, 32, {}, chunkSize);
   }
   console.timeEnd('BLAKE3 WASM (streaming, small)');
 
@@ -368,7 +414,7 @@ async function benchmark() {
 
   console.time('BLAKE3 WASM XOF (streaming, small, 64 bytes)');
   for (let i = 0; i < iterations; i++) {
-    testBlake3StreamingHash(inputSmall, 64, { hash_length: 64 });
+    testBlake3StreamingHash(inputSmall, 64, { hash_length: 64 }, chunkSize);
   }
   console.timeEnd('BLAKE3 WASM XOF (streaming, small, 64 bytes)');
 
@@ -381,7 +427,7 @@ async function benchmark() {
 
   console.time('MD4 WASM (streaming, small)');
   for (let i = 0; i < iterations; i++) {
-    testMD4StreamingHash(inputSmall, 16);
+    testMD4StreamingHash(inputSmall, 16, chunkSize);
   }
   console.timeEnd('MD4 WASM (streaming, small)');
 
@@ -394,7 +440,7 @@ async function benchmark() {
 
   console.time('MD5 WASM (streaming, small)');
   for (let i = 0; i < iterations; i++) {
-    testMD5StreamingHash(inputSmall, 16);
+    testMD5StreamingHash(inputSmall, 16, chunkSize);
   }
   console.timeEnd('MD5 WASM (streaming, small)');
 
@@ -407,7 +453,7 @@ async function benchmark() {
 
   console.time('RIPEMD160 WASM (streaming, small)');
   for (let i = 0; i < iterations; i++) {
-    testRIPEMD160StreamingHash(inputSmall, 20);
+    testRIPEMD160StreamingHash(inputSmall, 20, chunkSize);
   }
   console.timeEnd('RIPEMD160 WASM (streaming, small)');
 
@@ -420,7 +466,7 @@ async function benchmark() {
 
   console.time('SHA1 WASM (streaming, small)');
   for (let i = 0; i < iterations; i++) {
-    testSHA1StreamingHash(inputSmall, 20);
+    testSHA1StreamingHash(inputSmall, 20, chunkSize);
   }
   console.timeEnd('SHA1 WASM (streaming, small)');
 
@@ -433,7 +479,7 @@ async function benchmark() {
 
   console.time('SHA2-256 WASM (streaming, small)');
   for (let i = 0; i < iterations; i++) {
-    testSHA2StreamingHash(inputSmall, 32, { algo: 'sha256' });
+    testSHA2StreamingHash(inputSmall, 32, { algo: 'sha256' }, chunkSize);
   }
   console.timeEnd('SHA2-256 WASM (streaming, small)');
 
@@ -446,7 +492,7 @@ async function benchmark() {
 
   console.time('SHA3-256 WASM (streaming, small)');
   for (let i = 0; i < iterations; i++) {
-    testSHA3StreamingHash(inputSmall, 32, { algo: 'sha3_256' });
+    testSHA3StreamingHash(inputSmall, 32, { algo: 'sha3_256' }, chunkSize);
   }
   console.timeEnd('SHA3-256 WASM (streaming, small)');
 
@@ -458,7 +504,7 @@ async function benchmark() {
 
   console.time('SHAKE128 WASM (streaming, small, 64 bytes)');
   for (let i = 0; i < iterations; i++) {
-    testSHA3StreamingHash(inputSmall, 64, { algo: 'shake128', hash_length: 64 });
+    testSHA3StreamingHash(inputSmall, 64, { algo: 'shake128', hash_length: 64 }, chunkSize);
   }
   console.timeEnd('SHAKE128 WASM (streaming, small, 64 bytes)');
 
@@ -471,7 +517,7 @@ async function benchmark() {
 
   console.time('Whirlpool WASM (streaming, small)');
   for (let i = 0; i < iterations; i++) {
-    testWhirlpoolStreamingHash(inputSmall, 64);
+    testWhirlpoolStreamingHash(inputSmall, 64, chunkSize);
   }
   console.timeEnd('Whirlpool WASM (streaming, small)');
 
@@ -498,7 +544,7 @@ async function benchmark() {
 
   console.time('BLAKE2b WASM (streaming, 1MB)');
   for (let i = 0; i < iterations / 10; i++) {
-    testBlake2StreamingHash(input1MB, 64, { algo: 'blake2b' });
+    testBlake2StreamingHash(input1MB, 64, { algo: 'blake2b' }, chunkSize);
   }
   console.timeEnd('BLAKE2b WASM (streaming, 1MB)');
 
@@ -510,7 +556,7 @@ async function benchmark() {
 
   console.time('BLAKE3 WASM (streaming, 1MB)');
   for (let i = 0; i < iterations / 10; i++) {
-    testBlake3StreamingHash(input1MB, 32, {});
+    testBlake3StreamingHash(input1MB, 32, {}, chunkSize);
   }
   console.timeEnd('BLAKE3 WASM (streaming, 1MB)');
 
@@ -522,7 +568,7 @@ async function benchmark() {
 
   console.time('MD4 WASM (streaming, 1MB)');
   for (let i = 0; i < iterations / 10; i++) {
-    testMD4StreamingHash(input1MB, 16);
+    testMD4StreamingHash(input1MB, 16, chunkSize);
   }
   console.timeEnd('MD4 WASM (streaming, 1MB)');
 
@@ -534,7 +580,7 @@ async function benchmark() {
 
   console.time('MD5 WASM (streaming, 1MB)');
   for (let i = 0; i < iterations / 10; i++) {
-    testMD5StreamingHash(input1MB, 16);
+    testMD5StreamingHash(input1MB, 16, chunkSize);
   }
   console.timeEnd('MD5 WASM (streaming, 1MB)');
 
@@ -546,7 +592,7 @@ async function benchmark() {
 
   console.time('RIPEMD160 WASM (streaming, 1MB)');
   for (let i = 0; i < iterations / 10; i++) {
-    testRIPEMD160StreamingHash(input1MB, 20);
+    testRIPEMD160StreamingHash(input1MB, 20, chunkSize);
   }
   console.timeEnd('RIPEMD160 WASM (streaming, 1MB)');
 
@@ -558,7 +604,7 @@ async function benchmark() {
 
   console.time('SHA1 WASM (streaming, 1MB)');
   for (let i = 0; i < iterations / 10; i++) {
-    testSHA1StreamingHash(input1MB, 20);
+    testSHA1StreamingHash(input1MB, 20, chunkSize);
   }
   console.timeEnd('SHA1 WASM (streaming, 1MB)');
 
@@ -570,7 +616,7 @@ async function benchmark() {
 
   console.time('SHA2-256 WASM (streaming, 1MB)');
   for (let i = 0; i < iterations / 10; i++) {
-    testSHA2StreamingHash(input1MB, 32, { algo: 'sha256' });
+    testSHA2StreamingHash(input1MB, 32, { algo: 'sha256' }, chunkSize);
   }
   console.timeEnd('SHA2-256 WASM (streaming, 1MB)');
 
@@ -582,7 +628,7 @@ async function benchmark() {
 
   console.time('SHA3-256 WASM (streaming, 1MB)');
   for (let i = 0; i < iterations / 10; i++) {
-    testSHA3StreamingHash(input1MB, 32, { algo: 'sha3_256' });
+    testSHA3StreamingHash(input1MB, 32, { algo: 'sha3_256' }, chunkSize);
   }
   console.timeEnd('SHA3-256 WASM (streaming, 1MB)');
 
@@ -594,7 +640,7 @@ async function benchmark() {
 
   console.time('Whirlpool WASM (streaming, 1MB)');
   for (let i = 0; i < iterations / 10; i++) {
-    testWhirlpoolStreamingHash(input1MB, 64);
+    testWhirlpoolStreamingHash(input1MB, 64, chunkSize);
   }
   console.timeEnd('Whirlpool WASM (streaming, 1MB)');
 }
@@ -612,7 +658,7 @@ async function runTest(): Promise<void> {
   }
 
   console.log('Testing BLAKE2b WASM (streaming)...');
-  if (!testBlake2StreamingHash(inputSmall, 64, { algo: 'blake2b' })) {
+  if (!testBlake2StreamingHash(inputSmall, 64, { algo: 'blake2b' }, inputSmall.length)) {
     console.error('Aborting due to BLAKE2b WASM streaming hash failure');
     return;
   }
@@ -624,7 +670,7 @@ async function runTest(): Promise<void> {
   }
 
   console.log('Testing BLAKE2s WASM (streaming)...');
-  if (!testBlake2StreamingHash(inputSmall, 32, { algo: 'blake2s' })) {
+  if (!testBlake2StreamingHash(inputSmall, 32, { algo: 'blake2s' }, inputSmall.length)) {
     console.error('Aborting due to BLAKE2s WASM streaming hash failure');
     return;
   }
@@ -636,7 +682,7 @@ async function runTest(): Promise<void> {
   }
 
   console.log('Testing BLAKE3 WASM (streaming)...');
-  if (!testBlake3StreamingHash(inputSmall, 32, {})) {
+  if (!testBlake3StreamingHash(inputSmall, 32, {}, inputSmall.length)) {
     console.error('Aborting due to BLAKE3 WASM streaming hash failure');
     return;
   }
@@ -660,7 +706,7 @@ async function runTest(): Promise<void> {
   }
 
   console.log('Testing BLAKE3 WASM XOF (streaming)...');
-  if (!testBlake3StreamingHash(inputSmall, 64, { hash_length: 64 })) {
+  if (!testBlake3StreamingHash(inputSmall, 64, { hash_length: 64 }, inputSmall.length)) {
     console.error('Aborting due to BLAKE3 WASM XOF streaming hash failure');
     return;
   }
@@ -672,7 +718,7 @@ async function runTest(): Promise<void> {
   }
 
   console.log('Testing MD4 WASM (streaming)...');
-  if (!testMD4StreamingHash(inputSmall, 16)) {
+  if (!testMD4StreamingHash(inputSmall, 16, inputSmall.length)) {
     console.error('Aborting due to MD4 WASM streaming hash failure');
     return;
   }
@@ -684,7 +730,7 @@ async function runTest(): Promise<void> {
   }
 
   console.log('Testing MD5 WASM (streaming)...');
-  if (!testMD5StreamingHash(inputSmall, 16)) {
+  if (!testMD5StreamingHash(inputSmall, 16, inputSmall.length)) {
     console.error('Aborting due to MD5 WASM streaming hash failure');
     return;
   }
@@ -696,7 +742,7 @@ async function runTest(): Promise<void> {
   }
 
   console.log('Testing RIPEMD160 WASM (streaming)...');
-  if (!testRIPEMD160StreamingHash(inputSmall, 20)) {
+  if (!testRIPEMD160StreamingHash(inputSmall, 20, inputSmall.length)) {
     console.error('Aborting due to RIPEMD160 WASM streaming hash failure');
     return;
   }
@@ -708,7 +754,7 @@ async function runTest(): Promise<void> {
   }
 
   console.log('Testing SHA1 WASM (streaming)...');
-  if (!testSHA1StreamingHash(inputSmall, 20)) {
+  if (!testSHA1StreamingHash(inputSmall, 20, inputSmall.length)) {
     console.error('Aborting due to SHA1 WASM streaming hash failure');
     return;
   }
@@ -720,7 +766,7 @@ async function runTest(): Promise<void> {
   }
 
   console.log('Testing SHA2-256 WASM (streaming)...');
-  if (!testSHA2StreamingHash(inputSmall, 32, { algo: 'sha256' })) {
+  if (!testSHA2StreamingHash(inputSmall, 32, { algo: 'sha256' }, inputSmall.length)) {
     console.error('Aborting due to SHA2-256 WASM streaming hash failure');
     return;
   }
@@ -732,7 +778,7 @@ async function runTest(): Promise<void> {
   }
 
   console.log('Testing SHA3-256 WASM (streaming)...');
-  if (!testSHA3StreamingHash(inputSmall, 32, { algo: 'sha3_256' })) {
+  if (!testSHA3StreamingHash(inputSmall, 32, { algo: 'sha3_256' }, inputSmall.length)) {
     console.error('Aborting due to SHA3-256 WASM streaming hash failure');
     return;
   }
@@ -744,7 +790,7 @@ async function runTest(): Promise<void> {
   }
 
   console.log('Testing Whirlpool WASM (streaming)...');
-  if (!testWhirlpoolStreamingHash(inputSmall, 64)) {
+  if (!testWhirlpoolStreamingHash(inputSmall, 64, inputSmall.length)) {
     console.error('Aborting due to Whirlpool WASM streaming hash failure');
     return;
   }
