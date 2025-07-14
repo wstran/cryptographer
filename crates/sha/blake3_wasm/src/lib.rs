@@ -12,32 +12,26 @@ struct HashOptions {
 
 #[wasm_bindgen]
 pub fn hash(input: Uint8Array, options: JsValue) -> Result<Box<[u8]>, JsValue> {
-    let opts: HashOptions =
-        serde_wasm_bindgen::from_value(options).map_err(|e| JsValue::from_str(&e.to_string()))?;
+    let opts: HashOptions = serde_wasm_bindgen::from_value(options)
+        .map_err(|e| JsValue::from_str(&format!("Invalid options: {}", e)))?;
 
-    let input_bytes = input.to_vec();
+    let offset = input.byte_offset() as usize;
 
-    let mut hasher = if let Some(key_bytes) = opts.keyed {
-        if key_bytes.len() != 32 {
-            return Err(JsValue::from_str("Key must be 32 bytes"));
-        }
+    let len = input.length() as usize;
 
-        Hasher::new_keyed(
-            &key_bytes
-                .try_into()
-                .map_err(|_| JsValue::from_str("Key must be 32 bytes"))?,
-        )
-    } else if let Some(context) = opts.derive_key {
-        if context.is_empty() {
-            return Err(JsValue::from_str("Derive key cannot be empty"));
-        }
+    let ptr = offset as *const u8;
 
-        Hasher::new_derive_key(&context)
-    } else {
-        Hasher::new()
+    let input_slice = unsafe { std::slice::from_raw_parts(ptr, len) };
+
+    let mut hasher = match (&opts.keyed, &opts.derive_key) {
+        (Some(key), _) if key.len() == 32 => Hasher::new_keyed(&key[..].try_into().unwrap()),
+        (_, Some(context)) if !context.is_empty() => Hasher::new_derive_key(context),
+        (Some(_), _) => return Err(JsValue::from_str("Key must be 32 bytes")),
+        (_, Some(_)) => return Err(JsValue::from_str("Derive key cannot be empty")),
+        _ => Hasher::new(),
     };
 
-    hasher.update(&input_bytes);
+    hasher.update(input_slice);
 
     if let Some(len) = opts.hash_length {
         if len > 1024 {
@@ -64,36 +58,33 @@ impl StreamingHasher {
     #[wasm_bindgen(constructor)]
     pub fn new(options: JsValue) -> Result<StreamingHasher, JsValue> {
         let opts: HashOptions = serde_wasm_bindgen::from_value(options)
-            .map_err(|e| JsValue::from_str(&e.to_string()))?;
+            .map_err(|e| JsValue::from_str(&format!("Invalid options: {}", e)))?;
 
-        let inner = if let Some(key_bytes) = opts.keyed.as_ref() {
-            if key_bytes.len() != 32 {
-                return Err(JsValue::from_str("Key must be 32 bytes"));
-            }
-
-            let key_array: [u8; 32] = key_bytes
-                .as_slice()
-                .try_into()
-                .map_err(|_| JsValue::from_str("Invalid key format"))?;
-
-            Hasher::new_keyed(&key_array)
-        } else if let Some(context) = opts.derive_key.as_ref() {
-            if context.is_empty() {
-                return Err(JsValue::from_str("Derive key cannot be empty"));
-            }
-
-            Hasher::new_derive_key(context)
-        } else {
-            Hasher::new()
+        let hasher = match (&opts.keyed, &opts.derive_key) {
+            (Some(key), _) if key.len() == 32 => Hasher::new_keyed(&key[..].try_into().unwrap()),
+            (_, Some(context)) if !context.is_empty() => Hasher::new_derive_key(context),
+            (Some(_), _) => return Err(JsValue::from_str("Key must be 32 bytes")),
+            (_, Some(_)) => return Err(JsValue::from_str("Derive key cannot be empty")),
+            _ => Hasher::new(),
         };
 
-        Ok(StreamingHasher { inner: Some(inner) })
+        Ok(StreamingHasher {
+            inner: Some(hasher),
+        })
     }
 
     pub fn update(&mut self, data: Uint8Array) -> Result<(), JsValue> {
         if let Some(ref mut hasher) = self.inner {
-            hasher.update(&data.to_vec());
+            let offset = data.byte_offset() as usize;
 
+            let len = data.length() as usize;
+
+            let ptr = offset as *const u8;
+
+            let slice = unsafe { std::slice::from_raw_parts(ptr, len) };
+            
+            hasher.update(slice);
+            
             Ok(())
         } else {
             Err(JsValue::from_str("Hasher has been finalized"))
@@ -101,12 +92,10 @@ impl StreamingHasher {
     }
 
     pub fn finalize(&mut self) -> Result<Box<[u8]>, JsValue> {
-        let hasher = self
-            .inner
-            .take()
-            .ok_or_else(|| JsValue::from_str("Already finalized"))?;
-
-        Ok(hasher.finalize().as_bytes().to_vec().into_boxed_slice())
+        match self.inner.take() {
+            Some(hasher) => Ok(hasher.finalize().as_bytes().to_vec().into_boxed_slice()),
+            None => Err(JsValue::from_str("Already finalized")),
+        }
     }
 
     pub fn finalize_xof(&mut self, length: usize) -> Result<Box<[u8]>, JsValue> {
@@ -114,15 +103,15 @@ impl StreamingHasher {
             return Err(JsValue::from_str("Hash length must be <= 1024"));
         }
 
-        let hasher = self
-            .inner
-            .take()
-            .ok_or_else(|| JsValue::from_str("Already finalized"))?;
+        match self.inner.take() {
+            Some(hasher) => {
+                let mut buf = vec![0u8; length];
 
-        let mut buf = vec![0u8; length];
+                hasher.finalize_xof().fill(&mut buf);
 
-        hasher.finalize_xof().fill(&mut buf);
-
-        Ok(buf.into_boxed_slice())
+                Ok(buf.into_boxed_slice())
+            }
+            None => Err(JsValue::from_str("Already finalized")),
+        }
     }
 }
