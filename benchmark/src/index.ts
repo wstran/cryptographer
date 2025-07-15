@@ -8,6 +8,7 @@ import * as sha2_wasm from '../../packages/sha/sha2_wasm';
 import * as sha3_wasm from '../../packages/sha/sha3_wasm';
 import * as whirlpool_wasm from '../../packages/sha/whirlpool_wasm';
 import * as hmac_wasm from '../../packages/hmac/hmac_wasm';
+import * as bcrypt_wasm from '../../packages/pha/bcrypt_wasm';
 import { CryptoHasher } from 'bun';
 import SHA256 from 'crypto-js/sha256';
 
@@ -358,6 +359,37 @@ function testHmacWASMHash(
   }
 }
 
+
+// Hàm benchmark Bcrypt WASM
+function benchmarkBcryptWASMHash(input: Buffer, cost = 10) {
+  try {
+    const inputArray = new Uint8Array(input);
+    const options = { cost };
+    const hashed = bcrypt_wasm.hash_password(inputArray, options);
+    if (typeof hashed !== 'string' || hashed.length < 59) { // bcrypt hash thường dài ~60 ký tự
+      throw new Error(`Bcrypt WASM hash failed: invalid hash length`);
+    }
+    return hashed; // Trả về hash để sử dụng trong benchmark verify
+  } catch (e) {
+    console.error(`benchmarkBcryptWASMHash failed: ${e}`);
+    return null;
+  }
+}
+
+function benchmarkBcryptWASMVerify(input: Buffer, hashed: string) {
+  try {
+    const inputArray = new Uint8Array(input);
+    const result = bcrypt_wasm.verify_password(inputArray, hashed);
+    if (typeof result !== 'boolean') {
+      throw new Error(`Bcrypt WASM verify failed: invalid result`);
+    }
+    return result;
+  } catch (e) {
+    console.error(`benchmarkBcryptWASMVerify failed: ${e}`);
+    return false;
+  }
+}
+
 function testHmacStreamingHash(
   key: Uint8Array,
   input: Buffer,
@@ -688,6 +720,34 @@ async function benchmark() {
     const totalTime = endTime - startTime;
     const averageTime = totalTime / iterations;
     console.log(`CRYPTOJS SHA-256 (default, 32): ${averageTime.toFixed(7)} ms`);
+  }
+
+  // Bcrypt WASM
+  {
+    const iterations = 4;
+
+    let hashedPassword;
+    const startTime = performance.now();
+    for (let i = 0; i < iterations; i++) {
+      hashedPassword = benchmarkBcryptWASMHash(inputSmall, 10);
+      console.log(`BCRYPT WASM Hash (cost=10): ${hashedPassword}`);
+      
+    }
+    const endTime = performance.now();
+    const totalTime = endTime - startTime;
+    const averageTime = totalTime / iterations;
+    console.log(`BCRYPT WASM Hash (cost=10): ${averageTime.toFixed(7)} ms`);
+
+    if (hashedPassword) {
+      const startTimeVerify = performance.now();
+      for (let i = 0; i < iterations; i++) {
+        benchmarkBcryptWASMVerify(inputSmall, hashedPassword);
+      }
+      const endTimeVerify = performance.now();
+      const totalTimeVerify = endTimeVerify - startTimeVerify;
+      const averageTimeVerify = totalTimeVerify / iterations;
+      console.log(`BCRYPT WASM Verify (cost=10): ${averageTimeVerify.toFixed(7)} ms`);
+    }
   }
 
   // HMAC benchmarks
