@@ -105,3 +105,15 @@ mkdir -p "$TARGET_DIR"
 echo "Building WASM for $CRATE_NAME..."
 cd "$SCRIPT_DIR/../crates/hmac/$CRATE_NAME"
 wasm-pack build --target nodejs --release --out-dir "$TARGET_DIR" -- --features wasm
+
+####### PHA #######
+
+# ------- BCRYPT WASM -------
+CRATE_NAME="bcrypt_wasm"
+TARGET_DIR="$SCRIPT_DIR/../packages/pha/$CRATE_NAME"
+
+mkdir -p "$TARGET_DIR"
+
+echo "Building WASM for $CRATE_NAME..."
+cd "$SCRIPT_DIR/../crates/pha/$CRATE_NAME"
+RUSTFLAGS='--cfg getrandom_backend="wasm_js"' wasm-pack build --target nodejs --release --out-dir "$TARGET_DIR" -- --features wasm
