@@ -7,6 +7,7 @@ import * as sha1_wasm from '../../packages/sha/sha1_wasm';
 import * as sha2_wasm from '../../packages/sha/sha2_wasm';
 import * as sha3_wasm from '../../packages/sha/sha3_wasm';
 import * as whirlpool_wasm from '../../packages/sha/whirlpool_wasm';
+import * as hmac_wasm from '../../packages/hmac/hmac_wasm';
 import { CryptoHasher } from 'bun';
 import SHA256 from 'crypto-js/sha256';
 
@@ -337,6 +338,54 @@ function benchmarkCryptoJsSha256(input: Buffer, expectedLen: number): boolean {
   }
 }
 
+function testHmacWASMHash(
+  key: Uint8Array,
+  input: Buffer,
+  algo: number,
+  expectedLen: number
+): boolean {
+  try {
+    const outBuf = hmac_wasm.hmac(key, input, algo);
+    if (outBuf.length !== expectedLen) {
+      throw new Error(
+        `HMAC WASM hash failed for algo ${algo}: returned len=${outBuf.length}, expected=${expectedLen}`
+      );
+    }
+    return true;
+  } catch (e) {
+    console.error(`testHmacWASMHash failed for algo ${algo}: ${e}`);
+    return false;
+  }
+}
+
+function testHmacStreamingHash(
+  key: Uint8Array,
+  input: Buffer,
+  algo: number,
+  expectedLen: number,
+  chunkSize: number
+): boolean {
+  try {
+    const hasher = new hmac_wasm.StreamingHmac(key, algo);
+    let pos = 0;
+    while (pos < input.length) {
+      const end = Math.min(pos + chunkSize, input.length);
+      hasher.update(input.subarray(pos, end));
+      pos = end;
+    }
+    const outBuf = hasher.finalize();
+    if (outBuf.length !== expectedLen) {
+      throw new Error(
+        `HMAC streaming hash failed for algo ${algo}: returned len=${outBuf.length}, expected=${expectedLen}`
+      );
+    }
+    return true;
+  } catch (e) {
+    console.error(`testHmacStreamingHash failed for algo ${algo}: ${e}`);
+    return false;
+  }
+}
+
 async function benchmark() {
   const inputSmall = Buffer.from('Hello, Bun.js!');
   const iterations = 10_000;
@@ -435,7 +484,6 @@ async function benchmark() {
   }
 
   // MD4
-
   {
     const startTime = performance.now();
     for (let i = 0; i < iterations; i++) {
@@ -519,7 +567,7 @@ async function benchmark() {
   {
     const startTime = performance.now();
     for (let i = 0; i < iterations; i++) {
-      benchmarkSHA1WASMHash(inputSmall, 20);
+      benchmarkSHA1StreamingHash(inputSmall, 20, chunkSize);
     }
     const endTime = performance.now();
     const totalTime = endTime - startTime;
@@ -640,6 +688,93 @@ async function benchmark() {
     const totalTime = endTime - startTime;
     const averageTime = totalTime / iterations;
     console.log(`CRYPTOJS SHA-256 (default, 32): ${averageTime.toFixed(7)} ms`);
+  }
+
+  // HMAC benchmarks
+  const key = new Uint8Array(32).fill(0x42);
+
+  const hashLengths: { [key: number]: number } = {
+    0: 16, // md4
+    1: 16, // md5
+    2: 20, // sha1
+    3: 28, // sha224
+    4: 32, // sha256
+    5: 48, // sha384
+    6: 64, // sha512
+    7: 28, // sha512_224
+    8: 32, // sha512_256
+    9: 28, // sha3_224
+    10: 32, // sha3_256
+    11: 48, // sha3_384
+    12: 64, // sha3_512
+    13: 20, // ripemd160
+    14: 32, // ripemd256
+    15: 40, // ripemd320
+    16: 64, // whirlpool
+  };
+
+  const algorithms = [
+    0,  // md4
+    1,  // md5
+    2,  // sha1
+    3,  // sha224
+    4,  // sha256
+    5,  // sha384
+    6,  // sha512
+    7,  // sha512_224
+    8,  // sha512_256
+    9,  // sha3_224
+    10, // sha3_256
+    11, // sha3_384
+    12, // sha3_512
+    13, // ripemd160
+    14, // ripemd256
+    15, // ripemd320
+    16, // whirlpool
+  ];
+
+  const algorithmNames = [
+    'md4',
+    'md5',
+    'sha1',
+    'sha224',
+    'sha256',
+    'sha384',
+    'sha512',
+    'sha512_224',
+    'sha512_256',
+    'sha3_224',
+    'sha3_256',
+    'sha3_384',
+    'sha3_512',
+    'ripemd160',
+    'ripemd256',
+    'ripemd320',
+    'whirlpool'
+  ];
+
+  for (const algo of algorithms) {
+    const expectedLen = hashLengths[algo] as number;
+
+    // HMAC one-shot (small input)
+    const startTime = performance.now();
+    for (let i = 0; i < iterations; i++) {
+      testHmacWASMHash(key, inputSmall, algo, expectedLen);
+    }
+    const endTime = performance.now();
+    const totalTime = endTime - startTime;
+    const averageTime = totalTime / iterations;
+    console.log(`HMAC algo ${algorithmNames[algo]} WASM (default, small): ${averageTime.toFixed(7)} ms`);
+
+    // HMAC streaming (small input)
+    const startTimeStreaming = performance.now();
+    for (let i = 0; i < iterations; i++) {
+      testHmacStreamingHash(key, inputSmall, algo, expectedLen, chunkSize);
+    }
+    const endTimeStreaming = performance.now();
+    const totalTimeStreaming = endTimeStreaming - startTimeStreaming;
+    const averageTimeStreaming = totalTimeStreaming / iterations;
+    console.log(`HMAC algo ${algorithmNames[algo]} WASM (streaming, small): ${averageTimeStreaming.toFixed(7)} ms`);
   }
 }
 
