@@ -117,3 +117,13 @@ mkdir -p "$TARGET_DIR"
 echo "Building WASM for $CRATE_NAME..."
 cd "$SCRIPT_DIR/../crates/pha/$CRATE_NAME"
 RUSTFLAGS='--cfg getrandom_backend="wasm_js"' wasm-pack build --target nodejs --release --out-dir "$TARGET_DIR" -- --features wasm
+
+# ------- ARGON2 WASM -------
+CRATE_NAME="argon2_wasm"
+TARGET_DIR="$SCRIPT_DIR/../packages/pha/$CRATE_NAME"
+
+mkdir -p "$TARGET_DIR"
+
+echo "Building WASM for $CRATE_NAME..."
+cd "$SCRIPT_DIR/../crates/pha/$CRATE_NAME"
+RUSTFLAGS='--cfg getrandom_backend="wasm_js"' wasm-pack build --target nodejs --release --out-dir "$TARGET_DIR" -- --features wasm

@@ -39,3 +39,6 @@ rm -rf "$SCRIPT_DIR/../crates/hmac/hmac_wasm/target" "$SCRIPT_DIR/../crates/hmac
 
 # clean up the build artifacts and directories of the BCRYPT WASM crate
 rm -rf "$SCRIPT_DIR/../crates/pha/bcrypt_wasm/target" "$SCRIPT_DIR/../crates/pha/bcrypt_wasm/Cargo.lock" "$SCRIPT_DIR/../packages/pha/bcrypt_wasm"
+
+# clean up the build artifacts and directories of the ARGON2 WASM crate
+rm -rf "$SCRIPT_DIR/../crates/pha/argon2_wasm/target" "$SCRIPT_DIR/../crates/pha/argon2_wasm/Cargo.lock" "$SCRIPT_DIR/../packages/pha/argon2_wasm"
