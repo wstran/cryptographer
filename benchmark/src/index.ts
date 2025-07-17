@@ -1011,6 +1011,94 @@ async function benchmark() {
     console.log(`AES Decryption correct: ${matches}`);
   }
 
+  // AES-CCM
+  {
+    const key = crypto.getRandomValues(new Uint8Array(16));
+    const plaintext = new Uint8Array(Buffer.from('Hello, AES-CCM encryption!'));
+
+    const startEncrypt = performance.now();
+    for (let i = 0; i < iterations; i++) {
+      const newNonce = crypto.getRandomValues(new Uint8Array(13));
+      aes_wasm.encrypt(plaintext, key, newNonce, aes_wasm.AesAlgorithm.Aes128Ccm);
+    }
+    const endEncrypt = performance.now();
+    const encryptTime = (endEncrypt - startEncrypt) / iterations;
+    console.log(`AES-128-CCM WASM Encrypt: ${encryptTime.toFixed(7)} ms`);
+
+    const validNonce = crypto.getRandomValues(new Uint8Array(13));
+    const ciphertext = aes_wasm.encrypt(plaintext, key, validNonce, aes_wasm.AesAlgorithm.Aes128Ccm);
+
+    const startDecrypt = performance.now();
+    for (let i = 0; i < iterations; i++) {
+      aes_wasm.decrypt(ciphertext, key, validNonce, aes_wasm.AesAlgorithm.Aes128Ccm);
+    }
+    const endDecrypt = performance.now();
+    const decryptTime = (endDecrypt - startDecrypt) / iterations;
+    console.log(`AES-128-CCM WASM Decrypt: ${decryptTime.toFixed(7)} ms`);
+
+    const decrypted = aes_wasm.decrypt(ciphertext, key, validNonce, aes_wasm.AesAlgorithm.Aes128Ccm);
+    const matches = Buffer.from(decrypted).equals(Buffer.from(plaintext));
+    console.log(`AES Decryption correct: ${matches}`);
+  }
+
+  {
+    const key = crypto.getRandomValues(new Uint8Array(24));
+    const plaintext = new Uint8Array(Buffer.from('Hello, AES-CCM encryption!'));
+
+    const startEncrypt = performance.now();
+    for (let i = 0; i < iterations; i++) {
+      const newNonce = crypto.getRandomValues(new Uint8Array(13));
+      aes_wasm.encrypt(plaintext, key, newNonce, aes_wasm.AesAlgorithm.Aes192Ccm);
+    }
+    const endEncrypt = performance.now();
+    const encryptTime = (endEncrypt - startEncrypt) / iterations;
+    console.log(`AES-192-CCM WASM Encrypt: ${encryptTime.toFixed(7)} ms`);
+
+    const validNonce = crypto.getRandomValues(new Uint8Array(13));
+    const ciphertext = aes_wasm.encrypt(plaintext, key, validNonce, aes_wasm.AesAlgorithm.Aes192Ccm);
+
+    const startDecrypt = performance.now();
+    for (let i = 0; i < iterations; i++) {
+      aes_wasm.decrypt(ciphertext, key, validNonce, aes_wasm.AesAlgorithm.Aes192Ccm);
+    }
+    const endDecrypt = performance.now();
+    const decryptTime = (endDecrypt - startDecrypt) / iterations;
+    console.log(`AES-192-CCM WASM Decrypt: ${decryptTime.toFixed(7)} ms`);
+
+    const decrypted = aes_wasm.decrypt(ciphertext, key, validNonce, aes_wasm.AesAlgorithm.Aes192Ccm);
+    const matches = Buffer.from(decrypted).equals(Buffer.from(plaintext));
+    console.log(`AES Decryption correct: ${matches}`);
+  }
+
+  {
+    const key = crypto.getRandomValues(new Uint8Array(32));
+    const plaintext = new Uint8Array(Buffer.from('Hello, AES-CCM encryption!'));
+
+    const startEncrypt = performance.now();
+    for (let i = 0; i < iterations; i++) {
+      const newNonce = crypto.getRandomValues(new Uint8Array(13));
+      aes_wasm.encrypt(plaintext, key, newNonce, aes_wasm.AesAlgorithm.Aes256Ccm);
+    }
+    const endEncrypt = performance.now();
+    const encryptTime = (endEncrypt - startEncrypt) / iterations;
+    console.log(`AES-256-CCM WASM Encrypt: ${encryptTime.toFixed(7)} ms`);
+
+    const validNonce = crypto.getRandomValues(new Uint8Array(13));
+    const ciphertext = aes_wasm.encrypt(plaintext, key, validNonce, aes_wasm.AesAlgorithm.Aes256Ccm);
+
+    const startDecrypt = performance.now();
+    for (let i = 0; i < iterations; i++) {
+      aes_wasm.decrypt(ciphertext, key, validNonce, aes_wasm.AesAlgorithm.Aes256Ccm);
+    }
+    const endDecrypt = performance.now();
+    const decryptTime = (endDecrypt - startDecrypt) / iterations;
+    console.log(`AES-256-CCM WASM Decrypt: ${decryptTime.toFixed(7)} ms`);
+
+    const decrypted = aes_wasm.decrypt(ciphertext, key, validNonce, aes_wasm.AesAlgorithm.Aes256Ccm);
+    const matches = Buffer.from(decrypted).equals(Buffer.from(plaintext));
+    console.log(`AES Decryption correct: ${matches}`);
+  }
+
   // HMAC benchmarks
   const key = new Uint8Array(32).fill(0x42);
 
