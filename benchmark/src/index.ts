@@ -843,24 +843,24 @@ async function benchmark() {
     const startEncrypt = performance.now();
     for (let i = 0; i < iterations; i++) {
       const newNonce = crypto.getRandomValues(new Uint8Array(12));
-      aes_wasm.aes_encrypt(plaintext, key, newNonce, aes_wasm.AesAlgorithm.Aes128Gcm);
+      aes_wasm.encrypt(plaintext, key, newNonce, aes_wasm.AesAlgorithm.Aes128Gcm);
     }
     const endEncrypt = performance.now();
     const encryptTime = (endEncrypt - startEncrypt) / iterations;
     console.log(`AES-128-GCM WASM Encrypt: ${encryptTime.toFixed(7)} ms`);
 
     const validNonce = crypto.getRandomValues(new Uint8Array(12));
-    const ciphertext = aes_wasm.aes_encrypt(plaintext, key, validNonce, aes_wasm.AesAlgorithm.Aes128Gcm);
+    const ciphertext = aes_wasm.encrypt(plaintext, key, validNonce, aes_wasm.AesAlgorithm.Aes128Gcm);
 
     const startDecrypt = performance.now();
     for (let i = 0; i < iterations; i++) {
-      aes_wasm.aes_decrypt(ciphertext, key, validNonce, aes_wasm.AesAlgorithm.Aes128Gcm);
+      aes_wasm.decrypt(ciphertext, key, validNonce, aes_wasm.AesAlgorithm.Aes128Gcm);
     }
     const endDecrypt = performance.now();
     const decryptTime = (endDecrypt - startDecrypt) / iterations;
     console.log(`AES-128-GCM WASM Decrypt: ${decryptTime.toFixed(7)} ms`);
 
-    const decrypted = aes_wasm.aes_decrypt(ciphertext, key, validNonce, aes_wasm.AesAlgorithm.Aes128Gcm);
+    const decrypted = aes_wasm.decrypt(ciphertext, key, validNonce, aes_wasm.AesAlgorithm.Aes128Gcm);
     const matches = Buffer.from(decrypted).equals(Buffer.from(plaintext));
     console.log(`AES Decryption correct: ${matches}`);
   }
@@ -872,24 +872,24 @@ async function benchmark() {
     const startEncrypt = performance.now();
     for (let i = 0; i < iterations; i++) {
       const newNonce = crypto.getRandomValues(new Uint8Array(12));
-      aes_wasm.aes_encrypt(plaintext, key, newNonce, aes_wasm.AesAlgorithm.Aes192Gcm);
+      aes_wasm.encrypt(plaintext, key, newNonce, aes_wasm.AesAlgorithm.Aes192Gcm);
     }
     const endEncrypt = performance.now();
     const encryptTime = (endEncrypt - startEncrypt) / iterations;
     console.log(`AES-192-GCM WASM Encrypt: ${encryptTime.toFixed(7)} ms`);
 
     const validNonce = crypto.getRandomValues(new Uint8Array(12));
-    const ciphertext = aes_wasm.aes_encrypt(plaintext, key, validNonce, aes_wasm.AesAlgorithm.Aes192Gcm);
+    const ciphertext = aes_wasm.encrypt(plaintext, key, validNonce, aes_wasm.AesAlgorithm.Aes192Gcm);
 
     const startDecrypt = performance.now();
     for (let i = 0; i < iterations; i++) {
-      aes_wasm.aes_decrypt(ciphertext, key, validNonce, aes_wasm.AesAlgorithm.Aes192Gcm);
+      aes_wasm.decrypt(ciphertext, key, validNonce, aes_wasm.AesAlgorithm.Aes192Gcm);
     }
     const endDecrypt = performance.now();
     const decryptTime = (endDecrypt - startDecrypt) / iterations;
     console.log(`AES-192-GCM WASM Decrypt: ${decryptTime.toFixed(7)} ms`);
 
-    const decrypted = aes_wasm.aes_decrypt(ciphertext, key, validNonce, aes_wasm.AesAlgorithm.Aes192Gcm);
+    const decrypted = aes_wasm.decrypt(ciphertext, key, validNonce, aes_wasm.AesAlgorithm.Aes192Gcm);
     const matches = Buffer.from(decrypted).equals(Buffer.from(plaintext));
     console.log(`AES Decryption correct: ${matches}`);
   }
@@ -901,24 +901,112 @@ async function benchmark() {
     const startEncrypt = performance.now();
     for (let i = 0; i < iterations; i++) {
       const newNonce = crypto.getRandomValues(new Uint8Array(12));
-      aes_wasm.aes_encrypt(plaintext, key, newNonce, aes_wasm.AesAlgorithm.Aes256Gcm);
+      aes_wasm.encrypt(plaintext, key, newNonce, aes_wasm.AesAlgorithm.Aes256Gcm);
     }
     const endEncrypt = performance.now();
     const encryptTime = (endEncrypt - startEncrypt) / iterations;
     console.log(`AES-256-GCM WASM Encrypt: ${encryptTime.toFixed(7)} ms`);
 
     const validNonce = crypto.getRandomValues(new Uint8Array(12));
-    const ciphertext = aes_wasm.aes_encrypt(plaintext, key, validNonce, aes_wasm.AesAlgorithm.Aes256Gcm);
+    const ciphertext = aes_wasm.encrypt(plaintext, key, validNonce, aes_wasm.AesAlgorithm.Aes256Gcm);
 
     const startDecrypt = performance.now();
     for (let i = 0; i < iterations; i++) {
-      aes_wasm.aes_decrypt(ciphertext, key, validNonce, aes_wasm.AesAlgorithm.Aes256Gcm);
+      aes_wasm.decrypt(ciphertext, key, validNonce, aes_wasm.AesAlgorithm.Aes256Gcm);
     }
     const endDecrypt = performance.now();
     const decryptTime = (endDecrypt - startDecrypt) / iterations;
     console.log(`AES-256-GCM WASM Decrypt: ${decryptTime.toFixed(7)} ms`);
 
-    const decrypted = aes_wasm.aes_decrypt(ciphertext, key, validNonce, aes_wasm.AesAlgorithm.Aes256Gcm);
+    const decrypted = aes_wasm.decrypt(ciphertext, key, validNonce, aes_wasm.AesAlgorithm.Aes256Gcm);
+    const matches = Buffer.from(decrypted).equals(Buffer.from(plaintext));
+    console.log(`AES Decryption correct: ${matches}`);
+  }
+
+  // AES-CTR
+  {
+    const key = crypto.getRandomValues(new Uint8Array(16));
+    const plaintext = new Uint8Array(Buffer.from('Hello, AES-CTR encryption!'));
+
+    const startEncrypt = performance.now();
+    for (let i = 0; i < iterations; i++) {
+      const newNonce = crypto.getRandomValues(new Uint8Array(16));
+      aes_wasm.encrypt(plaintext, key, newNonce, aes_wasm.AesAlgorithm.Aes128Ctr);
+    }
+    const endEncrypt = performance.now();
+    const encryptTime = (endEncrypt - startEncrypt) / iterations;
+    console.log(`AES-128-CTR WASM Encrypt: ${encryptTime.toFixed(7)} ms`);
+
+    const validNonce = crypto.getRandomValues(new Uint8Array(16));
+    const ciphertext = aes_wasm.encrypt(plaintext, key, validNonce, aes_wasm.AesAlgorithm.Aes128Ctr);
+
+    const startDecrypt = performance.now();
+    for (let i = 0; i < iterations; i++) {
+      aes_wasm.decrypt(ciphertext, key, validNonce, aes_wasm.AesAlgorithm.Aes128Ctr);
+    }
+    const endDecrypt = performance.now();
+    const decryptTime = (endDecrypt - startDecrypt) / iterations;
+    console.log(`AES-128-CTR WASM Decrypt: ${decryptTime.toFixed(7)} ms`);
+
+    const decrypted = aes_wasm.decrypt(ciphertext, key, validNonce, aes_wasm.AesAlgorithm.Aes128Ctr);
+    const matches = Buffer.from(decrypted).equals(Buffer.from(plaintext));
+    console.log(`AES Decryption correct: ${matches}`);
+  }
+
+  {
+    const key = crypto.getRandomValues(new Uint8Array(24));
+    const plaintext = new Uint8Array(Buffer.from('Hello, AES-CTR encryption!'));
+
+    const startEncrypt = performance.now();
+    for (let i = 0; i < iterations; i++) {
+      const newNonce = crypto.getRandomValues(new Uint8Array(16));
+      aes_wasm.encrypt(plaintext, key, newNonce, aes_wasm.AesAlgorithm.Aes192Ctr);
+    }
+    const endEncrypt = performance.now();
+    const encryptTime = (endEncrypt - startEncrypt) / iterations;
+    console.log(`AES-192-CTR WASM Encrypt: ${encryptTime.toFixed(7)} ms`);
+
+    const validNonce = crypto.getRandomValues(new Uint8Array(16));
+    const ciphertext = aes_wasm.encrypt(plaintext, key, validNonce, aes_wasm.AesAlgorithm.Aes192Ctr);
+
+    const startDecrypt = performance.now();
+    for (let i = 0; i < iterations; i++) {
+      aes_wasm.decrypt(ciphertext, key, validNonce, aes_wasm.AesAlgorithm.Aes192Ctr);
+    }
+    const endDecrypt = performance.now();
+    const decryptTime = (endDecrypt - startDecrypt) / iterations;
+    console.log(`AES-192-CTR WASM Decrypt: ${decryptTime.toFixed(7)} ms`);
+
+    const decrypted = aes_wasm.decrypt(ciphertext, key, validNonce, aes_wasm.AesAlgorithm.Aes192Ctr);
+    const matches = Buffer.from(decrypted).equals(Buffer.from(plaintext));
+    console.log(`AES Decryption correct: ${matches}`);
+  }
+
+  {
+    const key = crypto.getRandomValues(new Uint8Array(32));
+    const plaintext = new Uint8Array(Buffer.from('Hello, AES-CTR encryption!'));
+
+    const startEncrypt = performance.now();
+    for (let i = 0; i < iterations; i++) {
+      const newNonce = crypto.getRandomValues(new Uint8Array(16));
+      aes_wasm.encrypt(plaintext, key, newNonce, aes_wasm.AesAlgorithm.Aes256Ctr);
+    }
+    const endEncrypt = performance.now();
+    const encryptTime = (endEncrypt - startEncrypt) / iterations;
+    console.log(`AES-256-CTR WASM Encrypt: ${encryptTime.toFixed(7)} ms`);
+
+    const validNonce = crypto.getRandomValues(new Uint8Array(16));
+    const ciphertext = aes_wasm.encrypt(plaintext, key, validNonce, aes_wasm.AesAlgorithm.Aes256Ctr);
+
+    const startDecrypt = performance.now();
+    for (let i = 0; i < iterations; i++) {
+      aes_wasm.decrypt(ciphertext, key, validNonce, aes_wasm.AesAlgorithm.Aes256Ctr);
+    }
+    const endDecrypt = performance.now();
+    const decryptTime = (endDecrypt - startDecrypt) / iterations;
+    console.log(`AES-256-CTR WASM Decrypt: ${decryptTime.toFixed(7)} ms`);
+
+    const decrypted = aes_wasm.decrypt(ciphertext, key, validNonce, aes_wasm.AesAlgorithm.Aes256Ctr);
     const matches = Buffer.from(decrypted).equals(Buffer.from(plaintext));
     console.log(`AES Decryption correct: ${matches}`);
   }
