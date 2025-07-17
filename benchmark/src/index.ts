@@ -9,6 +9,9 @@ import * as sha3_wasm from '../../packages/sha/sha3_wasm';
 import * as whirlpool_wasm from '../../packages/sha/whirlpool_wasm';
 import * as hmac_wasm from '../../packages/hmac/hmac_wasm';
 import * as bcrypt_wasm from '../../packages/pha/bcrypt_wasm';
+import * as argon2_wasm from '../../packages/pha/argon2_wasm';
+import * as pbkdf2_wasm from '../../packages/pha/pbkdf2_wasm';
+import * as aes_wasm from '../../packages/cipher/aes_wasm';
 import { CryptoHasher } from 'bun';
 import SHA256 from 'crypto-js/sha256';
 
@@ -731,7 +734,7 @@ async function benchmark() {
     for (let i = 0; i < iterations; i++) {
       hashedPassword = benchmarkBcryptWASMHash(inputSmall, 10);
       console.log(`BCRYPT WASM Hash (cost=10): ${hashedPassword}`);
-      
+
     }
     const endTime = performance.now();
     const totalTime = endTime - startTime;
@@ -748,6 +751,118 @@ async function benchmark() {
       const averageTimeVerify = totalTimeVerify / iterations;
       console.log(`BCRYPT WASM Verify (cost=10): ${averageTimeVerify.toFixed(7)} ms`);
     }
+  }
+
+  // ARGON2 WASM
+  {
+    const iterations = 4;
+    function toHex(bytes: Uint8Array): string {
+      return Array.from(bytes)
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+    }
+
+    const salt = toHex(crypto.getRandomValues(new Uint8Array(16)));
+
+    let hashedPassword: string | null = null;
+
+    const startTime = performance.now();
+    for (let i = 0; i < iterations; i++) {
+      const options = { salt };
+      const result = argon2_wasm.hash_password(inputSmall, options);
+      if (!result || typeof result !== 'string') {
+        console.error(`ARGON2 hash failed`);
+      } else {
+        hashedPassword = result;
+      }
+    }
+    const endTime = performance.now();
+    const average = (endTime - startTime) / iterations;
+    console.log(`ARGON2 WASM hash (default): ${average.toFixed(7)} ms`);
+
+    if (hashedPassword) {
+      const startVerify = performance.now();
+      for (let i = 0; i < iterations; i++) {
+        const result = argon2_wasm.verify_password(inputSmall, hashedPassword);
+        if (typeof result !== 'boolean') {
+          console.error(`ARGON2 verify failed`);
+        }
+      }
+      const endVerify = performance.now();
+      const averageVerify = (endVerify - startVerify) / iterations;
+      console.log(`ARGON2 WASM verify: ${averageVerify.toFixed(7)} ms`);
+    }
+  }
+
+  // PBKDF2 WASM
+  {
+    const iterations = 4;
+    const salt = Buffer.from('mysalt-2025').toString('base64');
+    const rounds = 100_000;
+    const keyLength = 32;
+
+    let encodedHash: string | null = null;
+
+    const startTime = performance.now();
+    for (let i = 0; i < iterations; i++) {
+      const options = {
+        salt,
+        iterations: rounds,
+        key_length: keyLength
+      };
+      const result = pbkdf2_wasm.hash_password(inputSmall, options);
+      if (!result || typeof result !== 'string') {
+        console.error(`PBKDF2 hash failed`);
+      } else {
+        encodedHash = result;
+      }
+    }
+    const endTime = performance.now();
+    const average = (endTime - startTime) / iterations;
+    console.log(`PBKDF2 WASM hash (SHA-256, 100k): ${average.toFixed(7)} ms`);
+
+    if (encodedHash) {
+      const startVerify = performance.now();
+      for (let i = 0; i < iterations; i++) {
+        const result = pbkdf2_wasm.verify_password(inputSmall, encodedHash, salt, rounds);
+        if (typeof result !== 'boolean') {
+          console.error(`PBKDF2 verify failed`);
+        }
+      }
+      const endVerify = performance.now();
+      const averageVerify = (endVerify - startVerify) / iterations;
+      console.log(`PBKDF2 WASM verify (SHA-256, 100k): ${averageVerify.toFixed(7)} ms`);
+    }
+  }
+
+  // AES WASM
+  {
+    const key = crypto.getRandomValues(new Uint8Array(32));
+    const plaintext = new Uint8Array(Buffer.from('Hello, AES-GCM encryption!'));
+
+    const startEncrypt = performance.now();
+    for (let i = 0; i < iterations; i++) {
+      const newNonce = crypto.getRandomValues(new Uint8Array(12));
+      aes_wasm.aes_encrypt(plaintext, key, newNonce);
+    }
+    const endEncrypt = performance.now();
+    const encryptTime = (endEncrypt - startEncrypt) / iterations;
+    console.log(`AES-256-GCM WASM Encrypt: ${encryptTime.toFixed(7)} ms`);
+
+    const validNonce = crypto.getRandomValues(new Uint8Array(12));
+    const ciphertext = aes_wasm.aes_encrypt(plaintext, key, validNonce);
+
+    const startDecrypt = performance.now();
+    for (let i = 0; i < iterations; i++) {
+      aes_wasm.aes_decrypt(ciphertext, key, validNonce);
+    }
+    const endDecrypt = performance.now();
+    const decryptTime = (endDecrypt - startDecrypt) / iterations;
+    console.log(`AES-256-GCM WASM Decrypt: ${decryptTime.toFixed(7)} ms`);
+
+    const decrypted = aes_wasm.aes_decrypt(ciphertext, key, validNonce);
+    const matches = Buffer.from(decrypted).equals(Buffer.from(plaintext));
+    console.log(`AES Decryption correct: ${matches}`);
   }
 
   // HMAC benchmarks

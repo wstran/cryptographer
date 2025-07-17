@@ -45,3 +45,8 @@ rm -rf "$SCRIPT_DIR/../crates/pha/argon2_wasm/target" "$SCRIPT_DIR/../crates/pha
 
 # clean up the build artifacts and directories of the PBKDF2 WASM crate
 rm -rf "$SCRIPT_DIR/../crates/pha/pbkdf2_wasm/target" "$SCRIPT_DIR/../crates/pha/pbkdf2_wasm/Cargo.lock" "$SCRIPT_DIR/../packages/pha/pbkdf2_wasm"
+
+# ------- CIPHER WASM -------
+
+# clean up the build artifacts and directories of the AES WASM crate
+rm -rf "$SCRIPT_DIR/../crates/cipher/aes_wasm/target" "$SCRIPT_DIR/../crates/cipher/aes_wasm/Cargo.lock" "$SCRIPT_DIR/../packages/cipher/aes_wasm"
