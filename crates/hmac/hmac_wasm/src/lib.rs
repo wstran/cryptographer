@@ -12,7 +12,7 @@ use sha3::{Sha3_224, Sha3_256, Sha3_384, Sha3_512};
 use whirlpool::Whirlpool;
 
 #[wasm_bindgen]
-#[derive(Deserialize, Clone, Copy)]
+#[derive(Deserialize, Clone)]
 #[serde(rename_all = "lowercase")]
 pub enum HashAlgorithm {
     Md4,
@@ -55,13 +55,17 @@ pub fn hmac(
         HashAlgorithm::Md4 => {
             let mut mac = Hmac::<Md4>::new_from_slice(key_input_slice)
                 .map_err(|e| JsValue::from_str(&e.to_string()))?;
+
             Mac::update(&mut mac, message_input_slice);
+
             mac.finalize().into_bytes().to_vec()
         }
         HashAlgorithm::Md5 => {
             let mut mac = Hmac::<Md5>::new_from_slice(key_input_slice)
                 .map_err(|e| JsValue::from_str(&e.to_string()))?;
+
             Mac::update(&mut mac, message_input_slice);
+
             mac.finalize().into_bytes().to_vec()
         }
         HashAlgorithm::Sha1 => {
@@ -73,13 +77,17 @@ pub fn hmac(
         HashAlgorithm::Sha224 => {
             let mut mac = Hmac::<Sha224>::new_from_slice(key_input_slice)
                 .map_err(|e| JsValue::from_str(&e.to_string()))?;
+
             Mac::update(&mut mac, message_input_slice);
+
             mac.finalize().into_bytes().to_vec()
         }
         HashAlgorithm::Sha256 => {
             let mut mac = Hmac::<Sha256>::new_from_slice(key_input_slice)
                 .map_err(|e| JsValue::from_str(&e.to_string()))?;
+
             Mac::update(&mut mac, message_input_slice);
+
             mac.finalize().into_bytes().to_vec()
         }
         HashAlgorithm::Sha384 => {
@@ -91,67 +99,89 @@ pub fn hmac(
         HashAlgorithm::Sha512 => {
             let mut mac = Hmac::<Sha512>::new_from_slice(key_input_slice)
                 .map_err(|e| JsValue::from_str(&e.to_string()))?;
+
             Mac::update(&mut mac, message_input_slice);
+
             mac.finalize().into_bytes().to_vec()
         }
         HashAlgorithm::Sha512_224 => {
             let mut mac = Hmac::<Sha512_224>::new_from_slice(key_input_slice)
                 .map_err(|e| JsValue::from_str(&e.to_string()))?;
+
             Mac::update(&mut mac, message_input_slice);
+
             mac.finalize().into_bytes().to_vec()
         }
         HashAlgorithm::Sha512_256 => {
             let mut mac = Hmac::<Sha512_256>::new_from_slice(key_input_slice)
                 .map_err(|e| JsValue::from_str(&e.to_string()))?;
+
             Mac::update(&mut mac, message_input_slice);
+
             mac.finalize().into_bytes().to_vec()
         }
         HashAlgorithm::Sha3_224 => {
             let mut mac = Hmac::<Sha3_224>::new_from_slice(key_input_slice)
                 .map_err(|e| JsValue::from_str(&e.to_string()))?;
+
             Mac::update(&mut mac, message_input_slice);
+
             mac.finalize().into_bytes().to_vec()
         }
         HashAlgorithm::Sha3_256 => {
             let mut mac = Hmac::<Sha3_256>::new_from_slice(key_input_slice)
                 .map_err(|e| JsValue::from_str(&e.to_string()))?;
+
             Mac::update(&mut mac, message_input_slice);
+
             mac.finalize().into_bytes().to_vec()
         }
         HashAlgorithm::Sha3_384 => {
             let mut mac = Hmac::<Sha3_384>::new_from_slice(key_input_slice)
                 .map_err(|e| JsValue::from_str(&e.to_string()))?;
+
             Mac::update(&mut mac, message_input_slice);
+
             mac.finalize().into_bytes().to_vec()
         }
         HashAlgorithm::Sha3_512 => {
             let mut mac = Hmac::<Sha3_512>::new_from_slice(key_input_slice)
                 .map_err(|e| JsValue::from_str(&e.to_string()))?;
+
             Mac::update(&mut mac, message_input_slice);
+
             mac.finalize().into_bytes().to_vec()
         }
         HashAlgorithm::Ripemd160 => {
             let mut mac = Hmac::<Ripemd160>::new_from_slice(key_input_slice)
                 .map_err(|e| JsValue::from_str(&e.to_string()))?;
+
             Mac::update(&mut mac, message_input_slice);
+
             mac.finalize().into_bytes().to_vec()
         }
         HashAlgorithm::Ripemd256 => {
             let mut mac = Hmac::<Ripemd256>::new_from_slice(key_input_slice)
                 .map_err(|e| JsValue::from_str(&e.to_string()))?;
+
             Mac::update(&mut mac, message_input_slice);
+
             mac.finalize().into_bytes().to_vec()
         }
         HashAlgorithm::Ripemd320 => {
             let mut mac = Hmac::<Ripemd320>::new_from_slice(key_input_slice)
                 .map_err(|e| JsValue::from_str(&e.to_string()))?;
+
             Mac::update(&mut mac, message_input_slice);
+
             mac.finalize().into_bytes().to_vec()
         }
         HashAlgorithm::Whirlpool => {
             let mut mac = Hmac::<Whirlpool>::new_from_slice(key_input_slice)
                 .map_err(|e| JsValue::from_str(&e.to_string()))?;
+            
             Mac::update(&mut mac, message_input_slice);
+
             mac.finalize().into_bytes().to_vec()
         }
     };

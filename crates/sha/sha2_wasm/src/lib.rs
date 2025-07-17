@@ -90,26 +90,32 @@ impl StreamingHasher {
         match &mut self.inner {
             Some(Sha2Impl::Sha224(h)) => {
                 h.update(input_slice);
+
                 Ok(())
             }
             Some(Sha2Impl::Sha256(h)) => {
                 h.update(input_slice);
+
                 Ok(())
             }
             Some(Sha2Impl::Sha384(h)) => {
                 h.update(input_slice);
+
                 Ok(())
             }
             Some(Sha2Impl::Sha512(h)) => {
                 h.update(input_slice);
+
                 Ok(())
             }
             Some(Sha2Impl::Sha512_224(h)) => {
                 h.update(input_slice);
+
                 Ok(())
             }
             Some(Sha2Impl::Sha512_256(h)) => {
                 h.update(input_slice);
+                
                 Ok(())
             }
             None => Err(JsValue::from_str("Hasher has been finalized")),
