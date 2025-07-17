@@ -1,14 +1,19 @@
+use aes::Aes192;
 use aes_gcm::aead::{Aead, KeyInit};
-use aes_gcm::{Aes128Gcm, Aes256Gcm, Nonce};
+use aes_gcm::{Aes128Gcm, Aes256Gcm, AesGcm, Nonce};
 use js_sys::Uint8Array;
 use serde::Deserialize;
+use typenum::U12;
 use wasm_bindgen::prelude::*;
+
+type Aes192Gcm = AesGcm<Aes192, U12>;
 
 #[wasm_bindgen]
 #[derive(Deserialize, Clone)]
 #[serde(rename_all = "lowercase")]
 pub enum AesAlgorithm {
     Aes128Gcm,
+    Aes192Gcm,
     Aes256Gcm,
 }
 
@@ -36,6 +41,18 @@ pub fn aes_encrypt(
 
             let cipher = Aes128Gcm::new_from_slice(&key_bytes)
                 .map_err(|_| JsValue::from_str("Invalid key for AES-128"))?;
+
+            cipher
+                .encrypt(nonce, plaintext.to_vec().as_ref())
+                .map_err(|_| JsValue::from_str("Encryption failed"))
+        }
+        AesAlgorithm::Aes192Gcm => {
+            if key_bytes.len() != 24 {
+                return Err(JsValue::from_str("Key must be 24 bytes for AES-192"));
+            }
+
+            let cipher = Aes192Gcm::new_from_slice(&key_bytes)
+                .map_err(|_| JsValue::from_str("Invalid key for AES-192"))?;
 
             cipher
                 .encrypt(nonce, plaintext.to_vec().as_ref())
@@ -87,6 +104,18 @@ pub fn aes_decrypt(
                 .decrypt(nonce, ciphertext.to_vec().as_ref())
                 .map_err(|_| JsValue::from_str("Decryption failed"))
         }
+        AesAlgorithm::Aes192Gcm => {
+            if key_bytes.len() != 24 {
+                return Err(JsValue::from_str("Key must be 24 bytes for AES-192"));
+            }
+
+            let cipher = Aes192Gcm::new_from_slice(&key_bytes)
+                .map_err(|_| JsValue::from_str("Invalid key for AES-192"))?;
+
+            cipher
+                .decrypt(nonce, ciphertext.to_vec().as_ref())
+                .map_err(|_| JsValue::from_str("Decryption failed"))
+        }
         AesAlgorithm::Aes256Gcm => {
             if key_bytes.len() != 32 {
                 return Err(JsValue::from_str("Key must be 32 bytes for AES-256"));
@@ -94,7 +123,7 @@ pub fn aes_decrypt(
 
             let cipher = Aes256Gcm::new_from_slice(&key_bytes)
                 .map_err(|_| JsValue::from_str("Invalid key for AES-256"))?;
-            
+
             cipher
                 .decrypt(nonce, ciphertext.to_vec().as_ref())
                 .map_err(|_| JsValue::from_str("Decryption failed"))
