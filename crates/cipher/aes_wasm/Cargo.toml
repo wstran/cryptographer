@@ -10,7 +10,8 @@ crate-type = ["cdylib", "rlib"]
 typenum = "1.18.0"
 aes = "0.8.4"
 ctr = "0.9.2"
-ccm = { version = "0.5.0", default-features = false, features = ["std", "alloc"] }
+aes-siv = { version = "0.7", default-features = false, features = ["alloc"] }
+ccm = { version = "0.5.0", default-features = false, features = ["alloc"] }
 aes-gcm = { version = "0.10.3", default-features = false, features = ["aes", "alloc"] }
 wasm-bindgen = { version = "0.2.100", optional = true }
 js-sys = { version = "0.3.72", optional = true }

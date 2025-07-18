@@ -1,6 +1,7 @@
 use aes::{Aes128, Aes192, Aes256};
 use aes_gcm::aead::{Aead as GcmAead, KeyInit as GcmKeyInit};
 use aes_gcm::{Aes128Gcm, Aes256Gcm, AesGcm, Nonce as GcmNonce};
+use aes_siv::{Aes128SivAead, Aes256SivAead, Nonce as SivNonce};
 use ccm::aead::Nonce;
 use ccm::Ccm;
 use ctr::cipher::{KeyIvInit, StreamCipher};
@@ -32,6 +33,8 @@ pub enum AesAlgorithm {
     Aes128Ccm,
     Aes192Ccm,
     Aes256Ccm,
+    Aes128Siv,
+    Aes256Siv,
 }
 
 #[wasm_bindgen]
@@ -139,7 +142,7 @@ pub fn encrypt(
                 .map_err(|_| JsValue::from_str("Invalid AES-256-CTR key/IV"))?;
 
             let mut data = data;
-            
+
             cipher.apply_keystream(&mut data);
 
             Ok(Uint8Array::from(data.as_slice()))
@@ -192,6 +195,38 @@ pub fn encrypt(
 
             Ok(Uint8Array::from(encrypted.as_slice()))
         }
+        AesAlgorithm::Aes128Siv => {
+            if key.len() != 32 || nonce.len() != 16 {
+                return Err(JsValue::from_str(
+                    "AES-128-SIV: key must be 32 bytes, nonce must be 16 bytes",
+                ));
+            }
+
+            let cipher = Aes128SivAead::new_from_slice(&key)
+                .map_err(|_| JsValue::from_str("Invalid AES-128-SIV key"))?;
+
+            let encrypted = cipher
+                .encrypt(SivNonce::from_slice(&nonce), data.as_ref())
+                .map_err(|_| JsValue::from_str("SIV encryption failed"))?;
+
+            Ok(Uint8Array::from(encrypted.as_slice()))
+        }
+        AesAlgorithm::Aes256Siv => {
+            if key.len() != 64 || nonce.len() != 16 {
+                return Err(JsValue::from_str(
+                    "AES-128-SIV: key must be 64 bytes, nonce must be 16 bytes",
+                ));
+            }
+
+            let cipher = Aes256SivAead::new_from_slice(&key)
+                .map_err(|_| JsValue::from_str("Invalid AES-256-SIV key"))?;
+
+            let encrypted = cipher
+                .encrypt(SivNonce::from_slice(&nonce), data.as_ref())
+                .map_err(|_| JsValue::from_str("SIV encryption failed"))?;
+
+            Ok(Uint8Array::from(encrypted.as_slice()))
+        }
     }
 }
 
@@ -222,7 +257,7 @@ pub fn decrypt(
             let decrypted = cipher
                 .decrypt(GcmNonce::from_slice(&nonce), data.as_ref())
                 .map_err(|_| JsValue::from_str("GCM decryption failed"))?;
-            
+
             Ok(Uint8Array::from(decrypted.as_slice()))
         }
         AesAlgorithm::Aes192Gcm => {
@@ -314,7 +349,7 @@ pub fn decrypt(
 
             let cipher = Aes128Ccm::new_from_slice(&key)
                 .map_err(|_| JsValue::from_str("Invalid AES-128-CCM key"))?;
-            
+
             let decrypted = cipher
                 .decrypt(Nonce::<Aes128Ccm>::from_slice(&nonce), data.as_ref())
                 .map_err(|_| JsValue::from_str("CCM decryption failed"))?;
@@ -350,7 +385,39 @@ pub fn decrypt(
             let decrypted = cipher
                 .decrypt(Nonce::<Aes256Ccm>::from_slice(&nonce), data.as_ref())
                 .map_err(|_| JsValue::from_str("CCM decryption failed"))?;
-            
+
+            Ok(Uint8Array::from(decrypted.as_slice()))
+        }
+        AesAlgorithm::Aes128Siv => {
+            if key.len() != 32 || nonce.len() != 16 {
+                return Err(JsValue::from_str(
+                    "AES-128-SIV: key must be 32 bytes, nonce must be 16 bytes",
+                ));
+            }
+
+            let cipher = Aes128SivAead::new_from_slice(&key)
+                .map_err(|_| JsValue::from_str("Invalid AES-128-SIV key"))?;
+
+            let decrypted = cipher
+                .decrypt(SivNonce::from_slice(&nonce), data.as_ref())
+                .map_err(|_| JsValue::from_str("SIV decryption failed"))?;
+
+            Ok(Uint8Array::from(decrypted.as_slice()))
+        }
+        AesAlgorithm::Aes256Siv => {
+            if key.len() != 64 || nonce.len() != 16 {
+                return Err(JsValue::from_str(
+                    "AES-256-SIV: key must be 64 bytes, nonce must be 16 bytes",
+                ));
+            }
+
+            let cipher = Aes256SivAead::new_from_slice(&key)
+                .map_err(|_| JsValue::from_str("Invalid AES-256-SIV key"))?;
+
+            let decrypted = cipher
+                .decrypt(SivNonce::from_slice(&nonce), data.as_ref())
+                .map_err(|_| JsValue::from_str("SIV decryption failed"))?;
+
             Ok(Uint8Array::from(decrypted.as_slice()))
         }
     }
