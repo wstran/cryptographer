@@ -252,6 +252,5 @@ See [CHANGELOG.md](CHANGELOG.md) for a list of changes.
 
 ## Support
 
-- 📧 Email: support@yourdomain.com
-- 💬 Discord: [Join our community](https://discord.gg/yourinvite)
-- 📚 Documentation: [https://docs.yourdomain.com](https://docs.yourdomain.com)
+- 📧 Email: [wilsontran@ronus.io](to:wilsontran@ronus.io)
+- 📚 Documentation: [Docs](https://cryptographer.gitbook.io/docs)
