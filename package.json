@@ -1,0 +1,54 @@
+{
+  "name": "cryptographer.js",
+  "version": "1.0.0",
+  "description": "High-performance cryptographic algorithms for Node.js using WebAssembly",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "packages"
+  ],
+  "scripts": {
+    "build:wasm": "bash scripts/build.sh",
+    "build:ts": "tsc",
+    "build": "npm run build:wasm && npm run build:ts",
+    "clean": "bash scripts/clean.sh && rm -rf dist",
+    "prepublishOnly": "npm run clean && npm run build",
+    "test": "node dist/test.js",
+    "benchmark": "cd benchmark && npm run benchmark"
+  },
+  "keywords": [
+    "crypto",
+    "cryptography",
+    "wasm",
+    "webassembly",
+    "hash",
+    "cipher",
+    "hmac",
+    "sha",
+    "md5",
+    "aes",
+    "blake2",
+    "blake3",
+    "argon2",
+    "bcrypt",
+    "pbkdf2"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/cryptographer.js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/cryptographer.js/issues"
+  },
+  "homepage": "https://github.com/yourusername/cryptographer.js#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}

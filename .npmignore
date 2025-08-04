@@ -1,0 +1,47 @@
+# Source files
+src/
+crates/
+scripts/
+benchmark/
+
+# Config files
+tsconfig.json
+wasm-pack.config.js
+
+# Git
+.git/
+.gitignore
+
+# Development files
+node_modules/
+*.log
+*.lock
+.DS_Store
+
+# Build artifacts (keep only dist and packages)
+!dist/
+!packages/
+
+# Documentation source
+docs/
+
+# Test files
+test/
+tests/
+*.test.js
+*.spec.js
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary files
+tmp/
+temp/
