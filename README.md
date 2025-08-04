@@ -164,13 +164,13 @@ console.log(isValid); // true or false
 This library includes TypeScript definitions. All types are exported from the main module:
 
 ```typescript
-import crypto, { 
-  CryptoInput, 
-  HashOptions, 
+import crypto, {
+  CryptoInput,
+  HashOptions,
   CipherOptions,
   KDFOptions,
   Argon2Options,
-  BcryptOptions 
+  BcryptOptions
 } from 'cryptographer.js';
 
 // Type-safe usage
@@ -217,7 +217,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/cryptographer.js.git
+git clone https://github.com/wstran/cryptographer.js.git
 cd cryptographer.js
 
 # Install dependencies
@@ -239,7 +239,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Security
 
-If you discover a security vulnerability, please email security@yourdomain.com instead of using the issue tracker.
+If you discover a security vulnerability, please email wstran@ronus.io instead of using the issue tracker.
 
 ## Acknowledgments
 
