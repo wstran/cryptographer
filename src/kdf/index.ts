@@ -147,7 +147,7 @@ export const pbkdf2 = (function () {
 
   return function (password: CryptoInput, options: KDFOptions): string | Buffer {
     if (!wasmModule) {
-              wasmModule = require('../../wasm_packages/pha/pbkdf2_wasm');
+              wasmModule = require('../wasm_packages/pha/pbkdf2_wasm');
     }
     const pbkdf2Instance = new PBKDF2(wasmModule);
     return pbkdf2Instance.derive(password, options);
@@ -162,7 +162,7 @@ export const argon2 = (function () {
 
   return function (password: CryptoInput, options: Argon2Options): string | Buffer {
     if (!wasmModule) {
-              wasmModule = require('../../wasm_packages/pha/argon2_wasm');
+              wasmModule = require('../wasm_packages/pha/argon2_wasm');
     }
     const argon2Instance = new Argon2(wasmModule);
     return argon2Instance.derive(password, options);
@@ -179,7 +179,7 @@ export const bcrypt = (function () {
   return {
     hash(password: CryptoInput, options?: BcryptOptions): string {
       if (!wasmModule) {
-        wasmModule = require('../../wasm_packages/pha/bcrypt_wasm');
+        wasmModule = require('../wasm_packages/pha/bcrypt_wasm');
         bcryptInstance = new Bcrypt(wasmModule);
       }
       return bcryptInstance.hash(password, options);
@@ -187,7 +187,7 @@ export const bcrypt = (function () {
 
     verify(password: CryptoInput, hash: string): boolean {
       if (!wasmModule) {
-        wasmModule = require('../../wasm_packages/pha/bcrypt_wasm');
+        wasmModule = require('../wasm_packages/pha/bcrypt_wasm');
         bcryptInstance = new Bcrypt(wasmModule);
       }
       return bcryptInstance.verify(password, hash);

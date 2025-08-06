@@ -116,18 +116,18 @@ class WhirlpoolHash extends BaseHash {
 class RIPEMD160Hash extends BaseHash {
 }
 // Export hash functions
-exports.sha1 = createHashFunction('../../wasm_packages/sha/sha1_wasm', SHA1Hash);
-exports.sha256 = createHashFunction('../../wasm_packages/sha/sha2_wasm', SHA256Hash);
-exports.sha512 = createHashFunction('../../wasm_packages/sha/sha2_wasm', SHA512Hash);
-exports.sha3_256 = createHashFunction('../../wasm_packages/sha/sha3_wasm', SHA3_256Hash);
-exports.sha3_512 = createHashFunction('../../wasm_packages/sha/sha3_wasm', SHA3_512Hash);
-exports.md4 = createHashFunction('../../wasm_packages/sha/md4_wasm', MD4Hash);
-exports.md5 = createHashFunction('../../wasm_packages/sha/md5_wasm', MD5Hash);
-exports.blake2b = createHashFunction('../../wasm_packages/sha/blake2_wasm', Blake2bHash);
-exports.blake2s = createHashFunction('../../wasm_packages/sha/blake2_wasm', Blake2sHash);
-exports.blake3 = createHashFunction('../../wasm_packages/sha/blake3_wasm', Blake3Hash);
-exports.whirlpool = createHashFunction('../../wasm_packages/sha/whirlpool_wasm', WhirlpoolHash);
-exports.ripemd160 = createHashFunction('../../wasm_packages/sha/ripemd160_wasm', RIPEMD160Hash);
+exports.sha1 = createHashFunction('../wasm_packages/sha/sha1_wasm', SHA1Hash);
+exports.sha256 = createHashFunction('../wasm_packages/sha/sha2_wasm', SHA256Hash);
+exports.sha512 = createHashFunction('../wasm_packages/sha/sha2_wasm', SHA512Hash);
+exports.sha3_256 = createHashFunction('../wasm_packages/sha/sha3_wasm', SHA3_256Hash);
+exports.sha3_512 = createHashFunction('../wasm_packages/sha/sha3_wasm', SHA3_512Hash);
+exports.md4 = createHashFunction('../wasm_packages/sha/md4_wasm', MD4Hash);
+exports.md5 = createHashFunction('../wasm_packages/sha/md5_wasm', MD5Hash);
+exports.blake2b = createHashFunction('../wasm_packages/sha/blake2_wasm', Blake2bHash);
+exports.blake2s = createHashFunction('../wasm_packages/sha/blake2_wasm', Blake2sHash);
+exports.blake3 = createHashFunction('../wasm_packages/sha/blake3_wasm', Blake3Hash);
+exports.whirlpool = createHashFunction('../wasm_packages/sha/whirlpool_wasm', WhirlpoolHash);
+exports.ripemd160 = createHashFunction('../wasm_packages/sha/ripemd160_wasm', RIPEMD160Hash);
 // Export all hash functions as an object
 exports.hash = {
     sha1: exports.sha1,

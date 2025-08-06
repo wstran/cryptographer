@@ -138,7 +138,7 @@ function createCipherFunction(wasmPath) {
     };
 }
 // Export cipher functions
-exports.aes = createCipherFunction('../../wasm_packages/cipher/aes_wasm');
+exports.aes = createCipherFunction('../wasm_packages/cipher/aes_wasm');
 // Export all cipher functions as an object
 exports.cipher = {
     aes: exports.aes,

@@ -110,18 +110,18 @@ class WhirlpoolHash extends BaseHash {}
 class RIPEMD160Hash extends BaseHash {}
 
 // Export hash functions
-export const sha1 = createHashFunction('../../wasm_packages/sha/sha1_wasm', SHA1Hash);
-export const sha256 = createHashFunction('../../wasm_packages/sha/sha2_wasm', SHA256Hash);
-export const sha512 = createHashFunction('../../wasm_packages/sha/sha2_wasm', SHA512Hash);
-export const sha3_256 = createHashFunction('../../wasm_packages/sha/sha3_wasm', SHA3_256Hash);
-export const sha3_512 = createHashFunction('../../wasm_packages/sha/sha3_wasm', SHA3_512Hash);
-export const md4 = createHashFunction('../../wasm_packages/sha/md4_wasm', MD4Hash);
-export const md5 = createHashFunction('../../wasm_packages/sha/md5_wasm', MD5Hash);
-export const blake2b = createHashFunction('../../wasm_packages/sha/blake2_wasm', Blake2bHash);
-export const blake2s = createHashFunction('../../wasm_packages/sha/blake2_wasm', Blake2sHash);
-export const blake3 = createHashFunction('../../wasm_packages/sha/blake3_wasm', Blake3Hash);
-export const whirlpool = createHashFunction('../../wasm_packages/sha/whirlpool_wasm', WhirlpoolHash);
-export const ripemd160 = createHashFunction('../../wasm_packages/sha/ripemd160_wasm', RIPEMD160Hash);
+export const sha1 = createHashFunction('../wasm_packages/sha/sha1_wasm', SHA1Hash);
+export const sha256 = createHashFunction('../wasm_packages/sha/sha2_wasm', SHA256Hash);
+export const sha512 = createHashFunction('../wasm_packages/sha/sha2_wasm', SHA512Hash);
+export const sha3_256 = createHashFunction('../wasm_packages/sha/sha3_wasm', SHA3_256Hash);
+export const sha3_512 = createHashFunction('../wasm_packages/sha/sha3_wasm', SHA3_512Hash);
+export const md4 = createHashFunction('../wasm_packages/sha/md4_wasm', MD4Hash);
+export const md5 = createHashFunction('../wasm_packages/sha/md5_wasm', MD5Hash);
+export const blake2b = createHashFunction('../wasm_packages/sha/blake2_wasm', Blake2bHash);
+export const blake2s = createHashFunction('../wasm_packages/sha/blake2_wasm', Blake2sHash);
+export const blake3 = createHashFunction('../wasm_packages/sha/blake3_wasm', Blake3Hash);
+export const whirlpool = createHashFunction('../wasm_packages/sha/whirlpool_wasm', WhirlpoolHash);
+export const ripemd160 = createHashFunction('../wasm_packages/sha/ripemd160_wasm', RIPEMD160Hash);
 
 // Export all hash functions as an object
 export const hash = {

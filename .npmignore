@@ -74,5 +74,5 @@ node_modules/
 # CHANGELOG.md
 # package.json
 
-# Explicitly include packages directory
-!packages/
+# Explicitly include wasm_packages directory
+!wasm_packages/

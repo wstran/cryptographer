@@ -53,8 +53,7 @@
     "**/*.spec.ts",
     "benchmark",
     "examples",
-    "crates",
-    "wasm_packages"
+    "crates"
   ],
   "ts-node": {
     "esm": false,
