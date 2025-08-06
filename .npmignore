@@ -68,8 +68,8 @@ node_modules/
 
 # Keep these in npm package:
 # dist/
+# packages/
 # LICENSE
 # README.md
 # CHANGELOG.md
 # package.json
-# packages/ (WASM modules needed)
