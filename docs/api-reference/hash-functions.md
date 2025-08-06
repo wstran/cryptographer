@@ -1,0 +1,304 @@
+# Hash Functions
+
+cryptographer.js provides a comprehensive set of hash functions, from legacy algorithms to modern, high-performance options.
+
+## Overview
+
+Hash functions take arbitrary data and produce a fixed-size output (digest). They are used for:
+
+- Data integrity verification
+- Digital signatures
+- Password hashing (with KDF functions)
+- Checksums
+- Deduplication
+
+## Supported Algorithms
+
+| Algorithm | Output Size | Standard | Status | Use Case |
+|-----------|-------------|----------|---------|----------|
+| **SHA-256** | 256 bits | FIPS 180-4 | ✅ Recommended | General purpose, digital signatures |
+| **SHA-512** | 512 bits | FIPS 180-4 | ✅ Recommended | Higher security, digital signatures |
+| **SHA3-256** | 256 bits | FIPS 202 | ✅ Recommended | Latest standard, future-proof |
+| **SHA3-512** | 512 bits | FIPS 202 | ✅ Recommended | Latest standard, higher security |
+| **BLAKE2b** | 512 bits | RFC 7693 | ✅ Recommended | Fast, secure, general purpose |
+| **BLAKE2s** | 256 bits | RFC 7693 | ✅ Recommended | Optimized for 8-32 bit platforms |
+| **BLAKE3** | 256 bits | - | ✅ Recommended | Extremely fast, secure |
+| **SHA-1** | 160 bits | RFC 3174 | ⚠️ Legacy only | Legacy compatibility |
+| **MD5** | 128 bits | RFC 1321 | ⚠️ Legacy only | Legacy compatibility |
+| **MD4** | 128 bits | RFC 1320 | ⚠️ Legacy only | Legacy compatibility |
+| **Whirlpool** | 512 bits | ISO/IEC 10118-3 | ✅ Supported | 512-bit hash function |
+| **RIPEMD-160** | 160 bits | - | ✅ Supported | Bitcoin, cryptocurrencies |
+
+## Basic Usage
+
+### Simple Hash
+
+```javascript
+import crypto from 'cryptographer.js';
+
+// SHA-256 hash
+const hash = crypto.hash.sha256('Hello World');
+console.log(hash); // 'a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e'
+
+// SHA-512 hash
+const hash512 = crypto.hash.sha512('Hello World');
+
+// BLAKE3 hash (faster)
+const blake3Hash = crypto.hash.blake3('Hello World');
+```
+
+### Output Formats
+
+```javascript
+// Hex output (default)
+const hexHash = crypto.hash.sha256('Hello World', { outputFormat: 'hex' });
+
+// Base64 output
+const base64Hash = crypto.hash.sha256('Hello World', { outputFormat: 'base64' });
+
+// Buffer output
+const bufferHash = crypto.hash.sha256('Hello World', { outputFormat: 'buffer' });
+
+// Binary string output
+const binaryHash = crypto.hash.sha256('Hello World', { outputFormat: 'binary' });
+```
+
+### Input Types
+
+```javascript
+// String input
+const hash1 = crypto.hash.sha256('Hello World');
+
+// Buffer input
+const hash2 = crypto.hash.sha256(Buffer.from('Hello World', 'utf8'));
+
+// Uint8Array input
+const hash3 = crypto.hash.sha256(new Uint8Array([72, 101, 108, 108, 111]));
+```
+
+## Streaming API
+
+For large files or data streams, use the streaming API:
+
+```javascript
+// Create hash instance
+const hash = crypto.hash.sha256.create();
+
+// Update with data chunks
+hash.update('Hello');
+hash.update(' ');
+hash.update('World');
+
+// Get final digest
+const result = hash.digest('hex');
+console.log(result); // SHA-256 hash of 'Hello World'
+```
+
+### Streaming with Files
+
+```javascript
+import fs from 'fs';
+
+const hash = crypto.hash.sha256.create();
+const stream = fs.createReadStream('large-file.txt');
+
+stream.on('data', (chunk) => {
+  hash.update(chunk);
+});
+
+stream.on('end', () => {
+  const fileHash = hash.digest('hex');
+  console.log('File hash:', fileHash);
+});
+```
+
+## Algorithm-Specific Functions
+
+### SHA Family
+
+```javascript
+// SHA-1 (legacy)
+const sha1Hash = crypto.hash.sha1('data');
+
+// SHA-256 (recommended)
+const sha256Hash = crypto.hash.sha256('data');
+
+// SHA-512 (higher security)
+const sha512Hash = crypto.hash.sha512('data');
+
+// SHA3-256 (latest standard)
+const sha3_256Hash = crypto.hash.sha3_256('data');
+
+// SHA3-512 (latest standard, higher security)
+const sha3_512Hash = crypto.hash.sha3_512('data');
+```
+
+### BLAKE Family
+
+```javascript
+// BLAKE2b (512-bit output)
+const blake2bHash = crypto.hash.blake2b('data');
+
+// BLAKE2s (256-bit output, optimized for small platforms)
+const blake2sHash = crypto.hash.blake2s('data');
+
+// BLAKE3 (256-bit output, extremely fast)
+const blake3Hash = crypto.hash.blake3('data');
+```
+
+### Legacy Algorithms
+
+```javascript
+// MD4 (legacy, cryptographically broken)
+const md4Hash = crypto.hash.md4('data');
+
+// MD5 (legacy, cryptographically broken)
+const md5Hash = crypto.hash.md5('data');
+
+// SHA-1 (legacy, cryptographically broken)
+const sha1Hash = crypto.hash.sha1('data');
+```
+
+### Specialized Algorithms
+
+```javascript
+// Whirlpool (512-bit hash)
+const whirlpoolHash = crypto.hash.whirlpool('data');
+
+// RIPEMD-160 (160-bit hash, used in Bitcoin)
+const ripemd160Hash = crypto.hash.ripemd160('data');
+```
+
+## Performance Comparison
+
+Sample performance on M2 Max / Node 18 (higher = better):
+
+| Algorithm | ops/s | vs crypto-js | Use Case |
+|-----------|-------|--------------|----------|
+| BLAKE3 | 2.1 M | 12× faster | General purpose, speed critical |
+| BLAKE2b | 1.8 M | 10× faster | General purpose, high security |
+| SHA-256 | 1.3 M | 8× faster | Digital signatures, compatibility |
+| SHA-512 | 0.9 M | 6× faster | Higher security requirements |
+| SHA3-256 | 0.8 M | 5× faster | Latest standard, future-proof |
+
+## Security Considerations
+
+### Algorithm Selection
+
+```javascript
+// ✅ Recommended for new applications
+const hash = crypto.hash.sha256(data);     // General purpose
+const hash = crypto.hash.blake3(data);     // Speed critical
+const hash = crypto.hash.sha3_256(data);   // Future-proof
+
+// ⚠️ Use only for legacy compatibility
+const hash = crypto.hash.sha1(data);       // Cryptographically broken
+const hash = crypto.hash.md5(data);        // Cryptographically broken
+const hash = crypto.hash.md4(data);        // Cryptographically broken
+```
+
+### Salt and Pepper
+
+For password hashing, use KDF functions instead:
+
+```javascript
+// ❌ Don't use hash functions for passwords
+const passwordHash = crypto.hash.sha256(password);
+
+// ✅ Use KDF functions for passwords
+const passwordHash = crypto.kdf.argon2(password, options);
+```
+
+### Length Extension Attacks
+
+Some hash functions are vulnerable to length extension attacks:
+
+```javascript
+// SHA-256, MD5, SHA-1 are vulnerable
+const hash = crypto.hash.sha256(data);
+
+// SHA3 family is resistant
+const hash = crypto.hash.sha3_256(data);
+```
+
+## Error Handling
+
+```javascript
+try {
+  const hash = crypto.hash.sha256(data);
+} catch (error) {
+  if (error.message.includes('Invalid input')) {
+    console.error('Invalid input data');
+  } else if (error.message.includes('WebAssembly')) {
+    console.error('WebAssembly module failed to load');
+  } else {
+    console.error('Unexpected error:', error.message);
+  }
+}
+```
+
+## TypeScript Support
+
+```typescript
+import crypto, { CryptoInput, HashOptions, HashOutput } from 'cryptographer.js';
+
+// Type-safe function calls
+const hash: string = crypto.hash.sha256('data');
+const hashBuffer: Buffer = crypto.hash.sha256('data', { outputFormat: 'buffer' });
+
+// Type-safe options
+const options: HashOptions = {
+  outputFormat: 'hex' as HashOutput
+};
+
+// Type-safe input
+const input: CryptoInput = 'data' || Buffer.from('data') || new Uint8Array([1, 2, 3]);
+```
+
+## API Reference
+
+### Function Signature
+
+```typescript
+function sha256(input: CryptoInput, options?: HashOptions): string | Buffer
+```
+
+### Types
+
+```typescript
+type CryptoInput = string | Buffer | Uint8Array;
+
+type HashOutput = 'hex' | 'base64' | 'binary' | 'buffer';
+
+interface HashOptions {
+  outputFormat?: HashOutput;
+}
+```
+
+### Available Functions
+
+- `crypto.hash.sha1(input, options?)`
+- `crypto.hash.sha256(input, options?)`
+- `crypto.hash.sha512(input, options?)`
+- `crypto.hash.sha3_256(input, options?)`
+- `crypto.hash.sha3_512(input, options?)`
+- `crypto.hash.md4(input, options?)`
+- `crypto.hash.md5(input, options?)`
+- `crypto.hash.blake2b(input, options?)`
+- `crypto.hash.blake2s(input, options?)`
+- `crypto.hash.blake3(input, options?)`
+- `crypto.hash.whirlpool(input, options?)`
+- `crypto.hash.ripemd160(input, options?)`
+
+### Streaming API
+
+```typescript
+interface HashInstance {
+  update(data: CryptoInput): this;
+  digest(format?: HashOutput): string | Buffer;
+  reset(): this;
+}
+
+// Create streaming instance
+const hash: HashInstance = crypto.hash.sha256.create();
+``` 

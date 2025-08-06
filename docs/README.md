@@ -47,4 +47,4 @@ const passwordHash = crypto.kdf.argon2('p@ssw0rd');
 
 ## 📖 Navigation
 
-Use the sidebar to navigate between sections. Each section provides detailed information and examples. 
+Use the sidebar to navigate between sections. Each section provides detailed information and examples.
