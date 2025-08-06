@@ -122,7 +122,7 @@ target/
 Cargo.lock
 
 # WebAssembly build outputs
-packages/
+wasm_packages/
 *.wasm
 
 # Test artifacts

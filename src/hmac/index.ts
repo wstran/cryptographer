@@ -82,7 +82,7 @@ function createHMACFunction(algorithm: string) {
 
   return function (data: CryptoInput, options: HMACOptions): string | Buffer {
     if (!wasmModule) {
-      wasmModule = require('../../packages/hmac/hmac_wasm');
+              wasmModule = require('../../wasm_packages/hmac/hmac_wasm');
     }
 
     const hmac = new HMAC(wasmModule, options.key, algorithm);

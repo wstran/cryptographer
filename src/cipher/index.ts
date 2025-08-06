@@ -149,7 +149,7 @@ function createCipherFunction(wasmPath: string): CipherFunction {
 }
 
 // Export cipher functions
-export const aes = createCipherFunction('../../packages/cipher/aes_wasm');
+export const aes = createCipherFunction('../../wasm_packages/cipher/aes_wasm');
 
 // Export all cipher functions as an object
 export const cipher = {

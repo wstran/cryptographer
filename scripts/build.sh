@@ -1,12 +1,12 @@
 #!/bin/bash
 SCRIPT_DIR=$(dirname "$(realpath "$0")")
-mkdir -p "$SCRIPT_DIR/../packages"
+mkdir -p "$SCRIPT_DIR/../wasm_packages"
 
 ####### SHA #######
 
 # ------- BLAKE2 WASM -------
 CRATE_NAME="blake2_wasm"
-TARGET_DIR="$SCRIPT_DIR/../packages/sha/$CRATE_NAME"
+TARGET_DIR="$SCRIPT_DIR/../wasm_packages/sha/$CRATE_NAME"
 
 mkdir -p "$TARGET_DIR"
 
@@ -16,7 +16,7 @@ wasm-pack build --target nodejs --release --out-dir "$TARGET_DIR" -- --features 
 
 # ------- BLAKE3 WASM -------
 CRATE_NAME="blake3_wasm"
-TARGET_DIR="$SCRIPT_DIR/../packages/sha/$CRATE_NAME"
+TARGET_DIR="$SCRIPT_DIR/../wasm_packages/sha/$CRATE_NAME"
 
 mkdir -p "$TARGET_DIR"
 
@@ -26,7 +26,7 @@ wasm-pack build --target nodejs --release --out-dir "$TARGET_DIR" -- --features 
 
 # ------- MD4 WASM -------
 CRATE_NAME="md4_wasm"
-TARGET_DIR="$SCRIPT_DIR/../packages/sha/$CRATE_NAME"
+TARGET_DIR="$SCRIPT_DIR/../wasm_packages/sha/$CRATE_NAME"
 
 mkdir -p "$TARGET_DIR"
 
@@ -36,7 +36,7 @@ wasm-pack build --target nodejs --release --out-dir "$TARGET_DIR" -- --features 
 
 # ------- MD5 WASM -------
 CRATE_NAME="md5_wasm"
-TARGET_DIR="$SCRIPT_DIR/../packages/sha/$CRATE_NAME"
+TARGET_DIR="$SCRIPT_DIR/../wasm_packages/sha/$CRATE_NAME"
 
 mkdir -p "$TARGET_DIR"
 
@@ -46,7 +46,7 @@ wasm-pack build --target nodejs --release --out-dir "$TARGET_DIR" -- --features 
 
 # ------- RIPEMD160 WASM -------
 CRATE_NAME="ripemd160_wasm"
-TARGET_DIR="$SCRIPT_DIR/../packages/sha/$CRATE_NAME"
+TARGET_DIR="$SCRIPT_DIR/../wasm_packages/sha/$CRATE_NAME"
 
 mkdir -p "$TARGET_DIR"
 
@@ -56,7 +56,7 @@ wasm-pack build --target nodejs --release --out-dir "$TARGET_DIR" -- --features 
 
 # ------- SHA1 WASM -------
 CRATE_NAME="sha1_wasm"
-TARGET_DIR="$SCRIPT_DIR/../packages/sha/$CRATE_NAME"
+TARGET_DIR="$SCRIPT_DIR/../wasm_packages/sha/$CRATE_NAME"
 
 mkdir -p "$TARGET_DIR"
 
@@ -66,7 +66,7 @@ wasm-pack build --target nodejs --release --out-dir "$TARGET_DIR" -- --features 
 
 # ------- SHA2 WASM -------
 CRATE_NAME="sha2_wasm"
-TARGET_DIR="$SCRIPT_DIR/../packages/sha/$CRATE_NAME"
+TARGET_DIR="$SCRIPT_DIR/../wasm_packages/sha/$CRATE_NAME"
 
 mkdir -p "$TARGET_DIR"
 
@@ -76,7 +76,7 @@ wasm-pack build --target nodejs --release --out-dir "$TARGET_DIR" -- --features 
 
 # ------- SHA3 WASM -------
 CRATE_NAME="sha3_wasm"
-TARGET_DIR="$SCRIPT_DIR/../packages/sha/$CRATE_NAME"
+TARGET_DIR="$SCRIPT_DIR/../wasm_packages/sha/$CRATE_NAME"
 
 mkdir -p "$TARGET_DIR"
 
@@ -86,7 +86,7 @@ wasm-pack build --target nodejs --release --out-dir "$TARGET_DIR" -- --features 
 
 # ------- WHIRLPOOL WASM -------
 CRATE_NAME="whirlpool_wasm"
-TARGET_DIR="$SCRIPT_DIR/../packages/sha/$CRATE_NAME"
+TARGET_DIR="$SCRIPT_DIR/../wasm_packages/sha/$CRATE_NAME"
 
 mkdir -p "$TARGET_DIR"
 
@@ -98,7 +98,7 @@ wasm-pack build --target nodejs --release --out-dir "$TARGET_DIR" -- --features 
 
 # ------- HMAC WASM -------
 CRATE_NAME="hmac_wasm"
-TARGET_DIR="$SCRIPT_DIR/../packages/hmac/$CRATE_NAME"
+TARGET_DIR="$SCRIPT_DIR/../wasm_packages/hmac/$CRATE_NAME"
 
 mkdir -p "$TARGET_DIR"
 
@@ -110,7 +110,7 @@ wasm-pack build --target nodejs --release --out-dir "$TARGET_DIR" -- --features 
 
 # ------- BCRYPT WASM -------
 CRATE_NAME="bcrypt_wasm"
-TARGET_DIR="$SCRIPT_DIR/../packages/pha/$CRATE_NAME"
+TARGET_DIR="$SCRIPT_DIR/../wasm_packages/pha/$CRATE_NAME"
 
 mkdir -p "$TARGET_DIR"
 
@@ -120,7 +120,7 @@ RUSTFLAGS='--cfg getrandom_backend="wasm_js"' wasm-pack build --target nodejs --
 
 # ------- ARGON2 WASM -------
 CRATE_NAME="argon2_wasm"
-TARGET_DIR="$SCRIPT_DIR/../packages/pha/$CRATE_NAME"
+TARGET_DIR="$SCRIPT_DIR/../wasm_packages/pha/$CRATE_NAME"
 
 mkdir -p "$TARGET_DIR"
 
@@ -130,7 +130,7 @@ RUSTFLAGS='--cfg getrandom_backend="wasm_js"' wasm-pack build --target nodejs --
 
 # ------- PBKDF2 WASM -------
 CRATE_NAME="pbkdf2_wasm"
-TARGET_DIR="$SCRIPT_DIR/../packages/pha/$CRATE_NAME"
+TARGET_DIR="$SCRIPT_DIR/../wasm_packages/pha/$CRATE_NAME"
 
 mkdir -p "$TARGET_DIR"
 
@@ -142,7 +142,7 @@ wasm-pack build --target nodejs --release --out-dir "$TARGET_DIR" -- --features 
 
 # ------- AES WASM -------
 CRATE_NAME="aes_wasm"
-TARGET_DIR="$SCRIPT_DIR/../packages/cipher/$CRATE_NAME"
+TARGET_DIR="$SCRIPT_DIR/../wasm_packages/cipher/$CRATE_NAME"
 
 mkdir -p "$TARGET_DIR"
 

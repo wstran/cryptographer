@@ -31,7 +31,7 @@
    ```bash
    npm run build:wasm
    ```
-   This will compile all Rust crates to WebAssembly and place them in the `packages/` directory.
+   This will compile all Rust crates to WebAssembly and place them in the `wasm_packages/` directory.
 
 3. **Build TypeScript**
    ```bash
@@ -115,7 +115,7 @@
 
 ### Module not found errors
 - Ensure all WASM modules are built before publishing
-- Verify `packages/` directory contains all built modules
+- Verify `wasm_packages/` directory contains all built modules
 - Check that `dist/types/index.js` exists
 
 ## Version Management

@@ -84,7 +84,7 @@ module.exports = {
   ignorePatterns: [
     'dist/',
     'node_modules/',
-    'packages/',
+    'wasm_packages/',
     'crates/',
     '*.d.ts',
     '*.js',
