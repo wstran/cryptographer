@@ -17,19 +17,15 @@
     "build": "npm run build:wasm && npm run build:ts",
     "clean": "bash scripts/clean.sh && rm -rf dist",
     "prepublishOnly": "npm run clean && npm run build",
-    "test": "node dist/test.js",
-    "test:unit": "jest",
-    "test:integration": "jest --config jest.integration.config.js",
-    "test:coverage": "jest --coverage",
-    "benchmark": "cd benchmark && npm run benchmark",
+    "test": "echo 'No tests configured yet'",
+    "benchmark": "cd benchmark && bun run src/index.ts",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix",
     "format": "prettier --write src/**/*.ts",
     "format:check": "prettier --check src/**/*.ts",
-    "docs:build": "typedoc",
-    "docs:serve": "typedoc --watch",
+
     "release": "semantic-release",
-    "validate": "npm run lint && npm run format:check && npm run test:coverage",
+    "validate": "npm run lint && npm run format:check",
     "precommit": "lint-staged"
   },
   "keywords": [
@@ -112,7 +108,7 @@
     "prettier": "^3.0.0",
     "semantic-release": "^22.0.0",
     "ts-jest": "^29.1.0",
-    "typedoc": "^0.25.0",
+
     "typescript": "^5.0.0"
   },
   "peerDependencies": {

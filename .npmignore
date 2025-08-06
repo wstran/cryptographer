@@ -16,7 +16,6 @@ benchmark/
 .eslintrc.js
 .prettierrc.js
 tsconfig.json
-jest.config.js
 .releaserc.js
 
 # CI/CD files
