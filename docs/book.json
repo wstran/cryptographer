@@ -1,0 +1,30 @@
+{
+    "title": "cryptographer.js v1.0.1 Documentation",
+    "description": "High-performance cryptographic algorithms for Node.js using WebAssembly",
+    "author": "Wilson Tran",
+    "language": "en",
+    "structure": {
+        "readme": "README.md",
+        "summary": "SUMMARY.md"
+    },
+    "plugins": [
+        "highlight",
+        "search",
+        "github",
+        "theme-default",
+        "fontsettings"
+    ],
+    "pluginsConfig": {
+        "github": {
+            "url": "https://github.com/wstran/cryptographer"
+        },
+        "theme-default": {
+            "showLevel": true
+        },
+        "fontsettings": {
+            "theme": "white",
+            "family": "sans",
+            "size": 2
+        }
+    }
+}
