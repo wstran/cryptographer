@@ -1,22 +1,47 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "module": "commonjs",
     "lib": ["ES2020"],
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "strict": true,
+    "module": "CommonJS",
+    "moduleResolution": "node",
     "esModuleInterop": true,
-    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": false,
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
     "removeComments": false,
+    "importHelpers": true,
+    "downlevelIteration": true,
+    "experimentalDecorators": false,
+    "emitDecoratorMetadata": false,
+    "skipLibCheck": true,
     "resolveJsonModule": true,
-    "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true,
-    "types": ["node"]
+    "isolatedModules": true,
+    "noEmitOnError": true,
+    "preserveConstEnums": true,
+    "useDefineForClassFields": true,
+    "preserveValueImports": false,
+    "allowUnusedLabels": false,
+    "allowUnreachableCode": false,
+    "noEmitHelpers": false,
+    "newLine": "lf",
+    "stripInternal": true
   },
   "include": [
     "src/**/*"
@@ -24,8 +49,15 @@
   "exclude": [
     "node_modules",
     "dist",
-    "packages",
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "benchmark",
+    "examples",
     "crates",
-    "benchmark"
-  ]
+    "packages"
+  ],
+  "ts-node": {
+    "esm": false,
+    "experimentalSpecifierResolution": "node"
+  }
 }

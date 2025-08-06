@@ -1,0 +1,287 @@
+version: 2
+updates:
+  # Enable version updates for npm
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    assignees:
+      - "wstran"
+    commit-message:
+      prefix: "chore"
+      prefix-development: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "javascript"
+    ignore:
+      # Ignore major version updates for now
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    groups:
+      typescript:
+        patterns:
+          - "typescript"
+          - "@types/*"
+          - "ts-*"
+      eslint:
+        patterns:
+          - "eslint*"
+          - "@typescript-eslint/*"
+      jest:
+        patterns:
+          - "jest"
+          - "@types/jest"
+          - "ts-jest"
+      development:
+        dependency-type: "development"
+        exclude-patterns:
+          - "typescript"
+          - "@types/*"
+          - "eslint*"
+          - "jest"
+
+  # Enable version updates for Rust dependencies
+  - package-ecosystem: "cargo"
+    directory: "/crates/sha/blake2_wasm"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "09:00"
+    assignees:
+      - "wstran"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "rust"
+
+  - package-ecosystem: "cargo"
+    directory: "/crates/sha/blake3_wasm"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "09:00"
+    assignees:
+      - "wstran"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "rust"
+
+  - package-ecosystem: "cargo"
+    directory: "/crates/sha/md4_wasm"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "09:00"
+    assignees:
+      - "wstran"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "rust"
+
+  - package-ecosystem: "cargo"
+    directory: "/crates/sha/md5_wasm"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "09:00"
+    assignees:
+      - "wstran"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "rust"
+
+  - package-ecosystem: "cargo"
+    directory: "/crates/sha/ripemd160_wasm"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "09:00"
+    assignees:
+      - "wstran"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "rust"
+
+  - package-ecosystem: "cargo"
+    directory: "/crates/sha/sha1_wasm"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "09:00"
+    assignees:
+      - "wstran"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "rust"
+
+  - package-ecosystem: "cargo"
+    directory: "/crates/sha/sha2_wasm"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "09:00"
+    assignees:
+      - "wstran"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "rust"
+
+  - package-ecosystem: "cargo"
+    directory: "/crates/sha/sha3_wasm"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "09:00"
+    assignees:
+      - "wstran"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "rust"
+
+  - package-ecosystem: "cargo"
+    directory: "/crates/sha/whirlpool_wasm"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "09:00"
+    assignees:
+      - "wstran"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "rust"
+
+  - package-ecosystem: "cargo"
+    directory: "/crates/hmac/hmac_wasm"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "09:00"
+    assignees:
+      - "wstran"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "rust"
+
+  - package-ecosystem: "cargo"
+    directory: "/crates/pha/argon2_wasm"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "09:00"
+    assignees:
+      - "wstran"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "rust"
+
+  - package-ecosystem: "cargo"
+    directory: "/crates/pha/bcrypt_wasm"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "09:00"
+    assignees:
+      - "wstran"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "rust"
+
+  - package-ecosystem: "cargo"
+    directory: "/crates/pha/pbkdf2_wasm"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "09:00"
+    assignees:
+      - "wstran"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "rust"
+
+  - package-ecosystem: "cargo"
+    directory: "/crates/cipher/aes_wasm"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "09:00"
+    assignees:
+      - "wstran"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "rust"
+
+  - package-ecosystem: "cargo"
+    directory: "/crates/cipher/3des_wasm"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "09:00"
+    assignees:
+      - "wstran"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "rust"
+
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+      time: "09:00"
+    assignees:
+      - "wstran"
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "github-actions"

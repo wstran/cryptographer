@@ -2,46 +2,75 @@
 src/
 crates/
 scripts/
+examples/
 benchmark/
 
-# Config files
-tsconfig.json
-wasm-pack.config.js
-
-# Git
-.git/
-.gitignore
-
 # Development files
-node_modules/
-*.log
-*.lock
-.DS_Store
-
-# Build artifacts (keep only dist and packages)
-!dist/
-!packages/
-
-# Documentation source
-docs/
-
-# Test files
-test/
-tests/
-*.test.js
-*.spec.js
-
-# CI/CD
 .github/
-.gitlab-ci.yml
-.travis.yml
-
-# Editor
 .vscode/
 .idea/
 *.swp
 *.swo
 
+# Configuration files
+.eslintrc.js
+.prettierrc.js
+tsconfig.json
+jest.config.js
+.releaserc.js
+
+# CI/CD files
+.travis.yml
+.circleci/
+.gitlab-ci.yml
+
+# Documentation (keep only essential)
+API_REFERENCE.md
+CONTRIBUTING.md
+SECURITY.md
+
+# Test files
+**/*.test.ts
+**/*.test.js
+**/*.spec.ts
+**/*.spec.js
+test/
+tests/
+__tests__/
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Logs
+*.log
+logs/
+
 # Temporary files
 tmp/
 temp/
+.cache/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+*.swp
+*.swo
+*~
+
+# Environment files
+.env*
+
+# Build artifacts that shouldn't be published
+target/
+node_modules/
+
+# Keep these in npm package:
+# dist/
+# packages/
+# LICENSE
+# README.md
+# CHANGELOG.md
+# package.json
