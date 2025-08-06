@@ -217,8 +217,8 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ```bash
 # Clone the repository
-git clone https://github.com/wstran/cryptographer.js.git
-cd cryptographer.js
+git clone https://github.com/wstran/cryptographer.git
+cd cryptographer
 
 # Install dependencies
 npm install

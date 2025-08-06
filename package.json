@@ -34,16 +34,16 @@
     "bcrypt",
     "pbkdf2"
   ],
-  "author": "Your Name",
+  "author": "Wilson Tran <wilsontran@ronus.io>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/wstran/cryptographer.js.git"
+    "url": "https://github.com/wstran/cryptographer.git"
   },
   "bugs": {
-    "url": "https://github.com/wstran/cryptographer.js/issues"
+    "url": "https://github.com/wstran/cryptographer/issues"
   },
-  "homepage": "https://github.com/wstran/cryptographer.js#readme",
+  "homepage": "https://github.com/wstran/cryptographer#readme",
   "engines": {
     "node": ">=14.0.0"
   },
