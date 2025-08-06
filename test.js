@@ -1,6 +1,6 @@
 const crypto = require('cryptographer.js');
 
-console.log('🔐 Testing cryptographer.js v1.0.10');
+console.log('🔐 Testing cryptographer.js v1.0.11');
 console.log('=====================================');
 
 // Test basic imports
