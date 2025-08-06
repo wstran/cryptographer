@@ -108,6 +108,6 @@ exports.hmac = {
     sha1: exports.hmacSHA1,
     sha256: exports.hmacSHA256,
     sha512: exports.hmacSHA512,
-    md5: exports.hmacMD5
+    md5: exports.hmacMD5,
 };
 //# sourceMappingURL=index.js.map

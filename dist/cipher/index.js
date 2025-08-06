@@ -134,13 +134,13 @@ function createCipherFunction(wasmPath) {
                 cipherInstance = new AESCipher(wasmModule);
             }
             return cipherInstance.decrypt(data, options);
-        }
+        },
     };
 }
 // Export cipher functions
 exports.aes = createCipherFunction('../../packages/cipher/aes_wasm');
 // Export all cipher functions as an object
 exports.cipher = {
-    aes: exports.aes
+    aes: exports.aes,
 };
 //# sourceMappingURL=index.js.map

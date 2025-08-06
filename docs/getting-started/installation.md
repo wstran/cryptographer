@@ -53,10 +53,10 @@ import crypto from 'cryptographer.js';
 ### TypeScript
 
 ```typescript
-import crypto, { 
-  CryptoInput, 
-  HashOptions, 
-  CipherOptions 
+import crypto, {
+  CryptoInput,
+  HashOptions,
+  CipherOptions
 } from 'cryptographer.js';
 ```
 
@@ -153,4 +153,4 @@ If you encounter issues:
 
 1. Check the [GitHub Issues](https://github.com/wstran/cryptographer/issues)
 2. Review the [Security Policy](https://github.com/wstran/cryptographer/blob/main/SECURITY.md)
-3. Create a new issue with detailed information 
+3. Create a new issue with detailed information

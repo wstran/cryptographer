@@ -141,6 +141,6 @@ exports.hash = {
     blake2s: exports.blake2s,
     blake3: exports.blake3,
     whirlpool: exports.whirlpool,
-    ripemd160: exports.ripemd160
+    ripemd160: exports.ripemd160,
 };
 //# sourceMappingURL=index.js.map

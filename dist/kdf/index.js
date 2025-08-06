@@ -71,7 +71,7 @@ class Argon2 extends BaseKDF {
             memoryCost: options.memoryCost || 4096,
             parallelism: options.parallelism || 1,
             keyLength: options.keyLength || 32,
-            variant: options.variant || 'argon2id'
+            variant: options.variant || 'argon2id',
         };
         let result;
         switch (config.variant) {
@@ -156,13 +156,13 @@ exports.bcrypt = (function () {
                 bcryptInstance = new Bcrypt(wasmModule);
             }
             return bcryptInstance.verify(password, hash);
-        }
+        },
     };
 })();
 // Export all KDF functions as an object
 exports.kdf = {
     pbkdf2: exports.pbkdf2,
     argon2: exports.argon2,
-    bcrypt: exports.bcrypt
+    bcrypt: exports.bcrypt,
 };
 //# sourceMappingURL=index.js.map
