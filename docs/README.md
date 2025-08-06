@@ -1,6 +1,6 @@
 # 📚 Cryptographer.js Documentation
 
-Welcome to the **cryptographer.js v1.0.15** documentation. This guide covers everything you need to know to install, use, and contribute to the project.
+Welcome to the **cryptographer.js v1.0.16** documentation. This guide covers everything you need to know to install, use, and contribute to the project.
 
 ## 🚀 Quick Start
 
