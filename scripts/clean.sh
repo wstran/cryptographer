@@ -1,5 +1,5 @@
 SCRIPT_DIR=$(dirname "$(realpath "$0")")
-mkdir -p "$SCRIPT_DIR/../packages"
+mkdir -p "$SCRIPT_DIR/../wasm_packages"
 
 # ------- SHA WASM -------
 

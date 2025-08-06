@@ -54,7 +54,7 @@
     "benchmark",
     "examples",
     "crates",
-    "packages"
+    "wasm_packages"
   ],
   "ts-node": {
     "esm": false,
