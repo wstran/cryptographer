@@ -2,9 +2,8 @@
 
 [![npm version](https://badge.fury.io/js/cryptographer.js.svg)](https://badge.fury.io/js/cryptographer.js)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Node.js CI](https://github.com/wstran/cryptographer/workflows/Node.js%20CI/badge.svg)](https://github.com/wstran/cryptographer/actions)
-[![Security Score](https://api.securityscorecards.dev/projects/github.com/wstran/cryptographer/badge)](https://api.securityscorecards.dev/projects/github.com/wstran/cryptographer)
-[![codecov](https://codecov.io/gh/wstran/cryptographer/branch/main/graph/badge.svg)](https://codecov.io/gh/wstran/cryptographer)
+
+> 📖 **Documentation**: [cryptographer.gitbook.io](https://cryptographer.gitbook.io)
 
 🚀 **High-performance cryptographic algorithms for Node.js using WebAssembly**
 
@@ -147,7 +146,7 @@ crypto.hmac.sha512(data, { key: 'secret', outputFormat?: 'hex' })
 crypto.hmac.md5(data, { key: 'secret', outputFormat?: 'hex' })
 
 // Example
-const hmac = crypto.hmac.sha256('message', { 
+const hmac = crypto.hmac.sha256('message', {
   key: 'secret-key',
   outputFormat: 'base64'
 });
@@ -366,7 +365,7 @@ npm run validate
 - **Contributing Guide**: [CONTRIBUTING.md](CONTRIBUTING.md)
 - **Security Policy**: [SECURITY.md](SECURITY.md)
 - **Changelog**: [CHANGELOG.md](CHANGELOG.md)
-- **Online Documentation**: [https://cryptographer.gitbook.io/docs](https://cryptographer.gitbook.io/docs)
+
 
 ## 🤝 Contributing
 
