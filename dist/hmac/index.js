@@ -92,7 +92,7 @@ function createHMACFunction(algorithm) {
     let wasmModule;
     return function (data, options) {
         if (!wasmModule) {
-            wasmModule = require('../../packages/hmac/hmac_wasm');
+            wasmModule = require('../../wasm_packages/hmac/hmac_wasm');
         }
         const hmac = new HMAC(wasmModule, options.key, algorithm);
         return hmac.digest(data, options.outputFormat || 'hex');

@@ -75,7 +75,7 @@
    ```bash
    npm publish
    ```
-   
+
    Or use the automated script:
    ```bash
    npm run prepublishOnly  # This runs clean and build automatically
@@ -94,10 +94,10 @@
 2. **Test the published package**
    ```javascript
    const crypto = require('cryptographer.js');
-   
+
    // Test hash
    console.log(crypto.hash.sha256('Hello World'));
-   
+
    // Test HMAC
    console.log(crypto.hmac.sha256('data', { key: 'secret' }));
    ```

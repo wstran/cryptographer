@@ -117,7 +117,7 @@ exports.pbkdf2 = (function () {
     let wasmModule;
     return function (password, options) {
         if (!wasmModule) {
-            wasmModule = require('../../packages/pha/pbkdf2_wasm');
+            wasmModule = require('../../wasm_packages/pha/pbkdf2_wasm');
         }
         const pbkdf2Instance = new PBKDF2(wasmModule);
         return pbkdf2Instance.derive(password, options);
@@ -130,7 +130,7 @@ exports.argon2 = (function () {
     let wasmModule;
     return function (password, options) {
         if (!wasmModule) {
-            wasmModule = require('../../packages/pha/argon2_wasm');
+            wasmModule = require('../../wasm_packages/pha/argon2_wasm');
         }
         const argon2Instance = new Argon2(wasmModule);
         return argon2Instance.derive(password, options);
@@ -145,14 +145,14 @@ exports.bcrypt = (function () {
     return {
         hash(password, options) {
             if (!wasmModule) {
-                wasmModule = require('../../packages/pha/bcrypt_wasm');
+                wasmModule = require('../../wasm_packages/pha/bcrypt_wasm');
                 bcryptInstance = new Bcrypt(wasmModule);
             }
             return bcryptInstance.hash(password, options);
         },
         verify(password, hash) {
             if (!wasmModule) {
-                wasmModule = require('../../packages/pha/bcrypt_wasm');
+                wasmModule = require('../../wasm_packages/pha/bcrypt_wasm');
                 bcryptInstance = new Bcrypt(wasmModule);
             }
             return bcryptInstance.verify(password, hash);
