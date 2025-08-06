@@ -1,0 +1,11 @@
+{
+  "name": "aes_wasm",
+  "version": "0.1.0",
+  "files": [
+    "aes_wasm_bg.wasm",
+    "aes_wasm.js",
+    "aes_wasm.d.ts"
+  ],
+  "main": "aes_wasm.js",
+  "types": "aes_wasm.d.ts"
+}

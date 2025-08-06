@@ -13,7 +13,7 @@ abstract class BaseHash implements HashInstance {
 
   constructor(wasmModule: any) {
     this.wasmModule = wasmModule;
-    this.hashInstance = new wasmModule.Hasher();
+    this.hashInstance = new wasmModule.StreamingHasher({});
   }
 
   update(data: CryptoInput): this {
@@ -23,7 +23,7 @@ abstract class BaseHash implements HashInstance {
   }
 
   digest(format: HashOutput = 'hex'): string | Buffer {
-    const result = this.hashInstance.digest();
+    const result = this.hashInstance.finalize();
     return this.formatOutput(result, format);
   }
 

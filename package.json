@@ -14,7 +14,7 @@
   "scripts": {
     "build:wasm": "bash scripts/build.sh",
     "build:ts": "tsc",
-    "build": "npm run build:wasm && npm run build:ts",
+    "build": "npm run build:wasm && npm run build:ts && npm run copy:packages",
     "clean": "bash scripts/clean.sh && rm -rf dist",
     "prepublishOnly": "npm run clean && npm run build",
     "test": "echo 'No tests configured yet'",
@@ -25,7 +25,8 @@
     "format:check": "prettier --check src/**/*.ts",
     "release": "semantic-release",
     "validate": "npm run lint && npm run format:check",
-    "precommit": "lint-staged"
+    "precommit": "lint-staged",
+    "copy:packages": "cp -r packages dist/"
   },
   "keywords": [
     "crypto",

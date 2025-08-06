@@ -1,0 +1,11 @@
+{
+  "name": "hmac_wasm",
+  "version": "0.1.0",
+  "files": [
+    "hmac_wasm_bg.wasm",
+    "hmac_wasm.js",
+    "hmac_wasm.d.ts"
+  ],
+  "main": "hmac_wasm.js",
+  "types": "hmac_wasm.d.ts"
+}

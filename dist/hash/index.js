@@ -22,7 +22,7 @@ class BaseHash {
             value: void 0
         });
         this.wasmModule = wasmModule;
-        this.hashInstance = new wasmModule.Hasher();
+        this.hashInstance = new wasmModule.StreamingHasher({});
     }
     update(data) {
         const buffer = this.toBuffer(data);
@@ -30,7 +30,7 @@ class BaseHash {
         return this;
     }
     digest(format = 'hex') {
-        const result = this.hashInstance.digest();
+        const result = this.hashInstance.finalize();
         return this.formatOutput(result, format);
     }
     reset() {
