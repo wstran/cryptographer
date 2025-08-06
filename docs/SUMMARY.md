@@ -1,4 +1,4 @@
-# Summary
+# Table of contents
 
 * [Introduction](README.md)
 
@@ -28,5 +28,5 @@
 
 ## Contributing
 
-* [Contributing Guide](../CONTRIBUTING.md)
+* [Contributing Guide](contributing/contributing-guide.md)
 * [Security Policy](../SECURITY.md)
