@@ -3,7 +3,6 @@
  *
  * @module cryptographer.js
  */
-export * from './types';
 import { hash } from './hash';
 import { cipher } from './cipher';
 import { hmac } from './hmac';

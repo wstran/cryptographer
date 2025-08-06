@@ -4,8 +4,8 @@
  * @module cryptographer.js
  */
 
-// Export types
-export * from './types';
+// Export types (commented out to avoid module resolution issues)
+// export * from './types';
 
 // Import all modules
 import { hash } from './hash';
