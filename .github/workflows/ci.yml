@@ -223,14 +223,14 @@ jobs:
         run: npm pack
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: npm-package
           path: '*.tgz'
           retention-days: 7
 
       - name: Upload dist folder
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: dist
           path: dist/
