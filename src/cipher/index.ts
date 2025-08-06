@@ -28,7 +28,9 @@ abstract class BaseCipher {
 
   protected validateKeyLength(key: Uint8Array, validLengths: number[]): void {
     if (!validLengths.includes(key.length)) {
-      throw new Error(`Invalid key length. Expected ${validLengths.join(', ')} bytes, got ${key.length}`);
+      throw new Error(
+        `Invalid key length. Expected ${validLengths.join(', ')} bytes, got ${key.length}`
+      );
     }
   }
 }
@@ -40,13 +42,13 @@ class AESCipher extends BaseCipher implements CipherFunction {
   encrypt(data: CryptoInput, options: CipherOptions): Buffer {
     const dataBuffer = this.toBuffer(data);
     const keyBuffer = this.toBuffer(options.key);
-    
+
     // Validate key length (16, 24, or 32 bytes for AES-128, AES-192, AES-256)
     this.validateKeyLength(keyBuffer, [16, 24, 32]);
-    
+
     const mode = options.mode || 'CBC';
     let result: Uint8Array;
-    
+
     switch (mode) {
       case 'CBC': {
         if (!options.iv) {
@@ -74,20 +76,20 @@ class AESCipher extends BaseCipher implements CipherFunction {
       default:
         throw new Error(`Unsupported cipher mode: ${mode}`);
     }
-    
+
     return Buffer.from(result);
   }
 
   decrypt(data: CryptoInput, options: CipherOptions): Buffer {
     const dataBuffer = this.toBuffer(data);
     const keyBuffer = this.toBuffer(options.key);
-    
+
     // Validate key length
     this.validateKeyLength(keyBuffer, [16, 24, 32]);
-    
+
     const mode = options.mode || 'CBC';
     let result: Uint8Array;
-    
+
     switch (mode) {
       case 'CBC': {
         if (!options.iv) {
@@ -115,7 +117,7 @@ class AESCipher extends BaseCipher implements CipherFunction {
       default:
         throw new Error(`Unsupported cipher mode: ${mode}`);
     }
-    
+
     return Buffer.from(result);
   }
 }
@@ -142,7 +144,7 @@ function createCipherFunction(wasmPath: string): CipherFunction {
         cipherInstance = new AESCipher(wasmModule);
       }
       return cipherInstance.decrypt(data, options);
-    }
+    },
   };
 }
 
@@ -151,5 +153,5 @@ export const aes = createCipherFunction('../../packages/cipher/aes_wasm');
 
 // Export all cipher functions as an object
 export const cipher = {
-  aes
+  aes,
 };

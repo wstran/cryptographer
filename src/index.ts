@@ -1,6 +1,6 @@
 /**
  * cryptographer.js - High-performance cryptographic algorithms for Node.js using WebAssembly
- * 
+ *
  * @module cryptographer.js
  */
 

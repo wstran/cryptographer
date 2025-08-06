@@ -23,7 +23,7 @@ class HMAC {
    */
   digest(data: CryptoInput, format: HashOutput = 'hex'): string | Buffer {
     const dataBuffer = this.toBuffer(data);
-    
+
     // Call the appropriate WASM function based on algorithm
     let result: Uint8Array;
     switch (this.algorithm) {
@@ -42,7 +42,7 @@ class HMAC {
       default:
         throw new Error(`Unsupported HMAC algorithm: ${this.algorithm}`);
     }
-    
+
     return this.formatOutput(result, format);
   }
 
@@ -80,11 +80,11 @@ class HMAC {
 function createHMACFunction(algorithm: string) {
   let wasmModule: any;
 
-  return function(data: CryptoInput, options: HMACOptions): string | Buffer {
+  return function (data: CryptoInput, options: HMACOptions): string | Buffer {
     if (!wasmModule) {
       wasmModule = require('../../packages/hmac/hmac_wasm');
     }
-    
+
     const hmac = new HMAC(wasmModule, options.key, algorithm);
     return hmac.digest(data, options.outputFormat || 'hex');
   };
@@ -101,5 +101,5 @@ export const hmac = {
   sha1: hmacSHA1,
   sha256: hmacSHA256,
   sha512: hmacSHA512,
-  md5: hmacMD5
+  md5: hmacMD5,
 };

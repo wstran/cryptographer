@@ -1,6 +1,6 @@
 /**
  * Validation utilities for cryptographer.js
- * 
+ *
  * This module provides input validation and error handling utilities
  * to ensure secure and reliable cryptographic operations.
  */
@@ -11,7 +11,10 @@ import type { CryptoInput, HashOutput } from '../types';
  * Custom error classes for better error handling
  */
 export class CryptographerError extends Error {
-  constructor(message: string, public readonly code?: string) {
+  constructor(
+    message: string,
+    public readonly code?: string
+  ) {
     super(message);
     this.name = 'CryptographerError';
   }
@@ -48,7 +51,10 @@ export class InvalidParameterError extends CryptographerError {
 /**
  * Validates that input is a valid CryptoInput type
  */
-export function validateCryptoInput(input: unknown, paramName = 'input'): asserts input is CryptoInput {
+export function validateCryptoInput(
+  input: unknown,
+  paramName = 'input'
+): asserts input is CryptoInput {
   if (input === null || input === undefined) {
     throw new InvalidInputError(`${paramName} cannot be null or undefined`);
   }
@@ -75,7 +81,7 @@ export function validateCryptoInput(input: unknown, paramName = 'input'): assert
  */
 export function validateHashOutput(format: unknown): asserts format is HashOutput {
   const validFormats: HashOutput[] = ['hex', 'base64', 'binary', 'buffer'];
-  
+
   if (!validFormats.includes(format as HashOutput)) {
     throw new InvalidParameterError(
       `Invalid output format. Must be one of: ${validFormats.join(', ')}. Received: ${format}`
@@ -89,13 +95,13 @@ export function validateHashOutput(format: unknown): asserts format is HashOutpu
 export function validateAESKey(key: CryptoInput): Buffer {
   const keyBuffer = convertToBuffer(key);
   const validLengths = [16, 24, 32]; // AES-128, AES-192, AES-256
-  
+
   if (!validLengths.includes(keyBuffer.length)) {
     throw new InvalidKeyError(
       `AES key must be 16, 24, or 32 bytes long. Received: ${keyBuffer.length} bytes`
     );
   }
-  
+
   return keyBuffer;
 }
 
@@ -104,13 +110,13 @@ export function validateAESKey(key: CryptoInput): Buffer {
  */
 export function validateAESIV(iv: CryptoInput): Buffer {
   const ivBuffer = convertToBuffer(iv);
-  
+
   if (ivBuffer.length !== 16) {
     throw new InvalidParameterError(
       `AES IV must be exactly 16 bytes long. Received: ${ivBuffer.length} bytes`
     );
   }
-  
+
   return ivBuffer;
 }
 
@@ -123,16 +129,18 @@ export function validateHMACKey(key: CryptoInput): Buffer {
   }
 
   const keyBuffer = convertToBuffer(key);
-  
+
   if (keyBuffer.length === 0) {
     throw new InvalidKeyError('HMAC key cannot be empty');
   }
 
   // Warn about weak keys
   if (keyBuffer.length < 16) {
-    console.warn('Warning: HMAC key is shorter than 16 bytes. Consider using a longer key for better security.');
+    console.warn(
+      'Warning: HMAC key is shorter than 16 bytes. Consider using a longer key for better security.'
+    );
   }
-  
+
   return keyBuffer;
 }
 
@@ -163,7 +171,9 @@ export function validatePBKDF2Options(options: {
   }
 
   if (iterations < 100000) {
-    console.warn(`Warning: PBKDF2 iterations (${iterations}) is below recommended minimum of 100000`);
+    console.warn(
+      `Warning: PBKDF2 iterations (${iterations}) is below recommended minimum of 100000`
+    );
   }
 
   // Validate key length
@@ -175,7 +185,7 @@ export function validatePBKDF2Options(options: {
   return {
     salt: saltBuffer,
     iterations,
-    keyLength
+    keyLength,
   };
 }
 
@@ -212,7 +222,9 @@ export function validateArgon2Options(options: {
   // Validate memory cost
   const memoryCost = options.memoryCost ?? 4096;
   if (memoryCost < 1024 || memoryCost > 1024 * 1024) {
-    throw new InvalidParameterError('Argon2 memory cost must be between 1024 KB and 1048576 KB (1GB)');
+    throw new InvalidParameterError(
+      'Argon2 memory cost must be between 1024 KB and 1048576 KB (1GB)'
+    );
   }
 
   // Validate parallelism
@@ -242,7 +254,7 @@ export function validateArgon2Options(options: {
     memoryCost,
     parallelism,
     keyLength,
-    variant
+    variant,
   };
 }
 
@@ -252,7 +264,7 @@ export function validateArgon2Options(options: {
 export function validateBcryptRounds(rounds?: number): number {
   const defaultRounds = 10;
   const actualRounds = rounds ?? defaultRounds;
-  
+
   if (actualRounds < 4 || actualRounds > 31) {
     throw new InvalidParameterError('bcrypt rounds must be between 4 and 31');
   }
@@ -269,7 +281,7 @@ export function validateBcryptRounds(rounds?: number): number {
  */
 export function validateCipherMode(mode: unknown): asserts mode is 'CBC' | 'ECB' | 'CTR' {
   const validModes = ['CBC', 'ECB', 'CTR'];
-  
+
   if (!validModes.includes(mode as string)) {
     throw new InvalidParameterError(
       `Invalid cipher mode. Must be one of: ${validModes.join(', ')}. Received: ${mode}`
@@ -280,9 +292,11 @@ export function validateCipherMode(mode: unknown): asserts mode is 'CBC' | 'ECB'
 /**
  * Validates padding scheme
  */
-export function validatePadding(padding: unknown): asserts padding is 'PKCS7' | 'NoPadding' | 'ZeroPadding' {
+export function validatePadding(
+  padding: unknown
+): asserts padding is 'PKCS7' | 'NoPadding' | 'ZeroPadding' {
   const validPaddings = ['PKCS7', 'NoPadding', 'ZeroPadding'];
-  
+
   if (!validPaddings.includes(padding as string)) {
     throw new InvalidParameterError(
       `Invalid padding scheme. Must be one of: ${validPaddings.join(', ')}. Received: ${padding}`
@@ -295,19 +309,19 @@ export function validatePadding(padding: unknown): asserts padding is 'PKCS7' | 
  */
 export function convertToBuffer(input: CryptoInput): Buffer {
   validateCryptoInput(input);
-  
+
   if (typeof input === 'string') {
     return Buffer.from(input, 'utf8');
   }
-  
+
   if (Buffer.isBuffer(input)) {
     return input;
   }
-  
+
   if (input instanceof Uint8Array) {
     return Buffer.from(input);
   }
-  
+
   // This should never happen due to validateCryptoInput, but TypeScript doesn't know that
   throw new InvalidInputError('Unable to convert input to Buffer');
 }
@@ -322,9 +336,9 @@ export function timeSafeEqual(a: Buffer, b: Buffer): boolean {
 
   let result = 0;
   for (let i = 0; i < a.length; i++) {
-    result |= a[i] ^ b[i];
+    result |= (a[i] ?? 0) ^ (b[i] ?? 0);
   }
-  
+
   return result === 0;
 }
 
@@ -333,7 +347,7 @@ export function timeSafeEqual(a: Buffer, b: Buffer): boolean {
  */
 export function validateNotEmpty(data: CryptoInput, paramName = 'data'): void {
   validateCryptoInput(data, paramName);
-  
+
   const buffer = convertToBuffer(data);
   if (buffer.length === 0) {
     throw new InvalidInputError(`${paramName} cannot be empty`);
@@ -345,7 +359,7 @@ export function validateNotEmpty(data: CryptoInput, paramName = 'data'): void {
  */
 export class RateLimiter {
   private readonly attempts = new Map<string, { count: number; resetTime: number }>();
-  
+
   constructor(
     private readonly maxAttempts: number = 100,
     private readonly windowMs: number = 60000 // 1 minute
@@ -357,20 +371,20 @@ export class RateLimiter {
   isAllowed(identifier: string): boolean {
     const now = Date.now();
     const attempt = this.attempts.get(identifier);
-    
+
     if (!attempt || now > attempt.resetTime) {
       // Reset or create new tracking
       this.attempts.set(identifier, {
         count: 1,
-        resetTime: now + this.windowMs
+        resetTime: now + this.windowMs,
       });
       return true;
     }
-    
+
     if (attempt.count >= this.maxAttempts) {
       return false;
     }
-    
+
     attempt.count++;
     return true;
   }
@@ -415,7 +429,7 @@ export function withRateLimit<T extends unknown[], R>(
         'RATE_LIMIT_EXCEEDED'
       );
     }
-    
+
     return fn(...args);
   };
 }

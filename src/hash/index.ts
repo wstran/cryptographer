@@ -63,20 +63,23 @@ abstract class BaseHash implements HashInstance {
 /**
  * Create a hash function wrapper
  */
-function createHashFunction<T extends BaseHash>(wasmPath: string, HashClass: new(wasmModule: any) => T): HashFunction {
+function createHashFunction<T extends BaseHash>(
+  wasmPath: string,
+  HashClass: new (wasmModule: any) => T
+): HashFunction {
   let wasmModule: any;
 
-  const hashFunction = function(input: CryptoInput, options?: HashOptions): string | Buffer {
+  const hashFunction = function (input: CryptoInput, options?: HashOptions): string | Buffer {
     if (!wasmModule) {
       wasmModule = require(wasmPath);
     }
-    
+
     const hash = new HashClass(wasmModule);
     hash.update(input);
     return hash.digest(options?.outputFormat || 'hex');
   } as HashFunction;
 
-  hashFunction.create = function(): HashInstance {
+  hashFunction.create = function (): HashInstance {
     if (!wasmModule) {
       wasmModule = require(wasmPath);
     }
@@ -133,5 +136,5 @@ export const hash = {
   blake2s,
   blake3,
   whirlpool,
-  ripemd160
+  ripemd160,
 };

@@ -9,6 +9,12 @@ exports.cipher = exports.aes = void 0;
  */
 class BaseCipher {
     constructor(wasmModule) {
+        Object.defineProperty(this, "wasmModule", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
         this.wasmModule = wasmModule;
     }
     toBuffer(input) {

@@ -51,14 +51,9 @@ class PBKDF2 extends BaseKDF {
     const saltBuffer = this.toBuffer(options.salt);
     const iterations = options.iterations || 100000;
     const keyLength = options.keyLength || 32;
-    
-    const result = this.wasmModule.pbkdf2_sha256(
-      passwordBuffer,
-      saltBuffer,
-      iterations,
-      keyLength
-    );
-    
+
+    const result = this.wasmModule.pbkdf2_sha256(passwordBuffer, saltBuffer, iterations, keyLength);
+
     return this.formatOutput(result, options.outputFormat || 'hex');
   }
 }
@@ -70,15 +65,15 @@ class Argon2 extends BaseKDF {
   derive(password: CryptoInput, options: Argon2Options): string | Buffer {
     const passwordBuffer = this.toBuffer(password);
     const saltBuffer = this.toBuffer(options.salt);
-    
+
     const config = {
       timeCost: options.timeCost || 3,
       memoryCost: options.memoryCost || 4096,
       parallelism: options.parallelism || 1,
       keyLength: options.keyLength || 32,
-      variant: options.variant || 'argon2id'
+      variant: options.variant || 'argon2id',
     };
-    
+
     let result: Uint8Array;
     switch (config.variant) {
       case 'argon2i':
@@ -114,7 +109,7 @@ class Argon2 extends BaseKDF {
       default:
         throw new Error(`Unknown Argon2 variant: ${config.variant}`);
     }
-    
+
     return this.formatOutput(result, options.outputFormat || 'hex');
   }
 }
@@ -126,20 +121,20 @@ class Bcrypt extends BaseKDF {
   hash(password: CryptoInput, options?: BcryptOptions): string {
     const passwordBuffer = this.toBuffer(password);
     const rounds = options?.rounds || 10;
-    
+
     if (rounds < 4 || rounds > 31) {
       throw new Error('Bcrypt rounds must be between 4 and 31');
     }
-    
+
     // Generate salt and hash
     const result = this.wasmModule.bcrypt_hash(passwordBuffer, rounds);
     return Buffer.from(result).toString('utf8');
   }
-  
+
   verify(password: CryptoInput, hash: string): boolean {
     const passwordBuffer = this.toBuffer(password);
     const hashBuffer = Buffer.from(hash, 'utf8');
-    
+
     return this.wasmModule.bcrypt_verify(passwordBuffer, hashBuffer);
   }
 }
@@ -147,10 +142,10 @@ class Bcrypt extends BaseKDF {
 /**
  * Create PBKDF2 function
  */
-export const pbkdf2 = (function() {
+export const pbkdf2 = (function () {
   let wasmModule: any;
-  
-  return function(password: CryptoInput, options: KDFOptions): string | Buffer {
+
+  return function (password: CryptoInput, options: KDFOptions): string | Buffer {
     if (!wasmModule) {
       wasmModule = require('../../packages/pha/pbkdf2_wasm');
     }
@@ -162,10 +157,10 @@ export const pbkdf2 = (function() {
 /**
  * Create Argon2 function
  */
-export const argon2 = (function() {
+export const argon2 = (function () {
   let wasmModule: any;
-  
-  return function(password: CryptoInput, options: Argon2Options): string | Buffer {
+
+  return function (password: CryptoInput, options: Argon2Options): string | Buffer {
     if (!wasmModule) {
       wasmModule = require('../../packages/pha/argon2_wasm');
     }
@@ -177,10 +172,10 @@ export const argon2 = (function() {
 /**
  * Create Bcrypt functions
  */
-export const bcrypt = (function() {
+export const bcrypt = (function () {
   let wasmModule: any;
   let bcryptInstance: Bcrypt;
-  
+
   return {
     hash(password: CryptoInput, options?: BcryptOptions): string {
       if (!wasmModule) {
@@ -189,14 +184,14 @@ export const bcrypt = (function() {
       }
       return bcryptInstance.hash(password, options);
     },
-    
+
     verify(password: CryptoInput, hash: string): boolean {
       if (!wasmModule) {
         wasmModule = require('../../packages/pha/bcrypt_wasm');
         bcryptInstance = new Bcrypt(wasmModule);
       }
       return bcryptInstance.verify(password, hash);
-    }
+    },
   };
 })();
 
@@ -204,5 +199,5 @@ export const bcrypt = (function() {
 export const kdf = {
   pbkdf2,
   argon2,
-  bcrypt
+  bcrypt,
 };

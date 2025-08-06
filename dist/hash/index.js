@@ -9,6 +9,18 @@ exports.hash = exports.ripemd160 = exports.whirlpool = exports.blake3 = exports.
  */
 class BaseHash {
     constructor(wasmModule) {
+        Object.defineProperty(this, "wasmModule", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        Object.defineProperty(this, "hashInstance", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
         this.wasmModule = wasmModule;
         this.hashInstance = new wasmModule.Hasher();
     }

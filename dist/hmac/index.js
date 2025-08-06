@@ -9,6 +9,24 @@ exports.hmac = exports.hmacMD5 = exports.hmacSHA512 = exports.hmacSHA256 = expor
  */
 class HMAC {
     constructor(wasmModule, key, algorithm) {
+        Object.defineProperty(this, "wasmModule", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        Object.defineProperty(this, "key", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        Object.defineProperty(this, "algorithm", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
         this.wasmModule = wasmModule;
         this.key = this.toBuffer(key);
         this.algorithm = algorithm;

@@ -9,6 +9,12 @@ exports.kdf = exports.bcrypt = exports.argon2 = exports.pbkdf2 = void 0;
  */
 class BaseKDF {
     constructor(wasmModule) {
+        Object.defineProperty(this, "wasmModule", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
         this.wasmModule = wasmModule;
     }
     toBuffer(input) {
