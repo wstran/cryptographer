@@ -4,11 +4,13 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.hash = exports.ripemd160 = exports.whirlpool = exports.blake3 = exports.blake2s = exports.blake2b = exports.md5 = exports.md4 = exports.sha3_512 = exports.sha3_256 = exports.sha512 = exports.sha256 = exports.sha1 = void 0;
+const tslib_1 = require("tslib");
+const path_1 = tslib_1.__importDefault(require("path"));
 /**
  * Base class for hash algorithm wrappers
  */
 class BaseHash {
-    constructor(wasmModule) {
+    constructor(wasmModule, streamingOptions) {
         Object.defineProperty(this, "wasmModule", {
             enumerable: true,
             configurable: true,
@@ -21,8 +23,33 @@ class BaseHash {
             writable: true,
             value: void 0
         });
+        Object.defineProperty(this, "streamingOptions", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
         this.wasmModule = wasmModule;
-        this.hashInstance = new wasmModule.StreamingHasher({});
+        this.streamingOptions = streamingOptions;
+        const ctor = wasmModule.StreamingHasher ||
+            wasmModule.StreamingSha1 ||
+            wasmModule.StreamingSha2 ||
+            wasmModule.StreamingSha3 ||
+            wasmModule.StreamingMd4 ||
+            wasmModule.StreamingMd5 ||
+            wasmModule.StreamingRipemd160 ||
+            wasmModule.StreamingWhirlpool;
+        if (!ctor) {
+            throw new Error('WASM module does not export a streaming hasher');
+        }
+        // Provide default algo when module expects options (e.g., sha2_wasm)
+        try {
+            const opts = this.streamingOptions ?? { algo: 'sha256' };
+            this.hashInstance = new ctor(opts);
+        }
+        catch (_e) {
+            this.hashInstance = new ctor({});
+        }
     }
     update(data) {
         const buffer = this.toBuffer(data);
@@ -69,21 +96,25 @@ class BaseHash {
 /**
  * Create a hash function wrapper
  */
-function createHashFunction(wasmPath, HashClass) {
+function createHashFunction(wasmPathSegments, HashClass, runtimeOptions) {
     let wasmModule;
     const hashFunction = function (input, options) {
         if (!wasmModule) {
-            wasmModule = require(wasmPath);
+            const resolvedPath = path_1.default.join(__dirname, '..', ...wasmPathSegments);
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            wasmModule = require(resolvedPath);
         }
-        const hash = new HashClass(wasmModule);
+        const hash = new HashClass(wasmModule, runtimeOptions);
         hash.update(input);
         return hash.digest(options?.outputFormat || 'hex');
     };
     hashFunction.create = function () {
         if (!wasmModule) {
-            wasmModule = require(wasmPath);
+            const resolvedPath = path_1.default.join(__dirname, '..', ...wasmPathSegments);
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            wasmModule = require(resolvedPath);
         }
-        return new HashClass(wasmModule);
+        return new HashClass(wasmModule, runtimeOptions);
     };
     return hashFunction;
 }
@@ -116,18 +147,18 @@ class WhirlpoolHash extends BaseHash {
 class RIPEMD160Hash extends BaseHash {
 }
 // Export hash functions
-exports.sha1 = createHashFunction('../../packages/sha/sha1_wasm', SHA1Hash);
-exports.sha256 = createHashFunction('../../packages/sha/sha2_wasm', SHA256Hash);
-exports.sha512 = createHashFunction('../../packages/sha/sha2_wasm', SHA512Hash);
-exports.sha3_256 = createHashFunction('../../packages/sha/sha3_wasm', SHA3_256Hash);
-exports.sha3_512 = createHashFunction('../../packages/sha/sha3_wasm', SHA3_512Hash);
-exports.md4 = createHashFunction('../../packages/sha/md4_wasm', MD4Hash);
-exports.md5 = createHashFunction('../../packages/sha/md5_wasm', MD5Hash);
-exports.blake2b = createHashFunction('../../packages/sha/blake2_wasm', Blake2bHash);
-exports.blake2s = createHashFunction('../../packages/sha/blake2_wasm', Blake2sHash);
-exports.blake3 = createHashFunction('../../packages/sha/blake3_wasm', Blake3Hash);
-exports.whirlpool = createHashFunction('../../packages/sha/whirlpool_wasm', WhirlpoolHash);
-exports.ripemd160 = createHashFunction('../../packages/sha/ripemd160_wasm', RIPEMD160Hash);
+exports.sha1 = createHashFunction(['sha', 'sha1_wasm', 'sha1_wasm.js'], SHA1Hash);
+exports.sha256 = createHashFunction(['sha', 'sha2_wasm', 'sha2_wasm.js'], SHA256Hash, { algo: 'sha256' });
+exports.sha512 = createHashFunction(['sha', 'sha2_wasm', 'sha2_wasm.js'], SHA512Hash, { algo: 'sha512' });
+exports.sha3_256 = createHashFunction(['sha', 'sha3_wasm', 'sha3_wasm.js'], SHA3_256Hash, { algo: 'sha3_256' });
+exports.sha3_512 = createHashFunction(['sha', 'sha3_wasm', 'sha3_wasm.js'], SHA3_512Hash, { algo: 'sha3_512' });
+exports.md4 = createHashFunction(['sha', 'md4_wasm', 'md4_wasm.js'], MD4Hash, { algo: 'md4' });
+exports.md5 = createHashFunction(['sha', 'md5_wasm', 'md5_wasm.js'], MD5Hash, { algo: 'md5' });
+exports.blake2b = createHashFunction(['sha', 'blake2_wasm', 'blake2_wasm.js'], Blake2bHash, { algo: 'blake2b' });
+exports.blake2s = createHashFunction(['sha', 'blake2_wasm', 'blake2_wasm.js'], Blake2sHash, { algo: 'blake2s' });
+exports.blake3 = createHashFunction(['sha', 'blake3_wasm', 'blake3_wasm.js'], Blake3Hash);
+exports.whirlpool = createHashFunction(['sha', 'whirlpool_wasm', 'whirlpool_wasm.js'], WhirlpoolHash, { algo: 'whirlpool' });
+exports.ripemd160 = createHashFunction(['sha', 'ripemd160_wasm', 'ripemd160_wasm.js'], RIPEMD160Hash, { algo: 'ripemd160' });
 // Export all hash functions as an object
 exports.hash = {
     sha1: exports.sha1,

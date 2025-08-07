@@ -1,6 +1,6 @@
 {
   "name": "cryptographer.js",
-  "version": "1.0.12",
+  "version": "1.0.18",
   "description": "High-performance cryptographic algorithms for Node.js using WebAssembly",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -14,7 +14,7 @@
   "scripts": {
     "build:wasm": "bash scripts/build.sh",
     "build:ts": "tsc",
-    "build": "npm run build:wasm && npm run build:ts && npm run copy:packages",
+    "build": "npm run build:wasm && npm run build:ts && npm run copy:packages && npm run copy:dist-wasm",
     "clean": "bash scripts/clean.sh && rm -rf dist",
     "prepublishOnly": "npm run clean && npm run build",
     "test": "echo 'No tests configured yet'",
@@ -26,7 +26,8 @@
     "release": "semantic-release",
     "validate": "npm run lint && npm run format:check",
     "precommit": "lint-staged",
-    "copy:packages": "cp -r packages dist/"
+    "copy:packages": "cp -r packages dist/",
+    "copy:dist-wasm": "bash scripts/copy.sh"
   },
   "keywords": [
     "crypto",

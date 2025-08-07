@@ -33,6 +33,20 @@ export interface HMACOptions extends HashOptions {
   key: CryptoInput;
 }
 
+// Aliases to match docs naming conventions
+export type HmacOutput = HashOutput;
+export interface HmacOptions extends HashOptions {
+  key: CryptoInput;
+}
+
+export type CipherMode = 'cbc' | 'ecb' | 'ctr';
+
+export type Argon2Variant = 'id' | 'i' | 'd';
+
+export interface Pbkdf2Options extends KDFOptions {
+  hash?: 'sha1' | 'sha256' | 'sha512';
+}
+
 /**
  * Options for cipher operations
  */

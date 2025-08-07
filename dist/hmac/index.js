@@ -4,6 +4,8 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.hmac = exports.hmacMD5 = exports.hmacSHA512 = exports.hmacSHA256 = exports.hmacSHA1 = void 0;
+const tslib_1 = require("tslib");
+const path_1 = tslib_1.__importDefault(require("path"));
 /**
  * HMAC implementation
  */
@@ -38,18 +40,19 @@ class HMAC {
         const dataBuffer = this.toBuffer(data);
         // Call the appropriate WASM function based on algorithm
         let result;
+        const Algo = this.wasmModule.HashAlgorithm;
         switch (this.algorithm) {
             case 'sha1':
-                result = this.wasmModule.hmac_sha1(dataBuffer, this.key);
+                result = this.wasmModule.hmac(this.key, dataBuffer, Algo.Sha1);
                 break;
             case 'sha256':
-                result = this.wasmModule.hmac_sha256(dataBuffer, this.key);
+                result = this.wasmModule.hmac(this.key, dataBuffer, Algo.Sha256);
                 break;
             case 'sha512':
-                result = this.wasmModule.hmac_sha512(dataBuffer, this.key);
+                result = this.wasmModule.hmac(this.key, dataBuffer, Algo.Sha512);
                 break;
             case 'md5':
-                result = this.wasmModule.hmac_md5(dataBuffer, this.key);
+                result = this.wasmModule.hmac(this.key, dataBuffer, Algo.Md5);
                 break;
             default:
                 throw new Error(`Unsupported HMAC algorithm: ${this.algorithm}`);
@@ -92,7 +95,9 @@ function createHMACFunction(algorithm) {
     let wasmModule;
     return function (data, options) {
         if (!wasmModule) {
-            wasmModule = require('../../packages/hmac/hmac_wasm');
+            const resolvedPath = path_1.default.join(__dirname, '..', 'hmac', 'hmac_wasm', 'hmac_wasm.js');
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            wasmModule = require(resolvedPath);
         }
         const hmac = new HMAC(wasmModule, options.key, algorithm);
         return hmac.digest(data, options.outputFormat || 'hex');

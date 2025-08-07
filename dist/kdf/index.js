@@ -4,6 +4,8 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.kdf = exports.bcrypt = exports.argon2 = exports.pbkdf2 = void 0;
+const tslib_1 = require("tslib");
+const path_1 = tslib_1.__importDefault(require("path"));
 /**
  * Base class for KDF wrappers
  */
@@ -52,11 +54,17 @@ class BaseKDF {
 class PBKDF2 extends BaseKDF {
     derive(password, options) {
         const passwordBuffer = this.toBuffer(password);
-        const saltBuffer = this.toBuffer(options.salt);
+        // PBKDF2 wasm expects base64 with proper padding
+        const saltBase64 = Buffer.from(this.toBuffer(options.salt)).toString('base64');
         const iterations = options.iterations || 100000;
         const keyLength = options.keyLength || 32;
-        const result = this.wasmModule.pbkdf2_sha256(passwordBuffer, saltBuffer, iterations, keyLength);
-        return this.formatOutput(result, options.outputFormat || 'hex');
+        const encoded = this.wasmModule.hash_password(passwordBuffer, {
+            salt: saltBase64,
+            iterations,
+            key_length: keyLength,
+        });
+        const outBuffer = Buffer.from(encoded, 'base64');
+        return this.formatOutput(outBuffer, options.outputFormat || 'hex');
     }
 }
 /**
@@ -65,29 +73,14 @@ class PBKDF2 extends BaseKDF {
 class Argon2 extends BaseKDF {
     derive(password, options) {
         const passwordBuffer = this.toBuffer(password);
-        const saltBuffer = this.toBuffer(options.salt);
-        const config = {
-            timeCost: options.timeCost || 3,
-            memoryCost: options.memoryCost || 4096,
-            parallelism: options.parallelism || 1,
-            keyLength: options.keyLength || 32,
-            variant: options.variant || 'argon2id',
-        };
-        let result;
-        switch (config.variant) {
-            case 'argon2i':
-                result = this.wasmModule.argon2i(passwordBuffer, saltBuffer, config.timeCost, config.memoryCost, config.parallelism, config.keyLength);
-                break;
-            case 'argon2d':
-                result = this.wasmModule.argon2d(passwordBuffer, saltBuffer, config.timeCost, config.memoryCost, config.parallelism, config.keyLength);
-                break;
-            case 'argon2id':
-                result = this.wasmModule.argon2id(passwordBuffer, saltBuffer, config.timeCost, config.memoryCost, config.parallelism, config.keyLength);
-                break;
-            default:
-                throw new Error(`Unknown Argon2 variant: ${config.variant}`);
+        const saltBase64 = Buffer.from(this.toBuffer(options.salt)).toString('base64');
+        // Argon2 crate expects salt without '=' padding
+        const encoded = this.wasmModule.hash_password(passwordBuffer, { salt: saltBase64.replace(/=+$/g, '') });
+        // For Argon2, return the PHC string (utf8) by default; if buffer requested, return bytes
+        if ((options.outputFormat || 'hex') === 'buffer') {
+            return Buffer.from(encoded, 'utf8');
         }
-        return this.formatOutput(result, options.outputFormat || 'hex');
+        return encoded;
     }
 }
 /**
@@ -100,14 +93,11 @@ class Bcrypt extends BaseKDF {
         if (rounds < 4 || rounds > 31) {
             throw new Error('Bcrypt rounds must be between 4 and 31');
         }
-        // Generate salt and hash
-        const result = this.wasmModule.bcrypt_hash(passwordBuffer, rounds);
-        return Buffer.from(result).toString('utf8');
+        return this.wasmModule.hash_password(passwordBuffer, { rounds });
     }
     verify(password, hash) {
         const passwordBuffer = this.toBuffer(password);
-        const hashBuffer = Buffer.from(hash, 'utf8');
-        return this.wasmModule.bcrypt_verify(passwordBuffer, hashBuffer);
+        return this.wasmModule.verify_password(passwordBuffer, hash);
     }
 }
 /**
@@ -117,7 +107,9 @@ exports.pbkdf2 = (function () {
     let wasmModule;
     return function (password, options) {
         if (!wasmModule) {
-            wasmModule = require('../../packages/pha/pbkdf2_wasm');
+            const resolvedPath = path_1.default.join(__dirname, '..', 'pha', 'pbkdf2_wasm', 'pbkdf2_wasm.js');
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            wasmModule = require(resolvedPath);
         }
         const pbkdf2Instance = new PBKDF2(wasmModule);
         return pbkdf2Instance.derive(password, options);
@@ -130,7 +122,9 @@ exports.argon2 = (function () {
     let wasmModule;
     return function (password, options) {
         if (!wasmModule) {
-            wasmModule = require('../../packages/pha/argon2_wasm');
+            const resolvedPath = path_1.default.join(__dirname, '..', 'pha', 'argon2_wasm', 'argon2_wasm.js');
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            wasmModule = require(resolvedPath);
         }
         const argon2Instance = new Argon2(wasmModule);
         return argon2Instance.derive(password, options);
@@ -145,14 +139,18 @@ exports.bcrypt = (function () {
     return {
         hash(password, options) {
             if (!wasmModule) {
-                wasmModule = require('../../packages/pha/bcrypt_wasm');
+                const resolvedPath = path_1.default.join(__dirname, '..', 'pha', 'bcrypt_wasm', 'bcrypt_wasm.js');
+                // eslint-disable-next-line @typescript-eslint/no-var-requires
+                wasmModule = require(resolvedPath);
                 bcryptInstance = new Bcrypt(wasmModule);
             }
             return bcryptInstance.hash(password, options);
         },
         verify(password, hash) {
             if (!wasmModule) {
-                wasmModule = require('../../packages/pha/bcrypt_wasm');
+                const resolvedPath = path_1.default.join(__dirname, '..', 'pha', 'bcrypt_wasm', 'bcrypt_wasm.js');
+                // eslint-disable-next-line @typescript-eslint/no-var-requires
+                wasmModule = require(resolvedPath);
                 bcryptInstance = new Bcrypt(wasmModule);
             }
             return bcryptInstance.verify(password, hash);

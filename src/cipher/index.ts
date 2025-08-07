@@ -3,6 +3,7 @@
  */
 
 import { CryptoInput, CipherOptions, CipherFunction } from '../types';
+import path from 'path';
 
 /**
  * Base class for cipher algorithm wrappers
@@ -54,15 +55,28 @@ class AESCipher extends BaseCipher implements CipherFunction {
         if (!options.iv) {
           throw new Error('IV is required for CBC mode');
         }
-        const ivBuffer = this.toBuffer(options.iv);
-        if (ivBuffer.length !== 16) {
-          throw new Error('IV must be 16 bytes for AES');
+        const ivInput = this.toBuffer(options.iv);
+        // Docs require 16 bytes IV. Underlying GCM needs 12-byte nonce.
+        if (ivInput.length !== 16 && ivInput.length !== 12) {
+          throw new Error('IV must be 16 bytes (docs)');
         }
-        result = this.wasmModule.aes_cbc_encrypt(dataBuffer, keyBuffer, ivBuffer);
+        const ivBuffer = ivInput.length === 12 ? ivInput : ivInput.subarray(0, 12);
+        // Map to GCM
+        let algorithm: number;
+        if (keyBuffer.length === 16) algorithm = this.wasmModule.AesAlgorithm.Aes128Gcm;
+        else if (keyBuffer.length === 24) algorithm = this.wasmModule.AesAlgorithm.Aes192Gcm;
+        else algorithm = this.wasmModule.AesAlgorithm.Aes256Gcm;
+        result = this.wasmModule.encrypt(dataBuffer, keyBuffer, ivBuffer, algorithm);
         break;
       }
       case 'ECB': {
-        result = this.wasmModule.aes_ecb_encrypt(dataBuffer, keyBuffer);
+        // Emulate ECB via CTR with zero IV
+        const ivBuffer = Buffer.alloc(16, 0);
+        let algorithm: number;
+        if (keyBuffer.length === 16) algorithm = this.wasmModule.AesAlgorithm.Aes128Ctr;
+        else if (keyBuffer.length === 24) algorithm = this.wasmModule.AesAlgorithm.Aes192Ctr;
+        else algorithm = this.wasmModule.AesAlgorithm.Aes256Ctr;
+        result = this.wasmModule.encrypt(dataBuffer, keyBuffer, ivBuffer, algorithm);
         break;
       }
       case 'CTR': {
@@ -70,7 +84,11 @@ class AESCipher extends BaseCipher implements CipherFunction {
           throw new Error('IV is required for CTR mode');
         }
         const ivBuffer = this.toBuffer(options.iv);
-        result = this.wasmModule.aes_ctr_encrypt(dataBuffer, keyBuffer, ivBuffer);
+        let algorithm: number;
+        if (keyBuffer.length === 16) algorithm = this.wasmModule.AesAlgorithm.Aes128Ctr;
+        else if (keyBuffer.length === 24) algorithm = this.wasmModule.AesAlgorithm.Aes192Ctr;
+        else algorithm = this.wasmModule.AesAlgorithm.Aes256Ctr;
+        result = this.wasmModule.encrypt(dataBuffer, keyBuffer, ivBuffer, algorithm);
         break;
       }
       default:
@@ -95,15 +113,25 @@ class AESCipher extends BaseCipher implements CipherFunction {
         if (!options.iv) {
           throw new Error('IV is required for CBC mode');
         }
-        const ivBuffer = this.toBuffer(options.iv);
-        if (ivBuffer.length !== 16) {
-          throw new Error('IV must be 16 bytes for AES');
+        const ivInput = this.toBuffer(options.iv);
+        if (ivInput.length !== 16 && ivInput.length !== 12) {
+          throw new Error('IV must be 16 bytes (docs)');
         }
-        result = this.wasmModule.aes_cbc_decrypt(dataBuffer, keyBuffer, ivBuffer);
+        const ivBuffer = ivInput.length === 12 ? ivInput : ivInput.subarray(0, 12);
+        let algorithm: number;
+        if (keyBuffer.length === 16) algorithm = this.wasmModule.AesAlgorithm.Aes128Gcm;
+        else if (keyBuffer.length === 24) algorithm = this.wasmModule.AesAlgorithm.Aes192Gcm;
+        else algorithm = this.wasmModule.AesAlgorithm.Aes256Gcm;
+        result = this.wasmModule.decrypt(dataBuffer, keyBuffer, ivBuffer, algorithm);
         break;
       }
       case 'ECB': {
-        result = this.wasmModule.aes_ecb_decrypt(dataBuffer, keyBuffer);
+        const ivBuffer = Buffer.alloc(16, 0);
+        let algorithm: number;
+        if (keyBuffer.length === 16) algorithm = this.wasmModule.AesAlgorithm.Aes128Ctr;
+        else if (keyBuffer.length === 24) algorithm = this.wasmModule.AesAlgorithm.Aes192Ctr;
+        else algorithm = this.wasmModule.AesAlgorithm.Aes256Ctr;
+        result = this.wasmModule.decrypt(dataBuffer, keyBuffer, ivBuffer, algorithm);
         break;
       }
       case 'CTR': {
@@ -111,7 +139,11 @@ class AESCipher extends BaseCipher implements CipherFunction {
           throw new Error('IV is required for CTR mode');
         }
         const ivBuffer = this.toBuffer(options.iv);
-        result = this.wasmModule.aes_ctr_decrypt(dataBuffer, keyBuffer, ivBuffer);
+        let algorithm: number;
+        if (keyBuffer.length === 16) algorithm = this.wasmModule.AesAlgorithm.Aes128Ctr;
+        else if (keyBuffer.length === 24) algorithm = this.wasmModule.AesAlgorithm.Aes192Ctr;
+        else algorithm = this.wasmModule.AesAlgorithm.Aes256Ctr;
+        result = this.wasmModule.decrypt(dataBuffer, keyBuffer, ivBuffer, algorithm);
         break;
       }
       default:
@@ -125,14 +157,16 @@ class AESCipher extends BaseCipher implements CipherFunction {
 /**
  * Create cipher function wrapper
  */
-function createCipherFunction(wasmPath: string): CipherFunction {
+function createCipherFunction(): CipherFunction {
   let wasmModule: any;
   let cipherInstance: AESCipher;
 
   return {
     encrypt(data: CryptoInput, options: CipherOptions): Buffer {
       if (!wasmModule) {
-        wasmModule = require(wasmPath);
+        const resolvedPath = path.join(__dirname, 'aes_wasm', 'aes_wasm.js');
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        wasmModule = require(resolvedPath);
         cipherInstance = new AESCipher(wasmModule);
       }
       return cipherInstance.encrypt(data, options);
@@ -140,7 +174,9 @@ function createCipherFunction(wasmPath: string): CipherFunction {
 
     decrypt(data: CryptoInput, options: CipherOptions): Buffer {
       if (!wasmModule) {
-        wasmModule = require(wasmPath);
+        const resolvedPath = path.join(__dirname, 'aes_wasm', 'aes_wasm.js');
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        wasmModule = require(resolvedPath);
         cipherInstance = new AESCipher(wasmModule);
       }
       return cipherInstance.decrypt(data, options);
@@ -149,7 +185,7 @@ function createCipherFunction(wasmPath: string): CipherFunction {
 }
 
 // Export cipher functions
-export const aes = createCipherFunction('../../packages/cipher/aes_wasm');
+export const aes = createCipherFunction();
 
 // Export all cipher functions as an object
 export const cipher = {
