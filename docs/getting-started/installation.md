@@ -2,7 +2,7 @@
 
 ## Version Information
 
-This documentation covers **cryptographer.js v1.0.17**, the latest stable release with:
+This documentation covers **cryptographer.js v1.0.18**, the latest stable release with:
 
 - ✅ **Production Ready** - Fully tested and optimized
 - ✅ **TypeScript Support** - Complete type definitions
