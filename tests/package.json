@@ -1,0 +1,11 @@
+{
+  "name": "cryptographer-tests",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "test": "node run-tests.js"
+  },
+  "dependencies": {}
+}
+
+
