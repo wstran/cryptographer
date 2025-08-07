@@ -279,8 +279,8 @@ export function validateBcryptRounds(rounds?: number): number {
 /**
  * Validates cipher mode
  */
-export function validateCipherMode(mode: unknown): asserts mode is 'CBC' | 'ECB' | 'CTR' {
-  const validModes = ['CBC', 'ECB', 'CTR'];
+export function validateCipherMode(mode: unknown): asserts mode is 'cbc' | 'ecb' | 'ctr' {
+  const validModes = ['cbc', 'ecb', 'ctr'];
 
   if (!validModes.includes(mode as string)) {
     throw new InvalidParameterError(

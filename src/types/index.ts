@@ -50,7 +50,7 @@ export interface CipherOptions {
   /**
    * Cipher mode
    */
-  mode?: 'CBC' | 'ECB' | 'CTR' | 'GCM';
+  mode?: 'cbc' | 'ecb' | 'ctr' | 'gcm';
 
   /**
    * Padding scheme

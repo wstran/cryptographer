@@ -1,0 +1,52 @@
+# Source files (not needed in package)
+src/
+crates/
+scripts/
+benchmark/
+docs/
+examples/
+
+# Development files
+.gitignore
+.npmignore
+.eslintrc.js
+.prettierrc
+tsconfig.json
+jest.config.js
+
+# Build artifacts (keep dist and packages)
+!dist/
+!packages/
+
+# Test files
+test/
+tests/
+*.test.js
+*.test.ts
+*.spec.js
+*.spec.ts
+
+# Development dependencies
+node_modules/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary files
+tmp/
+temp/
+.cache/
+
+# Don't ignore WASM files
+!*.wasm
+!*.wasm.d.ts

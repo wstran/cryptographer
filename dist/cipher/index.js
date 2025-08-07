@@ -46,7 +46,7 @@ class AESCipher extends BaseCipher {
         const keyBuffer = this.toBuffer(options.key);
         // Validate key length (16, 24, or 32 bytes for AES-128, AES-192, AES-256)
         this.validateKeyLength(keyBuffer, [16, 24, 32]);
-        const mode = options.mode || 'CBC';
+        const mode = (options.mode || 'cbc').toUpperCase();
         let result;
         switch (mode) {
             case 'CBC': {
@@ -82,7 +82,7 @@ class AESCipher extends BaseCipher {
         const keyBuffer = this.toBuffer(options.key);
         // Validate key length
         this.validateKeyLength(keyBuffer, [16, 24, 32]);
-        const mode = options.mode || 'CBC';
+        const mode = (options.mode || 'cbc').toUpperCase();
         let result;
         switch (mode) {
             case 'CBC': {
