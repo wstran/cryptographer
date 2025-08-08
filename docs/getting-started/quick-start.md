@@ -69,6 +69,18 @@ const decDes = crypto.cipher.des.decrypt(encDes, { key: kdes, iv: iv8, mode: 'cb
 
 ### 4. Key Derivation Functions
 
+### 5. Public-Key & Key Exchange
+
+```javascript
+// X25519 key exchange
+const a = crypto.x25519.generateKeypair();
+const b = crypto.x25519.generateKeypair();
+const ssA = crypto.x25519.deriveSharedSecret(a.privateKey, b.publicKey);
+const ssB = crypto.x25519.deriveSharedSecret(b.privateKey, a.publicKey);
+
+// (PQC KEM removed in this build)
+```
+
 ```javascript
 // PBKDF2
 const derivedKey = crypto.kdf.pbkdf2('password', {

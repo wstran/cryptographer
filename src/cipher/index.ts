@@ -428,6 +428,85 @@ function createDESFunction(): CipherFunction {
 export const chacha20 = createChaCha20Function();
 export const des = createDESFunction();
 
+// Asymmetric/Key-exchange wrappers
+class RSAOAEP extends BaseCipher {
+  private wasm: any;
+  constructor() {
+    const p = path.join(__dirname, 'rsa_wasm', 'rsa_wasm.js');
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    super(null);
+    this.wasm = require(p);
+  }
+  encrypt(plaintext: CryptoInput, publicKeyDer: CryptoInput, options?: { hash?: 'sha1' | 'sha256' | 'sha384' | 'sha512'; label?: CryptoInput }): Buffer {
+    const data = this.toBuffer(plaintext);
+    const pk = this.toBuffer(publicKeyDer);
+    const hash = (options?.hash ?? 'sha256').toUpperCase();
+    const hashEnum = this.wasm.HashAlg[hash === 'SHA1' ? 'Sha1' : hash === 'SHA384' ? 'Sha384' : hash === 'SHA512' ? 'Sha512' : 'Sha256'];
+    const label = options?.label ? this.toBuffer(options.label) : undefined;
+    const out: Uint8Array = this.wasm.rsa_oaep_encrypt(data, pk, hashEnum, label);
+    return Buffer.from(out);
+  }
+  decrypt(ciphertext: CryptoInput, privateKeyDer: CryptoInput, options?: { hash?: 'sha1' | 'sha256' | 'sha384' | 'sha512'; label?: CryptoInput }): Buffer {
+    const ct = this.toBuffer(ciphertext);
+    const sk = this.toBuffer(privateKeyDer);
+    const hash = (options?.hash ?? 'sha256').toUpperCase();
+    const hashEnum = this.wasm.HashAlg[hash === 'SHA1' ? 'Sha1' : hash === 'SHA384' ? 'Sha384' : hash === 'SHA512' ? 'Sha512' : 'Sha256'];
+    const label = options?.label ? this.toBuffer(options.label) : undefined;
+    const out: Uint8Array = this.wasm.rsa_oaep_decrypt(ct, sk, hashEnum, label);
+    return Buffer.from(out);
+  }
+}
+
+class X25519 extends BaseCipher {
+  private wasm: any;
+  constructor() {
+    const p = path.join(__dirname, 'x25519_wasm', 'x25519_wasm.js');
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    super(null);
+    this.wasm = require(p);
+  }
+  generateKeypair(): { privateKey: Buffer; publicKey: Buffer } {
+    const arr = this.wasm.x25519_generate_keypair();
+    return { privateKey: Buffer.from(arr[0]), publicKey: Buffer.from(arr[1]) };
+  }
+  deriveSharedSecret(privateKey: CryptoInput, peerPublicKey: CryptoInput): Buffer {
+    const sk = this.toBuffer(privateKey);
+    const pk = this.toBuffer(peerPublicKey);
+    const ss: Uint8Array = this.wasm.x25519_derive_shared_secret(sk, pk);
+    return Buffer.from(ss);
+  }
+}
+
+class ECDH extends BaseCipher {
+  private wasm: any;
+  constructor() {
+    super(null);
+    try {
+      const p = path.join(__dirname, 'ecdh_wasm', 'ecdh_wasm.js');
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      this.wasm = require(p);
+    } catch (_e) {
+      this.wasm = null;
+    }
+  }
+  generateKeypair(curve: 'p256' | 'p384' = 'p256'): { privateKey: Buffer; publicKey: Buffer } {
+    if (!this.wasm) throw new Error('ECDH module not available in this build');
+    const arr = this.wasm.ecdh_generate_keypair(curve);
+    return { privateKey: Buffer.from(arr[0]), publicKey: Buffer.from(arr[1]) };
+  }
+  deriveSharedSecret(curve: 'p256' | 'p384', privateKey: CryptoInput, peerPublicKey: CryptoInput): Buffer {
+    if (!this.wasm) throw new Error('ECDH module not available in this build');
+    const sk = this.toBuffer(privateKey);
+    const pk = this.toBuffer(peerPublicKey);
+    const ss: Uint8Array = this.wasm.ecdh_derive_shared_secret(curve, sk, pk);
+    return Buffer.from(ss);
+  }
+}
+
+export const rsa_oaep = new (RSAOAEP as any)();
+export const x25519 = new (X25519 as any)();
+export const ecdh = new (ECDH as any)();
+
 // Export all cipher functions as an object
 export const cipher = {
   aes,

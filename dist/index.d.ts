@@ -8,7 +8,7 @@ import { cipher } from './cipher';
 import { hmac } from './hmac';
 import { kdf } from './kdf';
 export { sha1, sha256, sha512, sha3_256, sha3_512, md4, md5, blake2b, blake2s, blake3, whirlpool, ripemd160 } from './hash';
-export { aes, chacha20, des } from './cipher';
+export { aes, chacha20, des, rsa_oaep, x25519, ecdh } from './cipher';
 export { hmacSHA1, hmacSHA256, hmacSHA512, hmacMD5 } from './hmac';
 export { pbkdf2, argon2, bcrypt } from './kdf';
 export { hash, cipher, hmac, kdf };
@@ -49,6 +49,9 @@ declare const cryptographer: {
             verify(password: import("./types").CryptoInput, hash: string): boolean;
         };
     };
+    rsa_oaep: any;
+    x25519: any;
+    ecdh: any;
 };
 export default cryptographer;
 //# sourceMappingURL=index.d.ts.map

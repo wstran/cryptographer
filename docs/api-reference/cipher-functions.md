@@ -24,6 +24,59 @@ Cipher functions provide symmetric encryption and decryption. They're used for:
 | DES | 56-bit | CBC, CTR | ❌ Legacy (avoid) | Interop only |
 | 3DES (EDE3) | 168-bit | CBC, CTR | ⚠️ Legacy (avoid) | Interop only |
 
+### Public-Key (Key Exchange & Asymmetric Encryption)
+
+| Algorithm | Purpose | Status | Notes |
+|-----------|---------|--------|-------|
+| RSA-OAEP (SHA-256 default) | Asymmetric encryption (small payloads) | ✅ Recommended | Use to encrypt keys, not large data |
+| X25519 | Key agreement (ECDH over Curve25519) | ✅ Recommended | Modern, fast, safe defaults |
+| ECDH P-256/P-384 | Key agreement | ✅ Recommended | Widely supported, choose curve per compliance |
+
+#### RSA-OAEP usage and limits
+- Key formats: Public (SPKI/PKCS#1 DER), Private (PKCS#8/PKCS#1 DER)
+- Hash options: 'sha1' | 'sha256' | 'sha384' | 'sha512' (default: 'sha256')
+- OAEP label: optional; if used, must match on decrypt
+- Max plaintext: For modulus size k (bytes) and hash hLen (bytes): max = k - 2*hLen - 2
+  - Example: 2048-bit (k=256) with SHA-256 (hLen=32) → 190 bytes
+
+```javascript
+import crypto from 'cryptographer.js';
+import fs from 'fs';
+
+const pub = fs.readFileSync('public_key.der');
+const prv = fs.readFileSync('private_key.der');
+
+// Wrap a random 32-byte key
+import { randomBytes } from 'crypto';
+const dataKey = randomBytes(32);
+const wrapped = crypto.rsa_oaep.encrypt(dataKey, pub, { hash: 'sha256' });
+const unwrapped = crypto.rsa_oaep.decrypt(wrapped, prv, { hash: 'sha256' });
+```
+
+#### X25519 usage
+- Generate keypair and derive shared secret; then HKDF → symmetric key
+```javascript
+import { hkdfSync } from 'crypto';
+const a = crypto.x25519.generateKeypair();
+const b = crypto.x25519.generateKeypair();
+const ssA = crypto.x25519.deriveSharedSecret(a.privateKey, b.publicKey);
+const ssB = crypto.x25519.deriveSharedSecret(b.privateKey, a.publicKey);
+const keyA = hkdfSync('sha256', ssA, Buffer.alloc(0), Buffer.from('x25519 hkdf'), 32);
+const keyB = hkdfSync('sha256', ssB, Buffer.alloc(0), Buffer.from('x25519 hkdf'), 32);
+```
+
+#### ECDH P-256/P-384 usage
+- Choose curve per compliance/perf; keys uncompressed: P-256 (pub 65B), P-384 (pub 97B)
+```javascript
+import { hkdfSync } from 'crypto';
+const e1 = crypto.ecdh.generateKeypair('p256');
+const e2 = crypto.ecdh.generateKeypair('p256');
+const s1 = crypto.ecdh.deriveSharedSecret('p256', e1.privateKey, e2.publicKey);
+const s2 = crypto.ecdh.deriveSharedSecret('p256', e2.privateKey, e1.publicKey);
+const k1 = hkdfSync('sha256', s1, Buffer.alloc(0), Buffer.from('ecdh p256 hkdf'), 32);
+const k2 = hkdfSync('sha256', s2, Buffer.alloc(0), Buffer.from('ecdh p256 hkdf'), 32);
+```
+
 ## Basic Usage
 
 ### AES: Simple Encryption/Decryption
@@ -32,9 +85,9 @@ Cipher functions provide symmetric encryption and decryption. They're used for:
 import crypto from 'cryptographer.js';
 
 // Generate secure key and IV
-const crypto = require('crypto');
-const key = crypto.randomBytes(32); // 32 bytes for AES-256
-const iv = crypto.randomBytes(16);  // 16 bytes for AES
+import { randomBytes } from 'crypto';
+const key = randomBytes(32); // 32 bytes for AES-256
+const iv = randomBytes(16);  // 16 bytes for AES
 
 // Encrypt data
 const encrypted = crypto.cipher.aes.encrypt('Hello World', {
@@ -57,15 +110,15 @@ console.log(decrypted.toString()); // 'Hello World'
 
 ```javascript
 // AES-128 (16 bytes key)
-const key128 = crypto.randomBytes(16);
+const key128 = randomBytes(16);
 const encrypted128 = crypto.cipher.aes.encrypt('data', { key: key128, iv });
 
 // AES-192 (24 bytes key)
-const key192 = crypto.randomBytes(24);
+const key192 = randomBytes(24);
 const encrypted192 = crypto.cipher.aes.encrypt('data', { key: key192, iv });
 
 // AES-256 (32 bytes key)
-const key256 = crypto.randomBytes(32);
+const key256 = randomBytes(32);
 const encrypted256 = crypto.cipher.aes.encrypt('data', { key: key256, iv });
 ```
 
@@ -74,15 +127,16 @@ const encrypted256 = crypto.cipher.aes.encrypt('data', { key: key256, iv });
 
 ```javascript
 import crypto from 'cryptographer.js';
-const key = crypto.randomBytes(32); // 32 bytes
-const nonce = crypto.randomBytes(12); // 12 bytes
+import { randomBytes } from 'crypto';
+const key = randomBytes(32); // 32 bytes
+const nonce = randomBytes(12); // 12 bytes
 
 // Stream cipher (CTR-like)
 const enc = crypto.cipher.chacha20.encrypt('hello', { key, iv: nonce, mode: 'ctr' });
 const dec = crypto.cipher.chacha20.decrypt(enc, { key, iv: nonce, mode: 'ctr' });
 
 // Authenticated encryption (maps to AEAD). Use 'cbc' mode selector to request AEAD internally.
-const aeadNonce = crypto.randomBytes(12);
+const aeadNonce = randomBytes(12);
 const ct = crypto.cipher.chacha20.encrypt('secret', { key, iv: aeadNonce, mode: 'cbc' });
 const pt = crypto.cipher.chacha20.decrypt(ct, { key, iv: aeadNonce, mode: 'cbc' });
 ```
@@ -94,10 +148,11 @@ Notes:
 ### DES / 3DES (Legacy)
 
 ```javascript
+import { randomBytes } from 'crypto';
 // DES (8-byte key) or 3DES (24-byte key). IV must be 8 bytes for CBC/CTR.
-const keyDES = crypto.randomBytes(8);
-const key3DES = crypto.randomBytes(24);
-const iv8 = crypto.randomBytes(8);
+const keyDES = randomBytes(8);
+const key3DES = randomBytes(24);
+const iv8 = randomBytes(8);
 
 // DES CBC
 const encDes = crypto.cipher.des.encrypt('data', { key: keyDES, iv: iv8, mode: 'cbc' });
@@ -138,6 +193,7 @@ const encryptedCTR = crypto.cipher.aes.encrypt('data', {
 
 ```javascript
 import fs from 'fs';
+import { randomBytes } from 'crypto';
 
 class FileEncryptor {
   constructor(key) {
@@ -147,7 +203,7 @@ class FileEncryptor {
   // Encrypt file
   encryptFile(inputPath, outputPath) {
     const data = fs.readFileSync(inputPath);
-    const iv = crypto.randomBytes(16);
+    const iv = randomBytes(16);
 
     const encrypted = crypto.cipher.aes.encrypt(data, {
       key: this.key,
@@ -179,7 +235,7 @@ class FileEncryptor {
 }
 
 // Usage
-const key = crypto.randomBytes(32);
+const key = randomBytes(32);
 const encryptor = new FileEncryptor(key);
 encryptor.encryptFile('input.txt', 'encrypted.bin');
 encryptor.decryptFile('encrypted.bin', 'decrypted.txt');
@@ -189,6 +245,7 @@ encryptor.decryptFile('encrypted.bin', 'decrypted.txt');
 
 ```javascript
 import { Transform } from 'stream';
+import { randomBytes } from 'crypto';
 
 class AESStream extends Transform {
   constructor(key, iv, mode = 'cbc', encrypt = true) {
@@ -262,8 +319,8 @@ class AESStream extends Transform {
 }
 
 // Usage
-const key = crypto.randomBytes(32);
-const iv = crypto.randomBytes(16);
+const key = randomBytes(32);
+const iv = randomBytes(16);
 
 // Encrypt stream
 const encryptStream = new AESStream(key, iv, 'cbc', true);
@@ -281,6 +338,8 @@ fs.createReadStream('encrypted.bin')
 ### Secure Communication Protocol
 
 ```javascript
+import { randomBytes } from 'crypto';
+
 class SecureChannel {
   constructor(sharedKey) {
     this.key = sharedKey;
@@ -288,7 +347,7 @@ class SecureChannel {
 
   // Encrypt message with integrity
   encryptMessage(message, additionalData = '') {
-    const iv = crypto.randomBytes(16);
+    const iv = randomBytes(16);
     const messageBuffer = Buffer.from(message, 'utf8');
 
     // Encrypt message

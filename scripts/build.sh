@@ -1,4 +1,6 @@
 #!/bin/bash
+export PATH="$HOME/.cargo/bin:$PATH"
+rustup target add wasm32-unknown-unknown >/dev/null 2>&1 || true
 SCRIPT_DIR=$(dirname "$(realpath "$0")")
 mkdir -p "$SCRIPT_DIR/../packages"
 
@@ -169,3 +171,33 @@ mkdir -p "$TARGET_DIR"
 echo "Building WASM for $CRATE_NAME..."
 cd "$SCRIPT_DIR/../crates/cipher/$CRATE_NAME"
 wasm-pack build --target nodejs --release --out-dir "$TARGET_DIR" -- --features wasm
+
+# ------- RSA-OAEP WASM -------
+CRATE_NAME="rsa_wasm"
+TARGET_DIR="$SCRIPT_DIR/../packages/cipher/$CRATE_NAME"
+
+mkdir -p "$TARGET_DIR"
+
+echo "Building WASM for $CRATE_NAME..."
+cd "$SCRIPT_DIR/../crates/cipher/$CRATE_NAME"
+RUSTFLAGS='--cfg getrandom_backend="wasm_js"' wasm-pack build --target nodejs --release --out-dir "$TARGET_DIR" -- --features wasm
+
+# ------- X25519 WASM -------
+CRATE_NAME="x25519_wasm"
+TARGET_DIR="$SCRIPT_DIR/../packages/cipher/$CRATE_NAME"
+
+mkdir -p "$TARGET_DIR"
+
+echo "Building WASM for $CRATE_NAME..."
+cd "$SCRIPT_DIR/../crates/cipher/$CRATE_NAME"
+RUSTFLAGS='--cfg getrandom_backend="wasm_js"' wasm-pack build --target nodejs --release --out-dir "$TARGET_DIR" -- --features wasm
+
+# ------- ECDH WASM -------
+CRATE_NAME="ecdh_wasm"
+TARGET_DIR="$SCRIPT_DIR/../packages/cipher/$CRATE_NAME"
+
+mkdir -p "$TARGET_DIR"
+
+echo "Building WASM for $CRATE_NAME..."
+cd "$SCRIPT_DIR/../crates/cipher/$CRATE_NAME"
+RUSTFLAGS='--cfg getrandom_backend="wasm_js"' wasm-pack build --target nodejs --release --out-dir "$TARGET_DIR" -- --features wasm

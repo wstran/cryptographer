@@ -5,6 +5,11 @@
 - Avoid ECB mode entirely; in this library ECB selector is mapped to CTR with zero IV only for compatibility.
 - Avoid DES/3DES; only use for legacy interoperability with strict key/IV handling.
 
+### Asymmetric
+
+- Use RSA-OAEP (SHA-256+) để mã hóa payload nhỏ như session keys; không dùng cho dữ liệu lớn.
+- Dùng X25519 hoặc ECDH P-256/P-384 cho key exchange; dẫn xuất khóa đối xứng qua HKDF.
+
 ### Nonce/IV management
 
 - AES CBC/CTR require a 16-byte IV. Never reuse an IV with the same key.

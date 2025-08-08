@@ -190,6 +190,35 @@ async function testKdf() {
   assert(kdf.bcrypt.verify('wrong', hash) === false, 'bcrypt verify false');
 }
 
+async function testAsymmetric() {
+  const lib = require(path.join(__dirname, '..', 'dist', 'index.js'));
+  // X25519
+  const xkp = lib.x25519.generateKeypair();
+  const xkp2 = lib.x25519.generateKeypair();
+  const ss1 = lib.x25519.deriveSharedSecret(xkp.privateKey, xkp2.publicKey);
+  const ss2 = lib.x25519.deriveSharedSecret(xkp2.privateKey, xkp.publicKey);
+  assert(Buffer.compare(ss1, ss2) === 0, 'x25519 shared secret matches');
+
+  // ECDH P-256 (required)
+  const e1 = lib.ecdh.generateKeypair('p256');
+  const e2 = lib.ecdh.generateKeypair('p256');
+  const es1 = lib.ecdh.deriveSharedSecret('p256', e1.privateKey, e2.publicKey);
+  const es2 = lib.ecdh.deriveSharedSecret('p256', e2.privateKey, e1.publicKey);
+  assert(Buffer.compare(es1, es2) === 0, 'ecdh p256 shared secret matches');
+
+  // Kyber removed in this build
+
+  // RSA-OAEP with SHA-256 (using a small test key set)
+  // Minimal DER keys for test would be large; skip heavy vector here. Validate error path with bogus key.
+  let threw = false;
+  try {
+    lib.rsa_oaep.encrypt(Buffer.from('hi'), Buffer.alloc(4), { hash: 'sha256' });
+  } catch (_e) {
+    threw = true;
+  }
+  assert(threw, 'rsa-oaep expected to throw with invalid key');
+}
+
 async function main() {
   await testHashes();
   await testHmac();
@@ -197,6 +226,7 @@ async function main() {
   await testChaCha20();
   await testDES();
   await testKdf();
+  await testAsymmetric();
   console.log('All tests passed');
 }
 

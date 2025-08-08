@@ -27,11 +27,13 @@ cryptographer.js is designed for high performance, leveraging Rust and WebAssemb
 
 ### Modern Hash Functions
 
+Note: crypto-js does not include BLAKE3. We compare where the competitor supports the algorithm; for BLAKE3 we only report our throughput.
+
 | Algorithm | cryptographer.js | crypto-js | Speed vs crypto-js |
 |-----------|------------------|-----------|-------------------|
 | BLAKE2b | 1.8 M ops/s | 150 K ops/s | **12× faster** |
 | BLAKE2s | 2.0 M ops/s | 160 K ops/s | **12.5× faster** |
-| BLAKE3 | 2.1 M ops/s | N/A | **N/A** |
+| BLAKE3 | 2.1 M ops/s | — | — |
 | SHA3-256 | 0.8 M ops/s | 100 K ops/s | **8× faster** |
 | SHA3-512 | 0.6 M ops/s | 80 K ops/s | **7.5× faster** |
 
@@ -93,9 +95,9 @@ cryptographer.js is designed for high performance, leveraging Rust and WebAssemb
 
 | Algorithm | cryptographer.js | crypto-js | Memory Efficiency |
 |-----------|------------------|-----------|-------------------|
-| SHA-256 | 2.1 MB | 8.5 MB | **4× more efficient** |
-| BLAKE3 | 1.8 MB | N/A | **N/A** |
-| SHA3-256 | 2.5 MB | 9.2 MB | **3.7× more efficient** |
+| SHA-256 | 2.1 MB | 8.5 MB | ~4× lower |
+| BLAKE3 | 1.8 MB | — | — |
+| SHA3-256 | 2.5 MB | 9.2 MB | ~3.7× lower |
 
 ### Encryption
 

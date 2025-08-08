@@ -210,6 +210,23 @@ const aeadDec = crypto.cipher.chacha20.decrypt(aeadEnc, { key: ck, iv: aeadNonce
 ```
 
 ### DES / 3DES (Legacy)
+## Public-Key and Key Exchange
+
+```javascript
+// X25519
+const a = crypto.x25519.generateKeypair();
+const b = crypto.x25519.generateKeypair();
+const ssA = crypto.x25519.deriveSharedSecret(a.privateKey, b.publicKey);
+const ssB = crypto.x25519.deriveSharedSecret(b.privateKey, a.publicKey);
+
+// ECDH P-256
+const e1 = crypto.ecdh.generateKeypair('p256');
+const e2 = crypto.ecdh.generateKeypair('p256');
+const es1 = crypto.ecdh.deriveSharedSecret('p256', e1.privateKey, e2.publicKey);
+const es2 = crypto.ecdh.deriveSharedSecret('p256', e2.privateKey, e1.publicKey);
+
+// (PQC KEM removed in this build)
+```
 
 ```javascript
 // DES (8 byte key) and 3DES (24 byte key). Use only for legacy interop.

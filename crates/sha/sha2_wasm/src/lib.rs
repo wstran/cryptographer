@@ -115,7 +115,7 @@ impl StreamingHasher {
             }
             Some(Sha2Impl::Sha512_256(h)) => {
                 h.update(input_slice);
-                
+
                 Ok(())
             }
             None => Err(JsValue::from_str("Hasher has been finalized")),

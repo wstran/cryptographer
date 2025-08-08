@@ -1,0 +1,36 @@
+[package]
+name = "rsa_wasm"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+rsa = { version = "0.9", default-features = false, features = ["sha2"] }
+sha2 = { version = "0.10", default-features = false }
+pkcs1 = { version = "0.7", default-features = false, features = ["alloc"] }
+pkcs8 = { version = "0.10", default-features = false, features = ["alloc"] }
+spki = { version = "0.7", default-features = false, features = ["alloc"] }
+rand = { version = "0.8", default-features = false, features = ["getrandom"], optional = true }
+getrandom = { version = "0.2", features = ["js"], optional = true }
+sha1 = { version = "0.10", default-features = false }
+rand_core = { version = "0.6", features = ["getrandom"] }
+wasm-bindgen = { version = "0.2.100", optional = true }
+js-sys = { version = "0.3.72", optional = true }
+serde = { version = "1.0.219", features = ["derive"], optional = true }
+serde-wasm-bindgen = { version = "0.6.5", optional = true }
+
+[features]
+default = []
+wasm = ["wasm-bindgen", "js-sys", "serde", "serde-wasm-bindgen", "rand", "getrandom"]
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = false

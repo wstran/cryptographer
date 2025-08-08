@@ -9,7 +9,7 @@
 
 // Import all modules
 import { hash } from './hash';
-import { cipher, aes, chacha20, des } from './cipher';
+import { cipher, aes, chacha20, des, rsa_oaep, x25519, ecdh } from './cipher';
 import { hmac } from './hmac';
 import { kdf } from './kdf';
 
@@ -34,7 +34,10 @@ export {
   // Cipher functions
   aes,
   chacha20,
-  des
+  des,
+  rsa_oaep,
+  x25519,
+  ecdh
 } from './cipher';
 
 export {
@@ -65,7 +68,10 @@ const cryptographer = {
   hash,
   cipher,
   hmac,
-  kdf
+  kdf,
+  rsa_oaep,
+  x25519,
+  ecdh
 };
 
 export default cryptographer;

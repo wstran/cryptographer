@@ -197,6 +197,40 @@ async function testKdf() {
   // Skip strict false check due to wasm verification semantics
 }
 
+async function testAsymmetric() {
+  const lib = cryptoLib;
+  // X25519
+  const xkp = lib.x25519.generateKeypair();
+  const xkp2 = lib.x25519.generateKeypair();
+  console.log('X25519 A priv.len', xkp.privateKey.length, 'pub.len', xkp.publicKey.length);
+  console.log('X25519 B priv.len', xkp2.privateKey.length, 'pub.len', xkp2.publicKey.length);
+  const ss1 = lib.x25519.deriveSharedSecret(xkp.privateKey, xkp2.publicKey);
+  const ss2 = lib.x25519.deriveSharedSecret(xkp2.privateKey, xkp.publicKey);
+  console.log('X25519 shared eq?', Buffer.compare(ss1, ss2));
+  assert(Buffer.compare(ss1, ss2) === 0, 'x25519 shared secret matches');
+
+  // ECDH P-256 (must be available and working)
+  const e1 = lib.ecdh.generateKeypair('p256');
+  const e2 = lib.ecdh.generateKeypair('p256');
+  console.log('ECDH A priv.len', e1.privateKey.length, 'pub.len', e1.publicKey.length);
+  console.log('ECDH B priv.len', e2.privateKey.length, 'pub.len', e2.publicKey.length);
+  const es1 = lib.ecdh.deriveSharedSecret('p256', e1.privateKey, e2.publicKey);
+  const es2 = lib.ecdh.deriveSharedSecret('p256', e2.privateKey, e1.publicKey);
+  console.log('ECDH shared eq?', Buffer.compare(es1, es2));
+  assert(Buffer.compare(es1, es2) === 0, 'ecdh p256 shared secret matches');
+
+  // Kyber removed in this build
+
+  // RSA-OAEP: ensure it throws on invalid key in this test environment
+  let threw = false;
+  try {
+    lib.rsa_oaep.encrypt(Buffer.from('hi'), Buffer.alloc(4), { hash: 'sha256' });
+  } catch (_e) {
+    threw = true;
+  }
+  assert(threw, 'rsa-oaep expected to throw with invalid key');
+}
+
 (async () => {
   await testHashes();
   await testHmac();
@@ -204,6 +238,7 @@ async function testKdf() {
   await testChaCha20();
   await testDES();
   await testKdf();
+  await testAsymmetric();
   console.log('All tests passed');
 })().catch((e) => {
   console.error('Test failed:', e);

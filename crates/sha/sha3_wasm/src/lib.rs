@@ -66,7 +66,7 @@ pub fn hash(input: Uint8Array, options: JsValue) -> Result<Box<[u8]>, JsValue> {
         }
         Sha3Type::Shake256 => {
             let len = opts.hash_length.ok_or("Shake256 requires hash_length")?;
-            
+
             let mut hasher = Shake256::default();
 
             hasher.update(input_slice);

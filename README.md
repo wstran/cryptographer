@@ -418,7 +418,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Additional Ciphers**: ChaCha20, Salsa20
 - **Digital Signatures**: RSA, ECDSA, EdDSA
 - **Key Exchange**: ECDH, X25519
-- **Post-Quantum Cryptography**: Kyber, Dilithium
+  - **Post-Quantum Cryptography**: (TBD)
 - **Browser Support**: WebAssembly builds for browsers
 - **Streaming Cipher Support**: Large file encryption
 - **Hardware Acceleration**: SIMD optimizations

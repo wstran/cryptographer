@@ -5,7 +5,7 @@
  * @module cryptographer.js
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.kdf = exports.hmac = exports.cipher = exports.hash = exports.bcrypt = exports.argon2 = exports.pbkdf2 = exports.hmacMD5 = exports.hmacSHA512 = exports.hmacSHA256 = exports.hmacSHA1 = exports.des = exports.chacha20 = exports.aes = exports.ripemd160 = exports.whirlpool = exports.blake3 = exports.blake2s = exports.blake2b = exports.md5 = exports.md4 = exports.sha3_512 = exports.sha3_256 = exports.sha512 = exports.sha256 = exports.sha1 = void 0;
+exports.kdf = exports.hmac = exports.cipher = exports.hash = exports.bcrypt = exports.argon2 = exports.pbkdf2 = exports.hmacMD5 = exports.hmacSHA512 = exports.hmacSHA256 = exports.hmacSHA1 = exports.ecdh = exports.x25519 = exports.rsa_oaep = exports.des = exports.chacha20 = exports.aes = exports.ripemd160 = exports.whirlpool = exports.blake3 = exports.blake2s = exports.blake2b = exports.md5 = exports.md4 = exports.sha3_512 = exports.sha3_256 = exports.sha512 = exports.sha256 = exports.sha1 = void 0;
 // Export types (commented out to avoid module resolution issues)
 // export * from './types';
 // Import all modules
@@ -37,6 +37,9 @@ var cipher_2 = require("./cipher");
 Object.defineProperty(exports, "aes", { enumerable: true, get: function () { return cipher_2.aes; } });
 Object.defineProperty(exports, "chacha20", { enumerable: true, get: function () { return cipher_2.chacha20; } });
 Object.defineProperty(exports, "des", { enumerable: true, get: function () { return cipher_2.des; } });
+Object.defineProperty(exports, "rsa_oaep", { enumerable: true, get: function () { return cipher_2.rsa_oaep; } });
+Object.defineProperty(exports, "x25519", { enumerable: true, get: function () { return cipher_2.x25519; } });
+Object.defineProperty(exports, "ecdh", { enumerable: true, get: function () { return cipher_2.ecdh; } });
 var hmac_2 = require("./hmac");
 // HMAC functions
 Object.defineProperty(exports, "hmacSHA1", { enumerable: true, get: function () { return hmac_2.hmacSHA1; } });
@@ -53,7 +56,10 @@ const cryptographer = {
     hash: hash_1.hash,
     cipher: cipher_1.cipher,
     hmac: hmac_1.hmac,
-    kdf: kdf_1.kdf
+    kdf: kdf_1.kdf,
+    rsa_oaep: cipher_1.rsa_oaep,
+    x25519: cipher_1.x25519,
+    ecdh: cipher_1.ecdh
 };
 exports.default = cryptographer;
 //# sourceMappingURL=index.js.map
