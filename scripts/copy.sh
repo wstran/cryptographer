@@ -31,6 +31,8 @@ done
 
 # CIPHER
 copy_crate "$PKG_DIR/cipher/aes_wasm" "$DIST_DIR/cipher/aes_wasm"
+copy_crate "$PKG_DIR/cipher/chacha20_wasm" "$DIST_DIR/cipher/chacha20_wasm"
+copy_crate "$PKG_DIR/cipher/des_wasm" "$DIST_DIR/cipher/des_wasm"
 
 echo "Copied WASM artifacts into dist/* layout."
 

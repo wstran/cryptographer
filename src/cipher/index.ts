@@ -155,6 +155,195 @@ class AESCipher extends BaseCipher implements CipherFunction {
 }
 
 /**
+ * ChaCha20 cipher implementation (with ChaCha20-Poly1305 for authenticated mode)
+ */
+class ChaCha20Cipher extends BaseCipher implements CipherFunction {
+  encrypt(data: CryptoInput, options: CipherOptions): Buffer {
+    const dataBuffer = this.toBuffer(data);
+    const keyBuffer = this.toBuffer(options.key);
+
+    // Validate key length (32 bytes)
+    this.validateKeyLength(keyBuffer, [32]);
+
+    const mode = (options.mode || 'cbc').toUpperCase() as 'CBC' | 'ECB' | 'CTR';
+    let result: Uint8Array;
+
+    switch (mode) {
+      case 'CBC': {
+        if (!options.iv) {
+          throw new Error('Nonce is required for ChaCha20-Poly1305 (CBC-mapped)');
+        }
+        const ivInput = this.toBuffer(options.iv);
+        if (ivInput.length !== 12 && ivInput.length !== 16) {
+          throw new Error('Nonce must be 12 bytes (docs)');
+        }
+        const nonce = ivInput.length === 12 ? ivInput : ivInput.subarray(0, 12);
+        const algorithm: number = this.wasmModule.ChaCha20Algorithm.Chacha20Poly1305;
+        result = this.wasmModule.encrypt(dataBuffer, keyBuffer, nonce, algorithm);
+        break;
+      }
+      case 'ECB': {
+        // Emulate ECB by using stream mode with zero nonce (not recommended)
+        const nonce = Buffer.alloc(12, 0);
+        const algorithm: number = this.wasmModule.ChaCha20Algorithm.Chacha20;
+        result = this.wasmModule.encrypt(dataBuffer, keyBuffer, nonce, algorithm);
+        break;
+      }
+      case 'CTR': {
+        if (!options.iv) {
+          throw new Error('Nonce is required for ChaCha20 CTR mode');
+        }
+        const nonce = this.toBuffer(options.iv);
+        if (nonce.length !== 12) {
+          throw new Error('Nonce must be 12 bytes for ChaCha20');
+        }
+        const algorithm: number = this.wasmModule.ChaCha20Algorithm.ChaCha20;
+        result = this.wasmModule.encrypt(dataBuffer, keyBuffer, nonce, algorithm);
+        break;
+      }
+      default:
+        throw new Error(`Unsupported cipher mode: ${mode}`);
+    }
+
+    return Buffer.from(result);
+  }
+
+  decrypt(data: CryptoInput, options: CipherOptions): Buffer {
+    const dataBuffer = this.toBuffer(data);
+    const keyBuffer = this.toBuffer(options.key);
+
+    // Validate key length (32 bytes)
+    this.validateKeyLength(keyBuffer, [32]);
+
+    const mode = (options.mode || 'cbc').toUpperCase() as 'CBC' | 'ECB' | 'CTR';
+    let result: Uint8Array;
+
+    switch (mode) {
+      case 'CBC': {
+        if (!options.iv) {
+          throw new Error('Nonce is required for ChaCha20-Poly1305 (CBC-mapped)');
+        }
+        const ivInput = this.toBuffer(options.iv);
+        if (ivInput.length !== 12 && ivInput.length !== 16) {
+          throw new Error('Nonce must be 12 bytes (docs)');
+        }
+        const nonce = ivInput.length === 12 ? ivInput : ivInput.subarray(0, 12);
+        const algorithm: number = this.wasmModule.ChaCha20Algorithm.Chacha20Poly1305;
+        result = this.wasmModule.decrypt(dataBuffer, keyBuffer, nonce, algorithm);
+        break;
+      }
+      case 'ECB': {
+        const nonce = Buffer.alloc(12, 0);
+        const algorithm: number = this.wasmModule.ChaCha20Algorithm.ChaCha20;
+        result = this.wasmModule.decrypt(dataBuffer, keyBuffer, nonce, algorithm);
+        break;
+      }
+      case 'CTR': {
+        if (!options.iv) {
+          throw new Error('Nonce is required for ChaCha20 CTR mode');
+        }
+        const nonce = this.toBuffer(options.iv);
+        if (nonce.length !== 12) {
+          throw new Error('Nonce must be 12 bytes for ChaCha20');
+        }
+        const algorithm: number = this.wasmModule.ChaCha20Algorithm.ChaCha20;
+        result = this.wasmModule.decrypt(dataBuffer, keyBuffer, nonce, algorithm);
+        break;
+      }
+      default:
+        throw new Error(`Unsupported cipher mode: ${mode}`);
+    }
+
+    return Buffer.from(result);
+  }
+}
+
+/**
+ * DES/3DES cipher implementation
+ */
+class DESCipher extends BaseCipher implements CipherFunction {
+  private resolveAlgo(keyLen: number, mode: 'CBC' | 'ECB' | 'CTR'): number {
+    const alg = this.wasmModule.DesAlgorithm;
+    if (keyLen === 8) {
+      switch (mode) {
+        case 'CBC':
+          return alg.DesCbc;
+        case 'ECB':
+          return alg.DesCtr; // ECB emulated via CTR with zero IV
+        case 'CTR':
+          return alg.DesCtr;
+      }
+    } else if (keyLen === 24) {
+      switch (mode) {
+        case 'CBC':
+          return alg.TdesCbc;
+        case 'ECB':
+          return alg.TdesCtr; // ECB emulated via CTR with zero IV
+        case 'CTR':
+          return alg.TdesCtr;
+      }
+    }
+    throw new Error('DES/3DES key must be 8 (DES) or 24 bytes (3DES EDE3)');
+  }
+
+  encrypt(data: CryptoInput, options: CipherOptions): Buffer {
+    const dataBuffer = this.toBuffer(data);
+    const keyBuffer = this.toBuffer(options.key);
+    if (keyBuffer.length !== 8 && keyBuffer.length !== 24) {
+      throw new Error('DES/3DES key must be 8 or 24 bytes');
+    }
+    const mode = (options.mode || 'cbc').toUpperCase() as 'CBC' | 'ECB' | 'CTR';
+    let ivForCall: Uint8Array | undefined = undefined;
+    if (mode === 'CBC' || mode === 'CTR') {
+      if (!options.iv) throw new Error('IV is required for DES/3DES CBC/CTR modes');
+      const ivInput = this.toBuffer(options.iv);
+      if (ivInput.length !== 8) {
+        throw new Error('IV must be 8 bytes for DES/3DES');
+      }
+      ivForCall = ivInput;
+    } else if (mode === 'ECB') {
+      ivForCall = Buffer.alloc(8, 0);
+    }
+    const algorithm = this.resolveAlgo(keyBuffer.length, mode);
+    const result: Uint8Array = this.wasmModule.encrypt(
+      dataBuffer,
+      keyBuffer,
+      ivForCall!,
+      algorithm
+    );
+    return Buffer.from(result);
+  }
+
+  decrypt(data: CryptoInput, options: CipherOptions): Buffer {
+    const dataBuffer = this.toBuffer(data);
+    const keyBuffer = this.toBuffer(options.key);
+    if (keyBuffer.length !== 8 && keyBuffer.length !== 24) {
+      throw new Error('DES/3DES key must be 8 or 24 bytes');
+    }
+    const mode = (options.mode || 'cbc').toUpperCase() as 'CBC' | 'ECB' | 'CTR';
+    let ivForCall: Uint8Array | undefined = undefined;
+    if (mode === 'CBC' || mode === 'CTR') {
+      if (!options.iv) throw new Error('IV is required for DES/3DES CBC/CTR modes');
+      const ivInput = this.toBuffer(options.iv);
+      if (ivInput.length !== 8) {
+        throw new Error('IV must be 8 bytes for DES/3DES');
+      }
+      ivForCall = ivInput;
+    } else if (mode === 'ECB') {
+      ivForCall = Buffer.alloc(8, 0);
+    }
+    const algorithm = this.resolveAlgo(keyBuffer.length, mode);
+    const result: Uint8Array = this.wasmModule.decrypt(
+      dataBuffer,
+      keyBuffer,
+      ivForCall!,
+      algorithm
+    );
+    return Buffer.from(result);
+  }
+}
+
+/**
  * Create cipher function wrapper
  */
 function createCipherFunction(): CipherFunction {
@@ -186,8 +375,62 @@ function createCipherFunction(): CipherFunction {
 
 // Export cipher functions
 export const aes = createCipherFunction();
+function createChaCha20Function(): CipherFunction {
+  let wasmModule: any;
+  let cipherInstance: ChaCha20Cipher;
+  return {
+    encrypt: (data: CryptoInput, options: CipherOptions): Buffer => {
+      if (!wasmModule) {
+        const resolvedPath = path.join(__dirname, 'chacha20_wasm', 'chacha20_wasm.js');
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        wasmModule = require(resolvedPath);
+        cipherInstance = new ChaCha20Cipher(wasmModule);
+      }
+      return cipherInstance.encrypt(data, options);
+    },
+    decrypt: (data: CryptoInput, options: CipherOptions): Buffer => {
+      if (!wasmModule) {
+        const resolvedPath = path.join(__dirname, 'chacha20_wasm', 'chacha20_wasm.js');
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        wasmModule = require(resolvedPath);
+        cipherInstance = new ChaCha20Cipher(wasmModule);
+      }
+      return cipherInstance.decrypt(data, options);
+    },
+  };
+}
+
+function createDESFunction(): CipherFunction {
+  let wasmModule: any;
+  let cipherInstance: DESCipher;
+  return {
+    encrypt: (data: CryptoInput, options: CipherOptions): Buffer => {
+      if (!wasmModule) {
+        const resolvedPath = path.join(__dirname, 'des_wasm', 'des_wasm.js');
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        wasmModule = require(resolvedPath);
+        cipherInstance = new DESCipher(wasmModule);
+      }
+      return cipherInstance.encrypt(data, options);
+    },
+    decrypt: (data: CryptoInput, options: CipherOptions): Buffer => {
+      if (!wasmModule) {
+        const resolvedPath = path.join(__dirname, 'des_wasm', 'des_wasm.js');
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        wasmModule = require(resolvedPath);
+        cipherInstance = new DESCipher(wasmModule);
+      }
+      return cipherInstance.decrypt(data, options);
+    },
+  };
+}
+
+export const chacha20 = createChaCha20Function();
+export const des = createDESFunction();
 
 // Export all cipher functions as an object
 export const cipher = {
   aes,
+  chacha20,
+  des,
 };

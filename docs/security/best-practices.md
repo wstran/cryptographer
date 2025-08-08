@@ -1,3 +1,15 @@
+### Cipher selection
+
+- Prefer AES-GCM or ChaCha20-Poly1305 for authenticated encryption.
+- Prefer AES-256-CBC or ChaCha20 (with separate MAC) if AEAD is not available.
+- Avoid ECB mode entirely; in this library ECB selector is mapped to CTR with zero IV only for compatibility.
+- Avoid DES/3DES; only use for legacy interoperability with strict key/IV handling.
+
+### Nonce/IV management
+
+- AES CBC/CTR require a 16-byte IV. Never reuse an IV with the same key.
+- ChaCha20 and ChaCha20-Poly1305 require a 12-byte nonce. Never reuse a nonce with the same key.
+- DES/3DES CBC/CTR use an 8-byte IV; treat reuse as catastrophic.
 # Security Best Practices
 
 This guide covers essential security best practices when using cryptographer.js in production applications.

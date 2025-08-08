@@ -81,6 +81,8 @@ const derivedKey = crypto.kdf.pbkdf2('password', {
 | Algorithm | Modes | Key Sizes | Status |
 |-----------|-------|-----------|---------|
 | **AES** | CBC, ECB, CTR | 128, 192, 256-bit | ✅ Recommended |
+| **ChaCha20** | CTR (12B nonce), AEAD | 256-bit | ✅ Recommended |
+| **DES/3DES** | CBC, CTR | 56/168-bit | ⚠️ Legacy only |
 
 ### HMAC (Hash-based Message Authentication Code)
 

@@ -1,6 +1,6 @@
 # Cipher Functions
 
-cryptographer.js provides AES encryption and decryption with multiple modes of operation.
+cryptographer.js provides AES, ChaCha20, and legacy DES/3DES encryption and decryption with multiple modes of operation.
 
 ## Overview
 
@@ -15,14 +15,18 @@ Cipher functions provide symmetric encryption and decryption. They're used for:
 ## Supported Algorithms
 
 | Algorithm | Key Sizes | Modes | Status | Use Case |
-|-----------|-----------|-------|---------|----------|
+|-----------|-----------|-------|--------|----------|
 | **AES-128** | 128 bits | CBC, ECB, CTR | ✅ Recommended | General purpose |
 | **AES-192** | 192 bits | CBC, ECB, CTR | ✅ Recommended | Higher security |
 | **AES-256** | 256 bits | CBC, ECB, CTR | ✅ Recommended | Maximum security |
+| **ChaCha20** | 256 bits | CTR (nonce=12B), AEAD | ✅ Recommended | Performance/portable |
+| **ChaCha20-Poly1305** | 256 bits | AEAD | ✅ Recommended | Authenticated encryption |
+| DES | 56-bit | CBC, CTR | ❌ Legacy (avoid) | Interop only |
+| 3DES (EDE3) | 168-bit | CBC, CTR | ⚠️ Legacy (avoid) | Interop only |
 
 ## Basic Usage
 
-### Simple Encryption/Decryption
+### AES: Simple Encryption/Decryption
 
 ```javascript
 import crypto from 'cryptographer.js';
@@ -65,7 +69,46 @@ const key256 = crypto.randomBytes(32);
 const encrypted256 = crypto.cipher.aes.encrypt('data', { key: key256, iv });
 ```
 
-### Different Modes
+### AES: Different Modes
+### ChaCha20 / ChaCha20-Poly1305
+
+```javascript
+import crypto from 'cryptographer.js';
+const key = crypto.randomBytes(32); // 32 bytes
+const nonce = crypto.randomBytes(12); // 12 bytes
+
+// Stream cipher (CTR-like)
+const enc = crypto.cipher.chacha20.encrypt('hello', { key, iv: nonce, mode: 'ctr' });
+const dec = crypto.cipher.chacha20.decrypt(enc, { key, iv: nonce, mode: 'ctr' });
+
+// Authenticated encryption (maps to AEAD). Use 'cbc' mode selector to request AEAD internally.
+const aeadNonce = crypto.randomBytes(12);
+const ct = crypto.cipher.chacha20.encrypt('secret', { key, iv: aeadNonce, mode: 'cbc' });
+const pt = crypto.cipher.chacha20.decrypt(ct, { key, iv: aeadNonce, mode: 'cbc' });
+```
+
+Notes:
+- For ChaCha20: nonce must be 12 bytes. Avoid nonce reuse.
+- For ChaCha20-Poly1305 AEAD: we map `mode: 'cbc'` to AEAD under the hood to keep the same API.
+
+### DES / 3DES (Legacy)
+
+```javascript
+// DES (8-byte key) or 3DES (24-byte key). IV must be 8 bytes for CBC/CTR.
+const keyDES = crypto.randomBytes(8);
+const key3DES = crypto.randomBytes(24);
+const iv8 = crypto.randomBytes(8);
+
+// DES CBC
+const encDes = crypto.cipher.des.encrypt('data', { key: keyDES, iv: iv8, mode: 'cbc' });
+const decDes = crypto.cipher.des.decrypt(encDes, { key: keyDES, iv: iv8, mode: 'cbc' });
+
+// 3DES CTR
+const enc3 = crypto.cipher.des.encrypt('data', { key: key3DES, iv: iv8, mode: 'ctr' });
+const dec3 = crypto.cipher.des.decrypt(enc3, { key: key3DES, iv: iv8, mode: 'ctr' });
+```
+
+Warning: DES/3DES are considered deprecated and should not be used for new systems.
 
 ```javascript
 // CBC mode (Cipher Block Chaining) - recommended
@@ -105,7 +148,7 @@ class FileEncryptor {
   encryptFile(inputPath, outputPath) {
     const data = fs.readFileSync(inputPath);
     const iv = crypto.randomBytes(16);
-    
+
     const encrypted = crypto.cipher.aes.encrypt(data, {
       key: this.key,
       iv: iv,
@@ -120,11 +163,11 @@ class FileEncryptor {
   // Decrypt file
   decryptFile(inputPath, outputPath) {
     const data = fs.readFileSync(inputPath);
-    
+
     // Extract IV from first 16 bytes
     const iv = data.slice(0, 16);
     const encrypted = data.slice(16);
-    
+
     const decrypted = crypto.cipher.aes.decrypt(encrypted, {
       key: this.key,
       iv: iv,
@@ -159,12 +202,12 @@ class AESStream extends Transform {
 
   _transform(chunk, encoding, callback) {
     this.buffer = Buffer.concat([this.buffer, chunk]);
-    
+
     // Process complete blocks (AES block size is 16 bytes)
     while (this.buffer.length >= 16) {
       const block = this.buffer.slice(0, 16);
       this.buffer = this.buffer.slice(16);
-      
+
       let result;
       if (this.encrypt) {
         result = crypto.cipher.aes.encrypt(block, {
@@ -179,10 +222,10 @@ class AESStream extends Transform {
           mode: this.mode
         });
       }
-      
+
       this.push(result);
     }
-    
+
     callback();
   }
 
@@ -195,7 +238,7 @@ class AESStream extends Transform {
         this.buffer,
         Buffer.alloc(padding, padding)
       ]);
-      
+
       let result;
       if (this.encrypt) {
         result = crypto.cipher.aes.encrypt(padded, {
@@ -210,10 +253,10 @@ class AESStream extends Transform {
           mode: this.mode
         });
       }
-      
+
       this.push(result);
     }
-    
+
     callback();
   }
 }
@@ -247,7 +290,7 @@ class SecureChannel {
   encryptMessage(message, additionalData = '') {
     const iv = crypto.randomBytes(16);
     const messageBuffer = Buffer.from(message, 'utf8');
-    
+
     // Encrypt message
     const encrypted = crypto.cipher.aes.encrypt(messageBuffer, {
       key: this.key,
@@ -272,13 +315,13 @@ class SecureChannel {
   decryptMessage(packet) {
     const iv = Buffer.from(packet.iv, 'hex');
     const encrypted = Buffer.from(packet.encrypted, 'hex');
-    
+
     // Verify HMAC
     const expectedHmac = crypto.hmac.sha256(
-      Buffer.concat([iv, encrypted, Buffer.from(packet.additionalData || '')]), 
+      Buffer.concat([iv, encrypted, Buffer.from(packet.additionalData || '')]),
       { key: this.key }
     );
-    
+
     if (packet.hmac !== expectedHmac) {
       throw new Error('Message integrity check failed');
     }
@@ -359,20 +402,20 @@ function encryptWithAuth(data, key) {
   const iv = crypto.randomBytes(16);
   const encrypted = crypto.cipher.aes.encrypt(data, { key, iv, mode: 'cbc' });
   const hmac = crypto.hmac.sha256(Buffer.concat([iv, encrypted]), { key });
-  
+
   return { iv: iv.toString('hex'), encrypted: encrypted.toString('hex'), hmac };
 }
 
 function decryptWithAuth(packet, key) {
   const iv = Buffer.from(packet.iv, 'hex');
   const encrypted = Buffer.from(packet.encrypted, 'hex');
-  
+
   // Verify HMAC first
   const expectedHmac = crypto.hmac.sha256(Buffer.concat([iv, encrypted]), { key });
   if (packet.hmac !== expectedHmac) {
     throw new Error('Integrity check failed');
   }
-  
+
   return crypto.cipher.aes.decrypt(encrypted, { key, iv, mode: 'cbc' });
 }
 ```
@@ -454,21 +497,24 @@ interface CipherOptions {
 
 ### Available Functions
 
-- `crypto.cipher.aes.encrypt(data, options)`
-- `crypto.cipher.aes.decrypt(data, options)`
+- `crypto.cipher.aes.encrypt(data, options)` / `decrypt`
+- `crypto.cipher.chacha20.encrypt(data, options)` / `decrypt`
+- `crypto.cipher.des.encrypt(data, options)` / `decrypt`
 
 ### Key Sizes
 
 - **AES-128**: 16 bytes key
-- **AES-192**: 24 bytes key  
+- **AES-192**: 24 bytes key
 - **AES-256**: 32 bytes key
 
-### IV Sizes
+### IV/Nonce Sizes
 
-- **CBC mode**: 16 bytes IV
-- **CTR mode**: 16 bytes nonce (used as IV)
-- **ECB mode**: No IV required
+- **AES CBC/CTR**: 16 bytes IV/nonce
+- **ChaCha20**: 12 bytes nonce (required)
+- **ChaCha20-Poly1305**: 12 bytes nonce (required)
+- **DES/3DES CBC/CTR**: 8 bytes IV/nonce
+- **ECB modes**: No IV required (emulated via CTR with zero IV; avoid for security)
 
 ### Block Size
 
-All AES modes use 16-byte blocks internally. 
+All AES modes use 16-byte blocks internally.

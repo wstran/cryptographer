@@ -135,6 +135,40 @@ async function testAES() {
   }
 }
 
+async function testChaCha20() {
+  const { cipher } = cryptoLib;
+  const key = randomBytes(32);
+  const nonce = randomBytes(12);
+  const payloads = [Buffer.alloc(0), Buffer.from('hello world'), randomBytes(31)];
+  for (const data of payloads) {
+    const enc = cipher.chacha20.encrypt(data, { key, iv: nonce, mode: 'ctr' });
+    assert(Buffer.isBuffer(enc), 'chacha20 encrypt returns buffer');
+    const dec = cipher.chacha20.decrypt(enc, { key, iv: nonce, mode: 'ctr' });
+    assert(Buffer.compare(Buffer.from(data), dec) === 0, 'chacha20 ctr roundtrip');
+  }
+  const aeadNonce = randomBytes(12);
+  const ct = cipher.chacha20.encrypt('secret', { key, iv: aeadNonce, mode: 'cbc' });
+  const pt = cipher.chacha20.decrypt(ct, { key, iv: aeadNonce, mode: 'cbc' });
+  assert(pt.toString() === 'secret', 'chacha20-poly1305 aead roundtrip');
+}
+
+async function testDES() {
+  const { cipher } = cryptoLib;
+  const keyDES = randomBytes(8);
+  const key3DES = randomBytes(24);
+  const iv = randomBytes(8);
+  const payloads = [Buffer.alloc(0), Buffer.from('hello'), randomBytes(24)];
+  for (const data of payloads) {
+    const encDes = cipher.des.encrypt(data, { key: keyDES, iv, mode: 'cbc' });
+    const decDes = cipher.des.decrypt(encDes, { key: keyDES, iv, mode: 'cbc' });
+    assert(Buffer.compare(Buffer.from(data), decDes) === 0, 'des cbc roundtrip');
+
+    const enc3 = cipher.des.encrypt(data, { key: key3DES, iv, mode: 'ctr' });
+    const dec3 = cipher.des.decrypt(enc3, { key: key3DES, iv, mode: 'ctr' });
+    assert(Buffer.compare(Buffer.from(data), dec3) === 0, '3des ctr roundtrip');
+  }
+}
+
 async function testKdf() {
   const { kdf } = cryptoLib;
   const passwordCases = ['password', randomBytes(8), new Uint8Array([1, 2, 3, 4])];
@@ -167,6 +201,8 @@ async function testKdf() {
   await testHashes();
   await testHmac();
   await testAES();
+  await testChaCha20();
+  await testDES();
   await testKdf();
   console.log('All tests passed');
 })().catch((e) => {

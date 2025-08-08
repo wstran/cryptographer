@@ -37,29 +37,34 @@ const hmacSha512 = crypto.hmac.sha512('data', { key: 'secret' });
 const hmacMd5 = crypto.hmac.md5('data', { key: 'secret' });
 ```
 
-### 3. AES Encryption
+### 3. Symmetric Encryption (AES, ChaCha20, DES/3DES)
 
 ```javascript
-// Generate secure key and IV
-const crypto = require('crypto');
-const key = crypto.randomBytes(32); // 32 bytes for AES-256
-const iv = crypto.randomBytes(16);  // 16 bytes for AES
+// AES-256-CBC
+const nodeCrypto = require('crypto');
+const key = nodeCrypto.randomBytes(32);
+const iv = nodeCrypto.randomBytes(16);
+const enc = crypto.cipher.aes.encrypt('Hello World', { key, iv, mode: 'cbc' });
+const dec = crypto.cipher.aes.decrypt(enc, { key, iv, mode: 'cbc' });
+console.log(dec.toString()); // 'Hello World'
 
-// Encrypt data
-const encrypted = crypto.cipher.aes.encrypt('Hello World', {
-  key: key,
-  iv: iv,
-  mode: 'cbc' // CBC, ECB, or CTR
-});
+// ChaCha20 (CTR-like stream)
+const ck = nodeCrypto.randomBytes(32);
+const nonce = nodeCrypto.randomBytes(12);
+const cc = crypto.cipher.chacha20.encrypt('Hello', { key: ck, iv: nonce, mode: 'ctr' });
+const dd = crypto.cipher.chacha20.decrypt(cc, { key: ck, iv: nonce, mode: 'ctr' });
 
-// Decrypt data
-const decrypted = crypto.cipher.aes.decrypt(encrypted, {
-  key: key,
-  iv: iv,
-  mode: 'cbc'
-});
+// ChaCha20-Poly1305 AEAD (mapped via mode: 'cbc')
+const aeadNonce = nodeCrypto.randomBytes(12);
+const ct = crypto.cipher.chacha20.encrypt('Secret', { key: ck, iv: aeadNonce, mode: 'cbc' });
+const pt = crypto.cipher.chacha20.decrypt(ct, { key: ck, iv: aeadNonce, mode: 'cbc' });
 
-console.log(decrypted.toString()); // 'Hello World'
+// DES/3DES (legacy; avoid in new systems)
+const kdes = nodeCrypto.randomBytes(8);
+const k3des = nodeCrypto.randomBytes(24);
+const iv8 = nodeCrypto.randomBytes(8);
+const encDes = crypto.cipher.des.encrypt('legacy', { key: kdes, iv: iv8, mode: 'cbc' });
+const decDes = crypto.cipher.des.decrypt(encDes, { key: kdes, iv: iv8, mode: 'cbc' });
 ```
 
 ### 4. Key Derivation Functions
@@ -213,4 +218,4 @@ try {
 - Explore the [API Reference](../api-reference/) for complete function documentation
 - Check out [Examples](../examples/) for real-world use cases
 - Learn about [Security Best Practices](../security/) for production use
-- Review [Performance Benchmarks](../performance/) for optimization tips 
+- Review [Performance Benchmarks](../performance/) for optimization tips

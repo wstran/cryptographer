@@ -8,7 +8,7 @@ import { cipher } from './cipher';
 import { hmac } from './hmac';
 import { kdf } from './kdf';
 export { sha1, sha256, sha512, sha3_256, sha3_512, md4, md5, blake2b, blake2s, blake3, whirlpool, ripemd160 } from './hash';
-export { aes } from './cipher';
+export { aes, chacha20, des } from './cipher';
 export { hmacSHA1, hmacSHA256, hmacSHA512, hmacMD5 } from './hmac';
 export { pbkdf2, argon2, bcrypt } from './kdf';
 export { hash, cipher, hmac, kdf };
@@ -32,6 +32,8 @@ declare const cryptographer: {
     };
     cipher: {
         aes: import("./types").CipherFunction;
+        chacha20: import("./types").CipherFunction;
+        des: import("./types").CipherFunction;
     };
     hmac: {
         sha1: (data: import("./types").CryptoInput, options: import("./types").HMACOptions) => string | Buffer;

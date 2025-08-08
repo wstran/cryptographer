@@ -9,7 +9,7 @@
 
 // Import all modules
 import { hash } from './hash';
-import { cipher } from './cipher';
+import { cipher, aes, chacha20, des } from './cipher';
 import { hmac } from './hmac';
 import { kdf } from './kdf';
 
@@ -32,7 +32,9 @@ export {
 
 export {
   // Cipher functions
-  aes
+  aes,
+  chacha20,
+  des
 } from './cipher';
 
 export {

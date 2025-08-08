@@ -1,6 +1,6 @@
 # 📚 Cryptographer.js Documentation
 
-Welcome to the **cryptographer.js v1.0.20** documentation. This guide covers everything you need to know to install, use, and contribute to the project.
+Welcome to the **cryptographer.js** documentation. This guide covers everything you need to know to install, use, and contribute to the project.
 
 ## 🚀 Quick Start
 
@@ -22,6 +22,16 @@ const encrypted = crypto.cipher.aes.encrypt('Hello World', {
   key: Buffer.from('0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef', 'hex'),
   iv: Buffer.from('0123456789abcdef0123456789abcdef', 'hex')
 });
+
+// ChaCha20 stream
+const key = require('crypto').randomBytes(32);
+const nonce = require('crypto').randomBytes(12);
+const chachaEnc = crypto.cipher.chacha20.encrypt('Hi', { key, iv: nonce, mode: 'ctr' });
+
+// DES (legacy)
+const desKey = require('crypto').randomBytes(8);
+const desIv = require('crypto').randomBytes(8);
+const desEnc = crypto.cipher.des.encrypt('legacy', { key: desKey, iv: desIv, mode: 'cbc' });
 
 // Argon2id password hash
 const passwordHash = crypto.kdf.argon2('p@ssw0rd');

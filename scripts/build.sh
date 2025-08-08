@@ -149,3 +149,23 @@ mkdir -p "$TARGET_DIR"
 echo "Building WASM for $CRATE_NAME..."
 cd "$SCRIPT_DIR/../crates/cipher/$CRATE_NAME"
 wasm-pack build --target nodejs --release --out-dir "$TARGET_DIR" -- --features wasm
+
+# ------- CHACHA20 WASM -------
+CRATE_NAME="chacha20_wasm"
+TARGET_DIR="$SCRIPT_DIR/../packages/cipher/$CRATE_NAME"
+
+mkdir -p "$TARGET_DIR"
+
+echo "Building WASM for $CRATE_NAME..."
+cd "$SCRIPT_DIR/../crates/cipher/$CRATE_NAME"
+wasm-pack build --target nodejs --release --out-dir "$TARGET_DIR" -- --features wasm
+
+# ------- DES/3DES WASM -------
+CRATE_NAME="des_wasm"
+TARGET_DIR="$SCRIPT_DIR/../packages/cipher/$CRATE_NAME"
+
+mkdir -p "$TARGET_DIR"
+
+echo "Building WASM for $CRATE_NAME..."
+cd "$SCRIPT_DIR/../crates/cipher/$CRATE_NAME"
+wasm-pack build --target nodejs --release --out-dir "$TARGET_DIR" -- --features wasm

@@ -5,7 +5,7 @@
  * @module cryptographer.js
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.kdf = exports.hmac = exports.cipher = exports.hash = exports.bcrypt = exports.argon2 = exports.pbkdf2 = exports.hmacMD5 = exports.hmacSHA512 = exports.hmacSHA256 = exports.hmacSHA1 = exports.aes = exports.ripemd160 = exports.whirlpool = exports.blake3 = exports.blake2s = exports.blake2b = exports.md5 = exports.md4 = exports.sha3_512 = exports.sha3_256 = exports.sha512 = exports.sha256 = exports.sha1 = void 0;
+exports.kdf = exports.hmac = exports.cipher = exports.hash = exports.bcrypt = exports.argon2 = exports.pbkdf2 = exports.hmacMD5 = exports.hmacSHA512 = exports.hmacSHA256 = exports.hmacSHA1 = exports.des = exports.chacha20 = exports.aes = exports.ripemd160 = exports.whirlpool = exports.blake3 = exports.blake2s = exports.blake2b = exports.md5 = exports.md4 = exports.sha3_512 = exports.sha3_256 = exports.sha512 = exports.sha256 = exports.sha1 = void 0;
 // Export types (commented out to avoid module resolution issues)
 // export * from './types';
 // Import all modules
@@ -35,6 +35,8 @@ Object.defineProperty(exports, "ripemd160", { enumerable: true, get: function ()
 var cipher_2 = require("./cipher");
 // Cipher functions
 Object.defineProperty(exports, "aes", { enumerable: true, get: function () { return cipher_2.aes; } });
+Object.defineProperty(exports, "chacha20", { enumerable: true, get: function () { return cipher_2.chacha20; } });
+Object.defineProperty(exports, "des", { enumerable: true, get: function () { return cipher_2.des; } });
 var hmac_2 = require("./hmac");
 // HMAC functions
 Object.defineProperty(exports, "hmacSHA1", { enumerable: true, get: function () { return hmac_2.hmacSHA1; } });

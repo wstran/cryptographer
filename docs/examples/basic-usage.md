@@ -136,15 +136,15 @@ const isValid = auth.verifyRequest(method, path, body, timestamp, signature);
 console.log('Signature valid:', isValid); // true
 ```
 
-## AES Encryption
+## Symmetric Encryption
 
 ### Basic Encryption/Decryption
 
 ```javascript
 // Generate secure key and IV
-const crypto = require('crypto');
-const key = crypto.randomBytes(32); // 32 bytes for AES-256
-const iv = crypto.randomBytes(16);  // 16 bytes for AES
+const nodeCrypto = require('crypto');
+const key = nodeCrypto.randomBytes(32); // 32 bytes for AES-256
+const iv = nodeCrypto.randomBytes(16);  // 16 bytes for AES
 
 // Encrypt data
 const plaintext = 'Hello World';
@@ -192,6 +192,36 @@ const encryptedCTR = crypto.cipher.aes.encrypt('Hello World', {
 console.log('CBC encrypted:', encryptedCBC.toString('hex'));
 console.log('ECB encrypted:', encryptedECB.toString('hex'));
 console.log('CTR encrypted:', encryptedCTR.toString('hex'));
+```
+
+### ChaCha20 / ChaCha20-Poly1305
+
+```javascript
+// ChaCha20 stream mode (CTR-like)
+const ck = nodeCrypto.randomBytes(32);
+const nonce = nodeCrypto.randomBytes(12);
+const cenc = crypto.cipher.chacha20.encrypt('Hello World', { key: ck, iv: nonce, mode: 'ctr' });
+const cdec = crypto.cipher.chacha20.decrypt(cenc, { key: ck, iv: nonce, mode: 'ctr' });
+
+// Authenticated: mapped via 'cbc' to AEAD under the hood
+const aeadNonce = nodeCrypto.randomBytes(12);
+const aeadEnc = crypto.cipher.chacha20.encrypt('Secret', { key: ck, iv: aeadNonce, mode: 'cbc' });
+const aeadDec = crypto.cipher.chacha20.decrypt(aeadEnc, { key: ck, iv: aeadNonce, mode: 'cbc' });
+```
+
+### DES / 3DES (Legacy)
+
+```javascript
+// DES (8 byte key) and 3DES (24 byte key). Use only for legacy interop.
+const kdes = nodeCrypto.randomBytes(8);
+const k3des = nodeCrypto.randomBytes(24);
+const iv8 = nodeCrypto.randomBytes(8);
+
+const desCBC = crypto.cipher.des.encrypt('Legacy', { key: kdes, iv: iv8, mode: 'cbc' });
+const desPlain = crypto.cipher.des.decrypt(desCBC, { key: kdes, iv: iv8, mode: 'cbc' });
+
+const tdesCTR = crypto.cipher.des.encrypt('Legacy', { key: k3des, iv: iv8, mode: 'ctr' });
+const tdesPlain = crypto.cipher.des.decrypt(tdesCTR, { key: k3des, iv: iv8, mode: 'ctr' });
 ```
 
 ### File Encryption
