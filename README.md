@@ -118,7 +118,7 @@ crypto.hash.md4(data, options?)      // ⚠️ Legacy only
 crypto.hash.md5(data, options?)      // ⚠️ Legacy only
 crypto.hash.blake2b(data, options?)
 crypto.hash.blake2s(data, options?)
-crypto.hash.blake3(data, options?)
+crypto.hash.blake3(data, options?) // supports keyed, deriveKey/derive_key, hashLength/hash_length
 crypto.hash.whirlpool(data, options?)
 crypto.hash.ripemd160(data, options?)
 ```

@@ -21,6 +21,14 @@ console.log('SHA-512:', hash512);
 // BLAKE3 hash (faster)
 const blake3Hash = crypto.hash.blake3('Hello World');
 console.log('BLAKE3:', blake3Hash);
+
+// BLAKE3 options
+// Keyed hashing (32-byte key)
+const b3Keyed = crypto.hash.blake3('Hello World', { keyed: Buffer.alloc(32, 1) });
+// Derive-key mode
+const b3Derive = crypto.hash.blake3('Hello World', { deriveKey: 'com.example.app' });
+// Extendable output (XOF) length
+const b3Xof = crypto.hash.blake3('Hello World', { hashLength: 64, outputFormat: 'base64' });
 ```
 
 ### Different Output Formats

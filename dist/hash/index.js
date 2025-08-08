@@ -42,13 +42,22 @@ class BaseHash {
         if (!ctor) {
             throw new Error('WASM module does not export a streaming hasher');
         }
-        // Provide default algo when module expects options (e.g., sha2_wasm)
+        // Try with provided options, then without args, then with empty object
+        // to accommodate different wasm constructors across algorithms
+        const candidateOptions = this.streamingOptions ?? { algo: 'sha256' };
         try {
-            const opts = this.streamingOptions ?? { algo: 'sha256' };
-            this.hashInstance = new ctor(opts);
+            // Some constructors accept an options object
+            this.hashInstance = new ctor(candidateOptions);
         }
-        catch (_e) {
-            this.hashInstance = new ctor({});
+        catch (_e1) {
+            try {
+                // Some constructors accept no arguments
+                this.hashInstance = new ctor();
+            }
+            catch (_e2) {
+                // Fallback to empty object
+                this.hashInstance = new ctor({});
+            }
         }
     }
     update(data) {
@@ -57,6 +66,12 @@ class BaseHash {
         return this;
     }
     digest(format = 'hex') {
+        // Support extendable-output for algorithms that expose finalize_xof(length)
+        const length = this.streamingOptions?.hash_length ?? this.streamingOptions?.hashLength;
+        if (typeof length === 'number' && typeof this.hashInstance.finalize_xof === 'function') {
+            const result = this.hashInstance.finalize_xof(length);
+            return this.formatOutput(result, format);
+        }
         const result = this.hashInstance.finalize();
         return this.formatOutput(result, format);
     }
@@ -98,23 +113,84 @@ class BaseHash {
  */
 function createHashFunction(wasmPathSegments, HashClass, runtimeOptions) {
     let wasmModule;
+    function toUint8(input) {
+        if (typeof input === 'string')
+            return new Uint8Array(Buffer.from(input, 'utf8'));
+        if (Buffer.isBuffer(input))
+            return new Uint8Array(input);
+        if (input instanceof Uint8Array)
+            return input;
+        throw new TypeError('Input must be string, Buffer, or Uint8Array');
+    }
+    function formatOutput(data, format) {
+        switch (format) {
+            case 'hex':
+                return Buffer.from(data).toString('hex');
+            case 'base64':
+                return Buffer.from(data).toString('base64');
+            case 'binary':
+                return Buffer.from(data).toString('binary');
+            case 'buffer':
+                return Buffer.from(data);
+            default:
+                throw new Error(`Unknown output format: ${format}`);
+        }
+    }
+    function normalizeOptions(options) {
+        if (!options)
+            return { ...runtimeOptions };
+        const { outputFormat, ...rest } = options;
+        const merged = { ...(runtimeOptions || {}), ...rest };
+        if (merged.deriveKey && !merged.derive_key) {
+            merged.derive_key = merged.deriveKey;
+            delete merged.deriveKey;
+        }
+        const hl = merged.hashLength ?? merged.hash_length;
+        if (typeof hl === 'number') {
+            merged.hash_length = hl;
+            delete merged.hashLength;
+        }
+        if (merged.keyed !== undefined) {
+            const k = merged.keyed;
+            if (typeof k === 'string')
+                merged.keyed = Buffer.from(k, 'utf8');
+            if (Buffer.isBuffer(k))
+                merged.keyed = new Uint8Array(k);
+            if (k instanceof Uint8Array)
+                merged.keyed = k;
+        }
+        return merged;
+    }
     const hashFunction = function (input, options) {
         if (!wasmModule) {
             const resolvedPath = path_1.default.join(__dirname, '..', ...wasmPathSegments);
             // eslint-disable-next-line @typescript-eslint/no-var-requires
             wasmModule = require(resolvedPath);
         }
-        const hash = new HashClass(wasmModule, runtimeOptions);
+        const outputFormat = options?.outputFormat || 'hex';
+        const normalizedOptions = normalizeOptions(options);
+        // Prefer direct wasm hash when it accepts options
+        if (wasmModule && typeof wasmModule.hash === 'function') {
+            const wantsOptions = wasmModule.hash.length >= 2;
+            const hasAlgoOptions = Object.keys(normalizedOptions || {}).length > 0;
+            if (wantsOptions && hasAlgoOptions) {
+                const buf = toUint8(input);
+                const result = wasmModule.hash(buf, normalizedOptions);
+                return formatOutput(result, outputFormat);
+            }
+        }
+        const hash = new HashClass(wasmModule, normalizedOptions);
         hash.update(input);
-        return hash.digest(options?.outputFormat || 'hex');
+        return hash.digest(outputFormat);
     };
-    hashFunction.create = function () {
+    hashFunction.create = function (options) {
         if (!wasmModule) {
             const resolvedPath = path_1.default.join(__dirname, '..', ...wasmPathSegments);
             // eslint-disable-next-line @typescript-eslint/no-var-requires
             wasmModule = require(resolvedPath);
         }
-        return new HashClass(wasmModule, runtimeOptions);
+        const normalizedOptions = normalizeOptions(options);
+        return new HashClass(wasmModule, normalizedOptions);
     };
     return hashFunction;
 }

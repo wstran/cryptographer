@@ -23,7 +23,10 @@ declare const cryptographer: {
         md5: import("./types").HashFunction;
         blake2b: import("./types").HashFunction;
         blake2s: import("./types").HashFunction;
-        blake3: import("./types").HashFunction;
+        blake3: {
+            (input: import("./types").CryptoInput, options?: import("./types").Blake3Options): string | Buffer;
+            create(options?: import("./types").Blake3Options): import("./types").HashInstance;
+        };
         whirlpool: import("./types").HashFunction;
         ripemd160: import("./types").HashFunction;
     };

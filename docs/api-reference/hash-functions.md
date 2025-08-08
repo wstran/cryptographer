@@ -142,8 +142,17 @@ const blake2bHash = crypto.hash.blake2b('data');
 // BLAKE2s (256-bit output, optimized for small platforms)
 const blake2sHash = crypto.hash.blake2s('data');
 
-// BLAKE3 (256-bit output, extremely fast)
+// BLAKE3 (256-bit output by default, extremely fast)
 const blake3Hash = crypto.hash.blake3('data');
+
+// BLAKE3 — keyed hashing (MAC-like)
+const keyed = crypto.hash.blake3('data', { keyed: Buffer.from('0123456789abcdef0123456789abcdef', 'hex') }); // 32 bytes key
+
+// BLAKE3 — derive-key mode (deterministic subkeys)
+const dk = crypto.hash.blake3('data', { deriveKey: 'com.example.app.key' });
+
+// BLAKE3 — extendable output (XOF) length in bytes
+const xof32 = crypto.hash.blake3('data', { hashLength: 32 }); // 32 bytes output
 ```
 
 ### Legacy Algorithms
@@ -261,6 +270,7 @@ const input: CryptoInput = 'data' || Buffer.from('data') || new Uint8Array([1, 2
 
 ```typescript
 function sha256(input: CryptoInput, options?: HashOptions): string | Buffer
+function blake3(input: CryptoInput, options?: Blake3Options): string | Buffer
 ```
 
 ### Types
@@ -272,6 +282,13 @@ type HashOutput = 'hex' | 'base64' | 'binary' | 'buffer';
 
 interface HashOptions {
   outputFormat?: HashOutput;
+}
+
+// BLAKE3 options (subset) for reference
+interface Blake3Options extends HashOptions {
+  keyed?: CryptoInput;         // 32-byte key
+  deriveKey?: string;          // aka derive_key
+  hashLength?: number;         // aka hash_length
 }
 ```
 
@@ -301,4 +318,6 @@ interface HashInstance {
 
 // Create streaming instance
 const hash: HashInstance = crypto.hash.sha256.create();
-``` 
+// Some algorithms accept options in create(), e.g. BLAKE3:
+const blake3Hasher = crypto.hash.blake3.create({ keyed: Buffer.alloc(32, 0x11) });
+```

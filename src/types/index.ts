@@ -24,6 +24,23 @@ export interface HashOptions {
 }
 
 /**
+ * Options for BLAKE3
+ * Note: We accept both camelCase and snake_case for convenience.
+ */
+export interface Blake3Options extends HashOptions {
+  /** 32-byte key for keyed hashing (Uint8Array | Buffer | string) */
+  keyed?: CryptoInput;
+  /** Context string for derive key mode (camelCase variant) */
+  deriveKey?: string;
+  /** Context string for derive key mode (snake_case variant) */
+  derive_key?: string;
+  /** Desired output length for XOF mode (camelCase variant) */
+  hashLength?: number;
+  /** Desired output length for XOF mode (snake_case variant) */
+  hash_length?: number;
+}
+
+/**
  * Options for HMAC operations
  */
 export interface HMACOptions extends HashOptions {
@@ -144,7 +161,7 @@ export interface HashFunction {
   /**
    * Create a hash instance for streaming
    */
-  create(): HashInstance;
+  create(options?: HashOptions): HashInstance;
 }
 
 /**
