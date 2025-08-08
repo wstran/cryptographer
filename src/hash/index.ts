@@ -2,7 +2,14 @@
  * Hash algorithms module
  */
 
-import { CryptoInput, HashOptions, HashFunction, HashInstance, HashOutput, Blake3Options } from '../types';
+import {
+  CryptoInput,
+  HashOptions,
+  HashFunction,
+  HashInstance,
+  HashOutput,
+  Blake3Options,
+} from '../types';
 import path from 'path';
 
 /**
@@ -127,7 +134,9 @@ function createHashFunction<T extends BaseHash>(
     }
   }
 
-  function normalizeOptions(options?: HashOptions | Record<string, unknown>): Record<string, unknown> {
+  function normalizeOptions(
+    options?: HashOptions | Record<string, unknown>
+  ): Record<string, unknown> {
     if (!options) return { ...runtimeOptions };
     const { outputFormat, ...rest } = options as Record<string, unknown>;
     const merged: Record<string, unknown> = { ...(runtimeOptions || {}), ...rest };
@@ -211,20 +220,43 @@ class RIPEMD160Hash extends BaseHash {}
 
 // Export hash functions
 export const sha1 = createHashFunction(['sha', 'sha1_wasm', 'sha1_wasm.js'], SHA1Hash);
-export const sha256 = createHashFunction(['sha', 'sha2_wasm', 'sha2_wasm.js'], SHA256Hash, { algo: 'sha256' });
-export const sha512 = createHashFunction(['sha', 'sha2_wasm', 'sha2_wasm.js'], SHA512Hash, { algo: 'sha512' });
-export const sha3_256 = createHashFunction(['sha', 'sha3_wasm', 'sha3_wasm.js'], SHA3_256Hash, { algo: 'sha3_256' });
-export const sha3_512 = createHashFunction(['sha', 'sha3_wasm', 'sha3_wasm.js'], SHA3_512Hash, { algo: 'sha3_512' });
+export const sha256 = createHashFunction(['sha', 'sha2_wasm', 'sha2_wasm.js'], SHA256Hash, {
+  algo: 'sha256',
+});
+export const sha512 = createHashFunction(['sha', 'sha2_wasm', 'sha2_wasm.js'], SHA512Hash, {
+  algo: 'sha512',
+});
+export const sha3_256 = createHashFunction(['sha', 'sha3_wasm', 'sha3_wasm.js'], SHA3_256Hash, {
+  algo: 'sha3_256',
+});
+export const sha3_512 = createHashFunction(['sha', 'sha3_wasm', 'sha3_wasm.js'], SHA3_512Hash, {
+  algo: 'sha3_512',
+});
 export const md4 = createHashFunction(['sha', 'md4_wasm', 'md4_wasm.js'], MD4Hash, { algo: 'md4' });
 export const md5 = createHashFunction(['sha', 'md5_wasm', 'md5_wasm.js'], MD5Hash, { algo: 'md5' });
-export const blake2b = createHashFunction(['sha', 'blake2_wasm', 'blake2_wasm.js'], Blake2bHash, { algo: 'blake2b' });
-export const blake2s = createHashFunction(['sha', 'blake2_wasm', 'blake2_wasm.js'], Blake2sHash, { algo: 'blake2s' });
-export const blake3 = createHashFunction(['sha', 'blake3_wasm', 'blake3_wasm.js'], Blake3Hash) as unknown as {
+export const blake2b = createHashFunction(['sha', 'blake2_wasm', 'blake2_wasm.js'], Blake2bHash, {
+  algo: 'blake2b',
+});
+export const blake2s = createHashFunction(['sha', 'blake2_wasm', 'blake2_wasm.js'], Blake2sHash, {
+  algo: 'blake2s',
+});
+export const blake3 = createHashFunction(
+  ['sha', 'blake3_wasm', 'blake3_wasm.js'],
+  Blake3Hash
+) as unknown as {
   (input: CryptoInput, options?: Blake3Options): string | Buffer;
   create(options?: Blake3Options): HashInstance;
 };
-export const whirlpool = createHashFunction(['sha', 'whirlpool_wasm', 'whirlpool_wasm.js'], WhirlpoolHash, { algo: 'whirlpool' });
-export const ripemd160 = createHashFunction(['sha', 'ripemd160_wasm', 'ripemd160_wasm.js'], RIPEMD160Hash, { algo: 'ripemd160' });
+export const whirlpool = createHashFunction(
+  ['sha', 'whirlpool_wasm', 'whirlpool_wasm.js'],
+  WhirlpoolHash,
+  { algo: 'whirlpool' }
+);
+export const ripemd160 = createHashFunction(
+  ['sha', 'ripemd160_wasm', 'ripemd160_wasm.js'],
+  RIPEMD160Hash,
+  { algo: 'ripemd160' }
+);
 
 // Export all hash functions as an object
 export const hash = {

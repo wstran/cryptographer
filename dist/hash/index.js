@@ -224,14 +224,26 @@ class RIPEMD160Hash extends BaseHash {
 }
 // Export hash functions
 exports.sha1 = createHashFunction(['sha', 'sha1_wasm', 'sha1_wasm.js'], SHA1Hash);
-exports.sha256 = createHashFunction(['sha', 'sha2_wasm', 'sha2_wasm.js'], SHA256Hash, { algo: 'sha256' });
-exports.sha512 = createHashFunction(['sha', 'sha2_wasm', 'sha2_wasm.js'], SHA512Hash, { algo: 'sha512' });
-exports.sha3_256 = createHashFunction(['sha', 'sha3_wasm', 'sha3_wasm.js'], SHA3_256Hash, { algo: 'sha3_256' });
-exports.sha3_512 = createHashFunction(['sha', 'sha3_wasm', 'sha3_wasm.js'], SHA3_512Hash, { algo: 'sha3_512' });
+exports.sha256 = createHashFunction(['sha', 'sha2_wasm', 'sha2_wasm.js'], SHA256Hash, {
+    algo: 'sha256',
+});
+exports.sha512 = createHashFunction(['sha', 'sha2_wasm', 'sha2_wasm.js'], SHA512Hash, {
+    algo: 'sha512',
+});
+exports.sha3_256 = createHashFunction(['sha', 'sha3_wasm', 'sha3_wasm.js'], SHA3_256Hash, {
+    algo: 'sha3_256',
+});
+exports.sha3_512 = createHashFunction(['sha', 'sha3_wasm', 'sha3_wasm.js'], SHA3_512Hash, {
+    algo: 'sha3_512',
+});
 exports.md4 = createHashFunction(['sha', 'md4_wasm', 'md4_wasm.js'], MD4Hash, { algo: 'md4' });
 exports.md5 = createHashFunction(['sha', 'md5_wasm', 'md5_wasm.js'], MD5Hash, { algo: 'md5' });
-exports.blake2b = createHashFunction(['sha', 'blake2_wasm', 'blake2_wasm.js'], Blake2bHash, { algo: 'blake2b' });
-exports.blake2s = createHashFunction(['sha', 'blake2_wasm', 'blake2_wasm.js'], Blake2sHash, { algo: 'blake2s' });
+exports.blake2b = createHashFunction(['sha', 'blake2_wasm', 'blake2_wasm.js'], Blake2bHash, {
+    algo: 'blake2b',
+});
+exports.blake2s = createHashFunction(['sha', 'blake2_wasm', 'blake2_wasm.js'], Blake2sHash, {
+    algo: 'blake2s',
+});
 exports.blake3 = createHashFunction(['sha', 'blake3_wasm', 'blake3_wasm.js'], Blake3Hash);
 exports.whirlpool = createHashFunction(['sha', 'whirlpool_wasm', 'whirlpool_wasm.js'], WhirlpoolHash, { algo: 'whirlpool' });
 exports.ripemd160 = createHashFunction(['sha', 'ripemd160_wasm', 'ripemd160_wasm.js'], RIPEMD160Hash, { algo: 'ripemd160' });

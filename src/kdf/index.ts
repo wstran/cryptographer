@@ -73,7 +73,9 @@ class Argon2 extends BaseKDF {
     const passwordBuffer = this.toBuffer(password);
     const saltBase64 = Buffer.from(this.toBuffer(options.salt)).toString('base64');
     // Argon2 crate expects salt without '=' padding
-    const encoded = this.wasmModule.hash_password(passwordBuffer, { salt: saltBase64.replace(/=+$/g, '') });
+    const encoded = this.wasmModule.hash_password(passwordBuffer, {
+      salt: saltBase64.replace(/=+$/g, ''),
+    });
     // For Argon2, return the PHC string (utf8) by default; if buffer requested, return bytes
     if ((options.outputFormat || 'hex') === 'buffer') {
       return Buffer.from(encoded, 'utf8');
