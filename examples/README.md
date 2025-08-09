@@ -162,10 +162,10 @@ const encrypted = crypto.cipher.aes.encrypt(data, {
 ### Data Integrity Verification
 ```javascript
 // Generate checksum
-const checksum = crypto.hash.blake3(fileContent);
+const checksum = crypto.sha.blake3(fileContent);
 
 // Verify integrity
-const isIntact = crypto.hash.blake3(receivedContent) === expectedChecksum;
+const isIntact = crypto.sha.blake3(receivedContent) === expectedChecksum;
 ```
 
 ## 📖 Additional Resources
@@ -194,7 +194,7 @@ When creating new examples:
 
 /**
  * [Example Name]
- * 
+ *
  * Brief description of what this example demonstrates.
  */
 

@@ -34,4 +34,21 @@ export declare const hash: {
     whirlpool: HashFunction;
     ripemd160: HashFunction;
 };
+export declare const sha: {
+    sha1: HashFunction;
+    sha256: HashFunction;
+    sha512: HashFunction;
+    sha3_256: HashFunction;
+    sha3_512: HashFunction;
+    md4: HashFunction;
+    md5: HashFunction;
+    blake2b: HashFunction;
+    blake2s: HashFunction;
+    blake3: {
+        (input: CryptoInput, options?: Blake3Options): string | Buffer;
+        create(options?: Blake3Options): HashInstance;
+    };
+    whirlpool: HashFunction;
+    ripemd160: HashFunction;
+};
 //# sourceMappingURL=index.d.ts.map

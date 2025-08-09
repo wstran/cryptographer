@@ -30,22 +30,22 @@ function hex(buf, len = 32) {
   section('Hash');
   const msg = 'Hello World';
   const hashes = {
-    sha1: lib.hash.sha1(msg),
-    sha256: lib.hash.sha256(msg),
-    sha512: lib.hash.sha512(msg),
-    sha3_256: lib.hash.sha3_256(msg),
-    sha3_512: lib.hash.sha3_512(msg),
-    md4: lib.hash.md4(msg),
-    md5: lib.hash.md5(msg),
-    blake2b: lib.hash.blake2b(msg),
-    blake2s: lib.hash.blake2s(msg),
-    blake3: lib.hash.blake3(msg),
-    whirlpool: lib.hash.whirlpool(msg),
-    ripemd160: lib.hash.ripemd160(msg),
+    sha1: lib.sha.sha1(msg),
+    sha256: lib.sha.sha256(msg),
+    sha512: lib.sha.sha512(msg),
+    sha3_256: lib.sha.sha3_256(msg),
+    sha3_512: lib.sha.sha3_512(msg),
+    md4: lib.sha.md4(msg),
+    md5: lib.sha.md5(msg),
+    blake2b: lib.sha.blake2b(msg),
+    blake2s: lib.sha.blake2s(msg),
+    blake3: lib.sha.blake3(msg),
+    whirlpool: lib.sha.whirlpool(msg),
+    ripemd160: lib.sha.ripemd160(msg),
   };
   console.table(Object.entries(hashes).map(([k, v]) => ({ algo: k, hex: String(v).slice(0, 32) + '…', len: String(v).length })));
   // Streaming hash
-  const h = lib.hash.sha256.create();
+  const h = lib.sha.sha256.create();
   h.update('Hello').update(' ').update('World');
   const streamHash = h.digest('hex');
   assert(streamHash === hashes.sha256, 'streaming sha256 matches');

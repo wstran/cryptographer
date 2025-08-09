@@ -330,7 +330,7 @@ console.log('=== Memory Usage Benchmarks ===');
 // Hash memory usage
 benchmarkMemoryUsage(() => {
   const data = crypto.randomBytes(1024);
-  crypto.hash.sha256(data);
+  crypto.sha.sha256(data);
 }, 10000);
 
 // Encryption memory usage
@@ -348,7 +348,7 @@ benchmarkMemoryUsage(() => {
 
 ```javascript
 // ✅ Good: Reuse hash instance for multiple updates
-const hash = crypto.hash.sha256.create();
+const hash = crypto.sha.sha256.create();
 for (const chunk of dataChunks) {
   hash.update(chunk);
 }
@@ -356,7 +356,7 @@ const result = hash.digest();
 
 // ❌ Bad: Create new hash for each chunk
 for (const chunk of dataChunks) {
-  const hash = crypto.hash.sha256(chunk); // Inefficient
+  const hash = crypto.sha.sha256(chunk); // Inefficient
 }
 ```
 
@@ -364,23 +364,23 @@ for (const chunk of dataChunks) {
 
 ```javascript
 // ✅ Good: Use BLAKE3 for speed-critical applications
-const hash = crypto.hash.blake3(data);
+const hash = crypto.sha.blake3(data);
 
 // ✅ Good: Use SHA-256 for compatibility
-const hash = crypto.hash.sha256(data);
+const hash = crypto.sha.sha256(data);
 
 // ✅ Good: Use SHA3-256 for future-proof applications
-const hash = crypto.hash.sha3_256(data);
+const hash = crypto.sha.sha3_256(data);
 ```
 
 ### 3. Optimize Buffer Operations
 
 ```javascript
 // ✅ Good: Use Buffer directly
-const hash = crypto.hash.sha256(buffer);
+const hash = crypto.sha.sha256(buffer);
 
 // ❌ Bad: Convert unnecessarily
-const hash = crypto.hash.sha256(buffer.toString());
+const hash = crypto.sha.sha256(buffer.toString());
 ```
 
 ### 4. Batch Operations
@@ -390,7 +390,7 @@ const hash = crypto.hash.sha256(buffer.toString());
 function processBatch(items) {
   const results = [];
   for (const item of items) {
-    results.push(crypto.hash.sha256(item));
+    results.push(crypto.sha.sha256(item));
   }
   return results;
 }
@@ -399,7 +399,7 @@ function processBatch(items) {
 async function processSequentially(items) {
   const results = [];
   for (const item of items) {
-    results.push(await crypto.hash.sha256(item)); // Unnecessary async
+    results.push(await crypto.sha.sha256(item)); // Unnecessary async
   }
   return results;
 }

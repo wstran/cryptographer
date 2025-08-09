@@ -14,7 +14,7 @@ npm install cryptographer.js
 import crypto from 'cryptographer.js';
 
 // SHA-256 hash
-const hash = crypto.hash.sha256('Hello World');
+const hash = crypto.sha.sha256('Hello World');
 console.log(hash); // 'a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e'
 
 // AES-256-CBC encryption

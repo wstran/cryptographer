@@ -4,7 +4,7 @@
  * @module cryptographer.js
  */
 export * from './types';
-import { hash } from './hash';
+import { sha } from './hash';
 import { cipher, rsa_oaep, x25519, ecdh } from './cipher';
 import { hmac } from './hmac';
 import { kdf } from './kdf';
@@ -16,9 +16,9 @@ export { hmacSHA1, hmacSHA256, hmacSHA512, hmacMD5 } from './hmac';
 export { pbkdf2, argon2, bcrypt } from './kdf';
 export declare function randomBytes(size: number): Buffer;
 export declare function timingSafeEqual(a: CryptoInput, b: CryptoInput): boolean;
-export { hash, cipher, hmac, kdf, dsa, ed25519, ecdsa, rsa };
+export { sha, cipher, hmac, kdf, dsa, ed25519, ecdsa, rsa };
 declare const cryptographer: {
-    hash: typeof hash;
+    sha: typeof sha;
     cipher: typeof cipher;
     hmac: typeof hmac;
     kdf: typeof kdf;

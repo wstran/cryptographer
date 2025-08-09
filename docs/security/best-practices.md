@@ -25,14 +25,14 @@ This guide covers essential security best practices when using cryptographer.js 
 
 ```javascript
 // ✅ Recommended for new applications
-const hash = crypto.hash.sha256(data);     // General purpose
-const hash = crypto.hash.blake3(data);     // Speed critical
-const hash = crypto.hash.sha3_256(data);   // Future-proof
+const hash = crypto.sha.sha256(data);     // General purpose
+const hash = crypto.sha.blake3(data);     // Speed critical
+const hash = crypto.sha.sha3_256(data);   // Future-proof
 
 // ⚠️ Use only for legacy compatibility
-const hash = crypto.hash.sha1(data);       // Cryptographically broken
-const hash = crypto.hash.md5(data);        // Cryptographically broken
-const hash = crypto.hash.md4(data);        // Cryptographically broken
+const hash = crypto.sha.sha1(data);       // Cryptographically broken
+const hash = crypto.sha.md5(data);        // Cryptographically broken
+const hash = crypto.sha.md4(data);        // Cryptographically broken
 ```
 
 ### Password Hashing
@@ -58,7 +58,7 @@ const key = crypto.kdf.pbkdf2(password, {
 });
 
 // ❌ Never use hash functions for passwords
-const hash = crypto.hash.sha256(password); // Vulnerable!
+const hash = crypto.sha.sha256(password); // Vulnerable!
 ```
 
 ### Encryption
@@ -278,7 +278,7 @@ function verifyPasswordBad(password, storedHash) {
 
 ```javascript
 // ✅ Good: Use constant-time operations where possible
-const hash = crypto.hash.sha256(data); // Constant-time
+const hash = crypto.sha.sha256(data); // Constant-time
 
 // ✅ Good: Use constant-time HMAC
 const hmac = crypto.hmac.sha256(data, { key });
@@ -336,7 +336,7 @@ function processData(input) {
   // Convert to Buffer for consistent processing
   const buffer = Buffer.isBuffer(input) ? input : Buffer.from(input, 'utf8');
 
-  return crypto.hash.sha256(buffer);
+  return crypto.sha.sha256(buffer);
 }
 ```
 
@@ -523,7 +523,7 @@ const logger = new SecurityLogger();
 
 function secureHash(data) {
   logger.logHashOperation('SHA-256', data.length);
-  return crypto.hash.sha256(data);
+  return crypto.sha.sha256(data);
 }
 ```
 
@@ -548,7 +548,7 @@ class CryptoMonitor {
 const monitor = new CryptoMonitor();
 
 const hash = monitor.measureOperation(
-  () => crypto.hash.sha256('data'),
+  () => crypto.sha.sha256('data'),
   'SHA-256'
 );
 ```
@@ -559,7 +559,7 @@ const hash = monitor.measureOperation(
 
 ```javascript
 // ✅ Good: Use FIPS-compliant algorithms
-const fipsCompliantHash = crypto.hash.sha256(data);     // FIPS 180-4
+const fipsCompliantHash = crypto.sha.sha256(data);     // FIPS 180-4
 const fipsCompliantEncryption = crypto.cipher.aes.encrypt(data, options); // FIPS 197
 
 // ✅ Good: Use NIST-recommended parameters
@@ -581,7 +581,7 @@ function hashUserData(userData) {
     userId: userData.id
   };
 
-  return crypto.hash.sha256(JSON.stringify(essentialData));
+  return crypto.sha.sha256(JSON.stringify(essentialData));
 }
 
 // ✅ Good: Implement data deletion

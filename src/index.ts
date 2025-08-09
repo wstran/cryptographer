@@ -8,7 +8,7 @@
 export * from './types';
 
 // Import all modules
-import { hash } from './hash';
+import { hash as _hashInternal, sha } from './hash';
 import { cipher, aes, chacha20, des, rsa_oaep, x25519, ecdh } from './cipher';
 import { hmac } from './hmac';
 import { kdf } from './kdf';
@@ -79,7 +79,7 @@ export function timingSafeEqual(a: CryptoInput, b: CryptoInput): boolean {
 
 // Export grouped modules
 export {
-  hash,
+  sha,
   cipher,
   hmac,
   kdf,
@@ -91,7 +91,7 @@ export {
 
 // Default export with all modules
 const cryptographer: {
-  hash: typeof hash;
+  sha: typeof sha;
   cipher: typeof cipher;
   hmac: typeof hmac;
   kdf: typeof kdf;
@@ -105,7 +105,7 @@ const cryptographer: {
   randomBytes: typeof randomBytes;
   timingSafeEqual: typeof timingSafeEqual;
 } = {
-  hash,
+  sha,
   cipher,
   hmac,
   kdf,

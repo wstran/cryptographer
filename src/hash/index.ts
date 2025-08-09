@@ -273,3 +273,6 @@ export const hash = {
   whirlpool,
   ripemd160,
 };
+
+// Namespace alias to match crates naming
+export const sha = hash;

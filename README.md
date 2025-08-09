@@ -36,7 +36,7 @@ const crypto = require('cryptographer.js');
 import crypto from 'cryptographer.js';
 
 // Hash example
-const hash = crypto.hash.sha256('Hello World');
+const hash = crypto.sha.sha256('Hello World');
 console.log(hash); // 'a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e'
 
 // HMAC example
@@ -125,28 +125,28 @@ All hash functions support the following options:
 
 ```javascript
 // Basic usage
-crypto.hash.sha256('Hello World') // Returns hex string by default
-crypto.hash.sha256('Hello World', { outputFormat: 'base64' })
+crypto.sha.sha256('Hello World') // Returns hex string by default
+crypto.sha.sha256('Hello World', { outputFormat: 'base64' })
 
 // Available functions
-crypto.hash.sha1(data, options?)
-crypto.hash.sha256(data, options?)
-crypto.hash.sha512(data, options?)
-crypto.hash.sha3_256(data, options?)
-crypto.hash.sha3_512(data, options?)
-crypto.hash.md4(data, options?)      // ⚠️ Legacy only
-crypto.hash.md5(data, options?)      // ⚠️ Legacy only
-crypto.hash.blake2b(data, options?)
-crypto.hash.blake2s(data, options?)
-crypto.hash.blake3(data, options?) // supports keyed, deriveKey/derive_key, hashLength/hash_length
-crypto.hash.whirlpool(data, options?)
-crypto.hash.ripemd160(data, options?)
+crypto.sha.sha1(data, options?)
+crypto.sha.sha256(data, options?)
+crypto.sha.sha512(data, options?)
+crypto.sha.sha3_256(data, options?)
+crypto.sha.sha3_512(data, options?)
+crypto.sha.md4(data, options?)      // ⚠️ Legacy only
+crypto.sha.md5(data, options?)      // ⚠️ Legacy only
+crypto.sha.blake2b(data, options?)
+crypto.sha.blake2s(data, options?)
+crypto.sha.blake3(data, options?) // supports keyed, deriveKey/derive_key, hashLength/hash_length
+crypto.sha.whirlpool(data, options?)
+crypto.sha.ripemd160(data, options?)
 ```
 
 #### Streaming Hash API
 
 ```javascript
-const hasher = crypto.hash.sha256.create();
+const hasher = crypto.sha.sha256.create();
 hasher.update('Hello ');
 hasher.update('World');
 const result = hasher.digest(); // 'a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e'
@@ -288,7 +288,7 @@ const options: HashOptions = {
   outputFormat: 'base64'
 };
 
-const hash: string = crypto.hash.sha256('data', options);
+const hash: string = crypto.sha.sha256('data', options);
 
 // Cipher with proper typing
 const cipherOptions: CipherOptions = {

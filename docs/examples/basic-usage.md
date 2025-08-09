@@ -10,41 +10,41 @@ This section provides comprehensive examples of how to use cryptographer.js for 
 import crypto from 'cryptographer.js';
 
 // SHA-256 hash
-const hash = crypto.hash.sha256('Hello World');
+const hash = crypto.sha.sha256('Hello World');
 console.log('SHA-256:', hash);
 // Output: a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e
 
 // SHA-512 hash
-const hash512 = crypto.hash.sha512('Hello World');
+const hash512 = crypto.sha.sha512('Hello World');
 console.log('SHA-512:', hash512);
 
 // BLAKE3 hash (faster)
-const blake3Hash = crypto.hash.blake3('Hello World');
+const blake3Hash = crypto.sha.blake3('Hello World');
 console.log('BLAKE3:', blake3Hash);
 
 // BLAKE3 options
 // Keyed hashing (32-byte key)
-const b3Keyed = crypto.hash.blake3('Hello World', { keyed: Buffer.alloc(32, 1) });
+const b3Keyed = crypto.sha.blake3('Hello World', { keyed: Buffer.alloc(32, 1) });
 // Derive-key mode
-const b3Derive = crypto.hash.blake3('Hello World', { deriveKey: 'com.example.app' });
+const b3Derive = crypto.sha.blake3('Hello World', { deriveKey: 'com.example.app' });
 // Extendable output (XOF) length
-const b3Xof = crypto.hash.blake3('Hello World', { hashLength: 64, outputFormat: 'base64' });
+const b3Xof = crypto.sha.blake3('Hello World', { hashLength: 64, outputFormat: 'base64' });
 ```
 
 ### Different Output Formats
 
 ```javascript
 // Hex output (default)
-const hexHash = crypto.hash.sha256('Hello World', { outputFormat: 'hex' });
+const hexHash = crypto.sha.sha256('Hello World', { outputFormat: 'hex' });
 
 // Base64 output
-const base64Hash = crypto.hash.sha256('Hello World', { outputFormat: 'base64' });
+const base64Hash = crypto.sha.sha256('Hello World', { outputFormat: 'base64' });
 
 // Buffer output
-const bufferHash = crypto.hash.sha256('Hello World', { outputFormat: 'buffer' });
+const bufferHash = crypto.sha.sha256('Hello World', { outputFormat: 'buffer' });
 
 // Binary string output
-const binaryHash = crypto.hash.sha256('Hello World', { outputFormat: 'binary' });
+const binaryHash = crypto.sha.sha256('Hello World', { outputFormat: 'binary' });
 
 console.log('Hex:', hexHash);
 console.log('Base64:', base64Hash);
@@ -58,7 +58,7 @@ console.log('Binary:', binaryHash);
 import fs from 'fs';
 
 function hashFile(filePath) {
-  const hash = crypto.hash.sha256.create();
+const hash = crypto.sha.sha256.create();
   const stream = fs.createReadStream(filePath);
 
   stream.on('data', (chunk) => {
@@ -511,7 +511,7 @@ console.log('Match:', original === retrieved);
 ```javascript
 try {
   // Hash operation
-  const hash = crypto.hash.sha256('Hello World');
+  const hash = crypto.sha.sha256('Hello World');
   console.log('Hash:', hash);
 
   // HMAC operation
@@ -567,10 +567,10 @@ function benchmark(operation, iterations = 100000) {
 
 // Benchmark hash functions
 console.log('=== SHA-256 Benchmark ===');
-benchmark(() => crypto.hash.sha256('Hello World'));
+benchmark(() => crypto.sha.sha256('Hello World'));
 
 console.log('\n=== BLAKE3 Benchmark ===');
-benchmark(() => crypto.hash.blake3('Hello World'));
+benchmark(() => crypto.sha.blake3('Hello World'));
 
 console.log('\n=== HMAC-SHA256 Benchmark ===');
 benchmark(() => crypto.hmac.sha256('Hello World', { key: 'secret' }));

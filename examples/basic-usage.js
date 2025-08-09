@@ -2,7 +2,7 @@
 
 /**
  * Basic Usage Examples for cryptographer.js
- * 
+ *
  * This file demonstrates the basic usage of all major functions
  * in the cryptographer.js library.
  */
@@ -18,19 +18,19 @@ console.log('📋 Hash Functions:');
 const message = 'Hello, World!';
 
 // SHA-256 (recommended)
-const sha256Hash = crypto.hash.sha256(message);
+const sha256Hash = crypto.sha.sha256(message);
 console.log(`SHA-256: ${sha256Hash}`);
 
 // BLAKE3 (fastest)
-const blake3Hash = crypto.hash.blake3(message);
+const blake3Hash = crypto.sha.blake3(message);
 console.log(`BLAKE3:  ${blake3Hash}`);
 
 // Different output formats
-const sha256Base64 = crypto.hash.sha256(message, { outputFormat: 'base64' });
+const sha256Base64 = crypto.sha.sha256(message, { outputFormat: 'base64' });
 console.log(`SHA-256 (Base64): ${sha256Base64}`);
 
 // Streaming hash
-const hasher = crypto.hash.sha256.create();
+const hasher = crypto.sha.sha256.create();
 hasher.update('Hello, ');
 hasher.update('World!');
 const streamResult = hasher.digest();
@@ -116,10 +116,10 @@ console.log('🚀 Practical Example - Secure File Storage:');
 function secureFileStorage() {
   const fileContent = 'This is sensitive file content.';
   const userPassword = 'user-master-password';
-  
+
   // 1. Generate a random salt
   const fileSalt = nodeCrypto.randomBytes(32);
-  
+
   // 2. Derive encryption key from password
   const encryptionKey = crypto.kdf.pbkdf2(userPassword, {
     salt: fileSalt,
@@ -127,29 +127,29 @@ function secureFileStorage() {
     keyLength: 32,
     outputFormat: 'buffer'
   });
-  
+
   // 3. Generate random IV
   const fileIv = nodeCrypto.randomBytes(16);
-  
+
   // 4. Encrypt the content
   const encryptedContent = crypto.cipher.aes.encrypt(fileContent, {
     key: encryptionKey,
     iv: fileIv,
     mode: 'CBC'
   });
-  
+
   // 5. Create integrity hash
-  const integrityHash = crypto.hash.sha256(encryptedContent);
-  
+  const integrityHash = crypto.sha.sha256(encryptedContent);
+
   console.log(`Original Content: ${fileContent}`);
   console.log(`Salt: ${fileSalt.toString('hex')}`);
   console.log(`IV: ${fileIv.toString('hex')}`);
   console.log(`Encrypted: ${encryptedContent.toString('hex')}`);
   console.log(`Integrity Hash: ${integrityHash}`);
-  
+
   // Simulate storage and retrieval
   console.log('\n--- Retrieving and Decrypting ---');
-  
+
   // 6. Derive the same key using stored salt
   const derivedKey = crypto.kdf.pbkdf2(userPassword, {
     salt: fileSalt,
@@ -157,21 +157,21 @@ function secureFileStorage() {
     keyLength: 32,
     outputFormat: 'buffer'
   });
-  
+
   // 7. Verify integrity
-  const computedHash = crypto.hash.sha256(encryptedContent);
+  const computedHash = crypto.sha.sha256(encryptedContent);
   if (computedHash !== integrityHash) {
     throw new Error('File integrity check failed!');
   }
   console.log('✓ Integrity check passed');
-  
+
   // 8. Decrypt the content
   const decryptedContent = crypto.cipher.aes.decrypt(encryptedContent, {
     key: derivedKey,
     iv: fileIv,
     mode: 'CBC'
   });
-  
+
   console.log(`Decrypted Content: ${decryptedContent.toString()}`);
   console.log('✓ File successfully decrypted');
 }

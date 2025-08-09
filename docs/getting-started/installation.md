@@ -74,7 +74,7 @@ To verify the installation, run this code:
 import crypto from 'cryptographer.js';
 
 // Test hash function
-const hash = crypto.hash.sha256('Hello World');
+const hash = crypto.sha.sha256('Hello World');
 console.log('SHA-256:', hash);
 
 // Test HMAC

@@ -8,13 +8,13 @@ console.log('\n📝 Example 1: Basic Hashing');
 const message = 'Hello, cryptographer.js!';
 console.log(`Message: "${message}"`);
 
-const sha256Hash = crypto.hash.sha256(message);
+const sha256Hash = crypto.sha.sha256(message);
 console.log(`SHA-256: ${sha256Hash}`);
 
-const md5Hash = crypto.hash.md5(message);
+const md5Hash = crypto.sha.md5(message);
 console.log(`MD5: ${md5Hash}`);
 
-const blake3Hash = crypto.hash.blake3(message);
+const blake3Hash = crypto.sha.blake3(message);
 console.log(`BLAKE3: ${blake3Hash}`);
 
 // Example 2: HMAC (Hash-based Message Authentication Code)
@@ -36,7 +36,7 @@ console.log(`Derived Key: ${derivedKey}`);
 
 // Example 4: Streaming Hash
 console.log('\n🌊 Example 4: Streaming Hash');
-const streamingHash = crypto.hash.sha256.create();
+const streamingHash = crypto.sha.sha256.create();
 streamingHash.update('Hello');
 streamingHash.update(', ');
 streamingHash.update('World!');
@@ -46,9 +46,9 @@ console.log(`Streaming Result: ${streamedResult}`);
 // Example 5: Different Output Formats
 console.log('\n📊 Example 5: Different Output Formats');
 const testData = 'Format test data';
-const hexFormat = crypto.hash.sha256(testData, { outputFormat: 'hex' });
-const base64Format = crypto.hash.sha256(testData, { outputFormat: 'base64' });
-const bufferFormat = crypto.hash.sha256(testData, { outputFormat: 'buffer' });
+const hexFormat = crypto.sha.sha256(testData, { outputFormat: 'hex' });
+const base64Format = crypto.sha.sha256(testData, { outputFormat: 'base64' });
+const bufferFormat = crypto.sha.sha256(testData, { outputFormat: 'buffer' });
 
 console.log(`Hex: ${hexFormat}`);
 console.log(`Base64: ${base64Format}`);
@@ -60,10 +60,10 @@ const performanceData = 'This is a longer string for performance testing. It sho
 const iterations = 1000;
 
 const algorithms = [
-  { name: 'SHA-256', func: crypto.hash.sha256 },
-  { name: 'SHA-512', func: crypto.hash.sha512 },
-  { name: 'BLAKE3', func: crypto.hash.blake3 },
-  { name: 'MD5', func: crypto.hash.md5 }
+  { name: 'SHA-256', func: crypto.sha.sha256 },
+  { name: 'SHA-512', func: crypto.sha.sha512 },
+  { name: 'BLAKE3', func: crypto.sha.blake3 },
+  { name: 'MD5', func: crypto.sha.md5 }
 ];
 
 console.log(`Benchmarking ${iterations} iterations with ${performanceData.length} character input:`);
@@ -87,9 +87,9 @@ console.log('\n🔒 Example 7: Security Verification');
 const sameInput = 'test';
 const differentInput = 'test2';
 
-const hash1 = crypto.hash.sha256(sameInput);
-const hash2 = crypto.hash.sha256(sameInput);
-const hash3 = crypto.hash.sha256(differentInput);
+const hash1 = crypto.sha.sha256(sameInput);
+const hash2 = crypto.sha.sha256(sameInput);
+const hash3 = crypto.sha.sha256(differentInput);
 
 console.log(`Same input, hash 1: ${hash1}`);
 console.log(`Same input, hash 2: ${hash2}`);

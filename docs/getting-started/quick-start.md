@@ -10,19 +10,19 @@ Get up and running with cryptographer.js in just a few minutes.
 import crypto from 'cryptographer.js';
 
 // SHA-256 hash
-const hash = crypto.hash.sha256('Hello World');
+const hash = crypto.sha.sha256('Hello World');
 console.log(hash); // 'a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e'
 
 // SHA-512 hash
-const hash512 = crypto.hash.sha512('Hello World');
+const hash512 = crypto.sha.sha512('Hello World');
 
 // BLAKE3 hash (faster than SHA-256)
-const blake3Hash = crypto.hash.blake3('Hello World');
+const blake3Hash = crypto.sha.blake3('Hello World');
 
 // Different output formats
-const hexHash = crypto.hash.sha256('Hello World', { outputFormat: 'hex' });
-const base64Hash = crypto.hash.sha256('Hello World', { outputFormat: 'base64' });
-const bufferHash = crypto.hash.sha256('Hello World', { outputFormat: 'buffer' });
+const hexHash = crypto.sha.sha256('Hello World', { outputFormat: 'hex' });
+const base64Hash = crypto.sha.sha256('Hello World', { outputFormat: 'base64' });
+const bufferHash = crypto.sha.sha256('Hello World', { outputFormat: 'buffer' });
 ```
 
 ### 2. HMAC (Hash-based Message Authentication Code)
@@ -108,7 +108,7 @@ const isValid = crypto.kdf.bcrypt.verify('password', bcryptHash);
 
 ```javascript
 // For large files or data streams
-const hash = crypto.hash.sha256.create();
+const hash = crypto.sha.sha256.create();
 hash.update('Hello');
 hash.update(' ');
 hash.update('World');
@@ -174,7 +174,7 @@ const isValid = await PasswordManager.verifyPassword('myPassword', hash, salt);
 
 ```javascript
 // Good: Reuse hash instance
-const hash = crypto.hash.sha256.create();
+const hash = crypto.sha.sha256.create();
 for (const chunk of dataChunks) {
   hash.update(chunk);
 }
@@ -182,7 +182,7 @@ const result = hash.digest();
 
 // Avoid: Create new hash for each chunk
 for (const chunk of dataChunks) {
-  const hash = crypto.hash.sha256(chunk); // Inefficient
+  const hash = crypto.sha.sha256(chunk); // Inefficient
 }
 ```
 
@@ -190,7 +190,7 @@ for (const chunk of dataChunks) {
 
 ```javascript
 // For general hashing: SHA-256 or BLAKE3
-const hash = crypto.hash.sha256(data);
+const hash = crypto.sha.sha256(data);
 
 // For password hashing: Argon2id
 const passwordHash = crypto.kdf.argon2(password, options);
@@ -203,17 +203,17 @@ const key = crypto.kdf.pbkdf2(password, options);
 
 ```javascript
 // Good: Use Buffer directly
-const hash = crypto.hash.sha256(buffer);
+const hash = crypto.sha.sha256(buffer);
 
 // Avoid: Convert to string unnecessarily
-const hash = crypto.hash.sha256(buffer.toString());
+const hash = crypto.sha.sha256(buffer.toString());
 ```
 
 ## Error Handling
 
 ```javascript
 try {
-  const hash = crypto.hash.sha256(data);
+  const hash = crypto.sha.sha256(data);
 } catch (error) {
   if (error.message.includes('Invalid input')) {
     console.error('Invalid input data');

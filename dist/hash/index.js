@@ -3,7 +3,7 @@
  * Hash algorithms module
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.hash = exports.ripemd160 = exports.whirlpool = exports.blake3 = exports.blake2s = exports.blake2b = exports.md5 = exports.md4 = exports.sha3_512 = exports.sha3_256 = exports.sha512 = exports.sha256 = exports.sha1 = void 0;
+exports.sha = exports.hash = exports.ripemd160 = exports.whirlpool = exports.blake3 = exports.blake2s = exports.blake2b = exports.md5 = exports.md4 = exports.sha3_512 = exports.sha3_256 = exports.sha512 = exports.sha256 = exports.sha1 = void 0;
 const tslib_1 = require("tslib");
 const path_1 = tslib_1.__importDefault(require("path"));
 /**
@@ -262,4 +262,6 @@ exports.hash = {
     whirlpool: exports.whirlpool,
     ripemd160: exports.ripemd160,
 };
+// Namespace alias to match crates naming
+exports.sha = exports.hash;
 //# sourceMappingURL=index.js.map
