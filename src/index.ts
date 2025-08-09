@@ -12,6 +12,7 @@ import { hash } from './hash';
 import { cipher, aes, chacha20, des, rsa_oaep, x25519, ecdh } from './cipher';
 import { hmac } from './hmac';
 import { kdf } from './kdf';
+import { dsa, ed25519, ecdsa, rsa } from './dsa';
 
 // Re-export individual functions for convenience
 export {
@@ -60,18 +61,38 @@ export {
   hash,
   cipher,
   hmac,
-  kdf
+  kdf,
+  dsa,
+  ed25519,
+  ecdsa,
+  rsa
 };
 
 // Default export with all modules
-const cryptographer = {
+const cryptographer: {
+  hash: typeof hash;
+  cipher: typeof cipher;
+  hmac: typeof hmac;
+  kdf: typeof kdf;
+  rsa_oaep: typeof rsa_oaep;
+  x25519: typeof x25519;
+  ecdh: typeof ecdh;
+  dsa: typeof dsa;
+  ed25519: typeof ed25519;
+  ecdsa: typeof ecdsa;
+  rsa: typeof rsa;
+} = {
   hash,
   cipher,
   hmac,
   kdf,
   rsa_oaep,
   x25519,
-  ecdh
+  ecdh,
+  dsa,
+  ed25519,
+  ecdsa,
+  rsa
 };
 
 export default cryptographer;

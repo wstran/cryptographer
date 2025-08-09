@@ -219,7 +219,7 @@ const b = crypto.x25519.generateKeypair();
 const ssA = crypto.x25519.deriveSharedSecret(a.privateKey, b.publicKey);
 const ssB = crypto.x25519.deriveSharedSecret(b.privateKey, a.publicKey);
 
-// ECDH P-256
+// ECDH secp256r1 (aka P-256)
 const e1 = crypto.ecdh.generateKeypair('p256');
 const e2 = crypto.ecdh.generateKeypair('p256');
 const es1 = crypto.ecdh.deriveSharedSecret('p256', e1.privateKey, e2.publicKey);
@@ -306,6 +306,25 @@ const decrypted = fs.readFileSync('decrypted.txt', 'utf8');
 console.log('Original:', original);
 console.log('Decrypted:', decrypted);
 console.log('Match:', original === decrypted);
+```
+
+## Digital Signatures (DSA)
+
+```javascript
+// Ed25519
+const ed = crypto.ed25519.generateKeypair();
+const sigEd = crypto.ed25519.sign(ed.privateKey, 'hello');
+console.log('ed25519 ok?', crypto.ed25519.verify(ed.publicKey, 'hello', sigEd));
+
+// ECDSA secp256r1 (aka P-256)
+const kp = crypto.ecdsa.generateKeypair('secp256r1');
+const sigP = crypto.ecdsa.sign('hello', { curve: 'secp256r1', privateKey: kp.privateKey });
+console.log('ecdsa secp256r1 ok?', crypto.ecdsa.verify('hello', { curve: 'secp256r1', publicKey: kp.publicKey, signature: sigP }));
+
+// ECDSA secp256k1
+const kk = crypto.ecdsa.generateKeypair('secp256k1');
+const sigK = crypto.ecdsa.sign('hello', { curve: 'secp256k1', privateKey: kk.privateKey });
+console.log('ecdsa secp256k1 ok?', crypto.ecdsa.verify('hello', { curve: 'secp256k1', publicKey: kk.publicKey, signature: sigK }));
 ```
 
 ## Key Derivation Functions

@@ -199,12 +199,12 @@ async function testAsymmetric() {
   const ss2 = lib.x25519.deriveSharedSecret(xkp2.privateKey, xkp.publicKey);
   assert(Buffer.compare(ss1, ss2) === 0, 'x25519 shared secret matches');
 
-  // ECDH P-256 (required)
+  // ECDH secp256r1 (alias accepted by wrapper if implemented); keep curve name consistent
   const e1 = lib.ecdh.generateKeypair('p256');
   const e2 = lib.ecdh.generateKeypair('p256');
   const es1 = lib.ecdh.deriveSharedSecret('p256', e1.privateKey, e2.publicKey);
   const es2 = lib.ecdh.deriveSharedSecret('p256', e2.privateKey, e1.publicKey);
-  assert(Buffer.compare(es1, es2) === 0, 'ecdh p256 shared secret matches');
+  assert(Buffer.compare(es1, es2) === 0, 'ecdh secp256r1 shared secret matches');
 
   // Kyber removed in this build
 
@@ -219,6 +219,39 @@ async function testAsymmetric() {
   assert(threw, 'rsa-oaep expected to throw with invalid key');
 }
 
+async function testDSA() {
+  const lib = require(path.join(__dirname, '..', 'dist', 'index.js'));
+  // Ed25519
+  const ed = lib.ed25519.generateKeypair();
+  const msg = Buffer.from('hello dsa');
+  const sig = lib.ed25519.sign(ed.privateKey, msg);
+  console.log('Ed25519', sig.toString('hex'));
+  assert(lib.ed25519.verify(ed.publicKey, msg, sig) === true, 'ed25519 verify true');
+  assert(lib.ed25519.verify(ed.publicKey, Buffer.from('tamper'), sig) === false, 'ed25519 verify false');
+
+  // ECDSA P-256
+  const ecdsaP = lib.ecdsa.generateKeypair('p256');
+  const msga = Buffer.from('hello ecdsa');
+  const sigp = lib.ecdsa.sign(msga, { curve: 'p256', privateKey: ecdsaP.privateKey, hash: 'sha256' });
+  console.log('ECDSA P-256 pub.len', ecdsaP.publicKey.length, 'sig.len', sigp.length);
+  assert(lib.ecdsa.verify(msga, { curve: 'p256', publicKey: ecdsaP.publicKey, signature: sigp, hash: 'sha256' }) === true, 'ecdsa p256 verify');
+
+  // ECDSA secp256k1
+  const ecdsaK = lib.ecdsa.generateKeypair('secp256k1');
+  const msgk = Buffer.from('hello secp256k1');
+  const sigk = lib.ecdsa.sign(msgk, { curve: 'secp256k1', privateKey: ecdsaK.privateKey, hash: 'sha256' });
+  console.log('ECDSA secp256k1 pub.len', ecdsaK.publicKey.length, 'sig.len', sigk.length);
+  assert(lib.ecdsa.verify(msgk, { curve: 'secp256k1', publicKey: ecdsaK.publicKey, signature: sigk, hash: 'sha256' }) === true, 'ecdsa k1 verify');
+
+  // RSA sign functions presence (expect throw on bogus key)
+  let threwPss = false;
+  try { lib.rsa.signPSS(Buffer.from('hi'), Buffer.alloc(4), { hash: 'sha256' }); } catch (_e) { threwPss = true; }
+  assert(threwPss, 'rsa-pss requires valid key');
+  let threwPk = false;
+  try { lib.rsa.signPKCS1v15(Buffer.from('hi'), Buffer.alloc(4), { hash: 'sha256' }); } catch (_e) { threwPk = true; }
+  assert(threwPk, 'rsa-pkcs1v15 requires valid key');
+}
+
 async function main() {
   await testHashes();
   await testHmac();
@@ -227,6 +260,7 @@ async function main() {
   await testDES();
   await testKdf();
   await testAsymmetric();
+  await testDSA();
   console.log('All tests passed');
 }
 

@@ -37,6 +37,11 @@ copy_crate "$PKG_DIR/cipher/rsa_wasm" "$DIST_DIR/cipher/rsa_wasm"
 copy_crate "$PKG_DIR/cipher/x25519_wasm" "$DIST_DIR/cipher/x25519_wasm"
 copy_crate "$PKG_DIR/cipher/ecdh_wasm" "$DIST_DIR/cipher/ecdh_wasm"
 
+# DSA
+copy_crate "$PKG_DIR/dsa/ed25519_wasm" "$DIST_DIR/dsa/ed25519_wasm"
+copy_crate "$PKG_DIR/dsa/ecdsa_wasm" "$DIST_DIR/dsa/ecdsa_wasm"
+copy_crate "$PKG_DIR/dsa/rsa_sign_wasm" "$DIST_DIR/dsa/rsa_sign_wasm"
+
 echo "Copied WASM artifacts into dist/* layout."
 
 

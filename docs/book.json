@@ -1,5 +1,5 @@
 {
-    "title": "cryptographer.js v1.0.20 Documentation",
+    "title": "cryptographer.js Documentation",
     "description": "High-performance cryptographic algorithms for Node.js using WebAssembly",
     "author": "Wilson Tran",
     "language": "en",

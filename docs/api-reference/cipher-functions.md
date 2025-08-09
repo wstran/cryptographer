@@ -30,7 +30,7 @@ Cipher functions provide symmetric encryption and decryption. They're used for:
 |-----------|---------|--------|-------|
 | RSA-OAEP (SHA-256 default) | Asymmetric encryption (small payloads) | ✅ Recommended | Use to encrypt keys, not large data |
 | X25519 | Key agreement (ECDH over Curve25519) | ✅ Recommended | Modern, fast, safe defaults |
-| ECDH P-256/P-384 | Key agreement | ✅ Recommended | Widely supported, choose curve per compliance |
+| ECDH secp256r1/P-384 | Key agreement | ✅ Recommended | Widely supported, choose curve per compliance |
 
 #### RSA-OAEP usage and limits
 - Key formats: Public (SPKI/PKCS#1 DER), Private (PKCS#8/PKCS#1 DER)
@@ -65,16 +65,16 @@ const keyA = hkdfSync('sha256', ssA, Buffer.alloc(0), Buffer.from('x25519 hkdf')
 const keyB = hkdfSync('sha256', ssB, Buffer.alloc(0), Buffer.from('x25519 hkdf'), 32);
 ```
 
-#### ECDH P-256/P-384 usage
-- Choose curve per compliance/perf; keys uncompressed: P-256 (pub 65B), P-384 (pub 97B)
+#### ECDH secp256r1/P-384 usage
+- Choose curve per compliance/perf; keys uncompressed: secp256r1 (pub 65B), P-384 (pub 97B)
 ```javascript
 import { hkdfSync } from 'crypto';
 const e1 = crypto.ecdh.generateKeypair('p256');
 const e2 = crypto.ecdh.generateKeypair('p256');
 const s1 = crypto.ecdh.deriveSharedSecret('p256', e1.privateKey, e2.publicKey);
 const s2 = crypto.ecdh.deriveSharedSecret('p256', e2.privateKey, e1.publicKey);
-const k1 = hkdfSync('sha256', s1, Buffer.alloc(0), Buffer.from('ecdh p256 hkdf'), 32);
-const k2 = hkdfSync('sha256', s2, Buffer.alloc(0), Buffer.from('ecdh p256 hkdf'), 32);
+const k1 = hkdfSync('sha256', s1, Buffer.alloc(0), Buffer.from('ecdh secp256r1 hkdf'), 32);
+const k2 = hkdfSync('sha256', s2, Buffer.alloc(0), Buffer.from('ecdh secp256r1 hkdf'), 32);
 ```
 
 ## Basic Usage
@@ -397,7 +397,7 @@ class SecureChannel {
 }
 
 // Usage
-const key = crypto.randomBytes(32);
+const key = randomBytes(32);
 const channel = new SecureChannel(key);
 
 const encrypted = channel.encryptMessage('Hello World', 'user123');

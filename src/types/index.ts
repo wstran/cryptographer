@@ -199,6 +199,10 @@ export interface CipherFunction {
   decrypt(data: CryptoInput, options: CipherOptions): Buffer;
 }
 
+// DSA types
+export type EcdsaCurve = 'p256' | 'secp256k1';
+export type RsaHash = 'sha256' | 'sha384' | 'sha512';
+
 /**
  * Result of a benchmark run
  */

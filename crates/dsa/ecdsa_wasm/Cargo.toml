@@ -1,0 +1,32 @@
+[package]
+name = "ecdsa_wasm"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+p256 = { version = "0.13", default-features = false, features = ["ecdsa"] }
+k256 = { version = "0.13", default-features = false, features = ["ecdsa"] }
+rand_core = { version = "0.6", features = ["getrandom"] }
+getrandom = { version = "0.2", features = ["js"] }
+wasm-bindgen = { version = "0.2.100" }
+js-sys = { version = "0.3.72" }
+serde = { version = "1.0.219", features = ["derive"] }
+serde-wasm-bindgen = { version = "0.6.5" }
+
+[features]
+default = []
+wasm = []
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = false
+

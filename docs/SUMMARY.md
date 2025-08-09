@@ -12,6 +12,7 @@
 * [Hash Functions](api-reference/hash-functions.md)
 * [HMAC Functions](api-reference/hmac-functions.md)
 * [Cipher Functions](api-reference/cipher-functions.md)
+* [DSA Functions](api-reference/dsa-functions.md)
 * [Key Derivation Functions](api-reference/kdf-functions.md)
 
 ## Examples

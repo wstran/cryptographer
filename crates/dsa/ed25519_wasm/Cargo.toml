@@ -1,0 +1,29 @@
+[package]
+name = "ed25519_wasm"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+ed25519-dalek = { version = "2", default-features = false, features = ["rand_core"] }
+rand_core = { version = "0.6", features = ["getrandom"] }
+getrandom = { version = "0.2", features = ["js"] }
+wasm-bindgen = { version = "0.2.100" }
+js-sys = { version = "0.3.72" }
+
+[features]
+default = []
+wasm = []
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = false
+

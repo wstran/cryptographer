@@ -184,7 +184,7 @@ Sample performance on M2 Max / Node 18 (higher = better):
 
 | Algorithm | ops/s | vs crypto-js | Use Case |
 |-----------|-------|--------------|----------|
-| BLAKE3 | 2.1 M | 12× faster | General purpose, speed critical |
+| BLAKE3 | 2.1 M | N/A | General purpose, speed critical |
 | BLAKE2b | 1.8 M | 10× faster | General purpose, high security |
 | SHA-256 | 1.3 M | 8× faster | Digital signatures, compatibility |
 | SHA-512 | 0.9 M | 6× faster | Higher security requirements |

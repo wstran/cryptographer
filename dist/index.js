@@ -5,7 +5,7 @@
  * @module cryptographer.js
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.kdf = exports.hmac = exports.cipher = exports.hash = exports.bcrypt = exports.argon2 = exports.pbkdf2 = exports.hmacMD5 = exports.hmacSHA512 = exports.hmacSHA256 = exports.hmacSHA1 = exports.ecdh = exports.x25519 = exports.rsa_oaep = exports.des = exports.chacha20 = exports.aes = exports.ripemd160 = exports.whirlpool = exports.blake3 = exports.blake2s = exports.blake2b = exports.md5 = exports.md4 = exports.sha3_512 = exports.sha3_256 = exports.sha512 = exports.sha256 = exports.sha1 = void 0;
+exports.rsa = exports.ecdsa = exports.ed25519 = exports.dsa = exports.kdf = exports.hmac = exports.cipher = exports.hash = exports.bcrypt = exports.argon2 = exports.pbkdf2 = exports.hmacMD5 = exports.hmacSHA512 = exports.hmacSHA256 = exports.hmacSHA1 = exports.ecdh = exports.x25519 = exports.rsa_oaep = exports.des = exports.chacha20 = exports.aes = exports.ripemd160 = exports.whirlpool = exports.blake3 = exports.blake2s = exports.blake2b = exports.md5 = exports.md4 = exports.sha3_512 = exports.sha3_256 = exports.sha512 = exports.sha256 = exports.sha1 = void 0;
 // Export types (commented out to avoid module resolution issues)
 // export * from './types';
 // Import all modules
@@ -17,6 +17,11 @@ const hmac_1 = require("./hmac");
 Object.defineProperty(exports, "hmac", { enumerable: true, get: function () { return hmac_1.hmac; } });
 const kdf_1 = require("./kdf");
 Object.defineProperty(exports, "kdf", { enumerable: true, get: function () { return kdf_1.kdf; } });
+const dsa_1 = require("./dsa");
+Object.defineProperty(exports, "dsa", { enumerable: true, get: function () { return dsa_1.dsa; } });
+Object.defineProperty(exports, "ed25519", { enumerable: true, get: function () { return dsa_1.ed25519; } });
+Object.defineProperty(exports, "ecdsa", { enumerable: true, get: function () { return dsa_1.ecdsa; } });
+Object.defineProperty(exports, "rsa", { enumerable: true, get: function () { return dsa_1.rsa; } });
 // Re-export individual functions for convenience
 var hash_2 = require("./hash");
 // Hash functions
@@ -59,7 +64,11 @@ const cryptographer = {
     kdf: kdf_1.kdf,
     rsa_oaep: cipher_1.rsa_oaep,
     x25519: cipher_1.x25519,
-    ecdh: cipher_1.ecdh
+    ecdh: cipher_1.ecdh,
+    dsa: dsa_1.dsa,
+    ed25519: dsa_1.ed25519,
+    ecdsa: dsa_1.ecdsa,
+    rsa: dsa_1.rsa
 };
 exports.default = cryptographer;
 //# sourceMappingURL=index.js.map

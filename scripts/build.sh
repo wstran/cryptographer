@@ -201,3 +201,35 @@ mkdir -p "$TARGET_DIR"
 echo "Building WASM for $CRATE_NAME..."
 cd "$SCRIPT_DIR/../crates/cipher/$CRATE_NAME"
 RUSTFLAGS='--cfg getrandom_backend="wasm_js"' wasm-pack build --target nodejs --release --out-dir "$TARGET_DIR" -- --features wasm
+
+####### DSA #######
+
+# ------- Ed25519 WASM -------
+CRATE_NAME="ed25519_wasm"
+TARGET_DIR="$SCRIPT_DIR/../packages/dsa/$CRATE_NAME"
+
+mkdir -p "$TARGET_DIR"
+
+echo "Building WASM for $CRATE_NAME..."
+cd "$SCRIPT_DIR/../crates/dsa/$CRATE_NAME"
+RUSTFLAGS='--cfg getrandom_backend="wasm_js"' wasm-pack build --target nodejs --release --out-dir "$TARGET_DIR" -- --features wasm
+
+# ------- ECDSA WASM -------
+CRATE_NAME="ecdsa_wasm"
+TARGET_DIR="$SCRIPT_DIR/../packages/dsa/$CRATE_NAME"
+
+mkdir -p "$TARGET_DIR"
+
+echo "Building WASM for $CRATE_NAME..."
+cd "$SCRIPT_DIR/../crates/dsa/$CRATE_NAME"
+RUSTFLAGS='--cfg getrandom_backend="wasm_js"' wasm-pack build --target nodejs --release --out-dir "$TARGET_DIR" -- --features wasm
+
+# ------- RSA Sign WASM -------
+CRATE_NAME="rsa_sign_wasm"
+TARGET_DIR="$SCRIPT_DIR/../packages/dsa/$CRATE_NAME"
+
+mkdir -p "$TARGET_DIR"
+
+echo "Building WASM for $CRATE_NAME..."
+cd "$SCRIPT_DIR/../crates/dsa/$CRATE_NAME"
+RUSTFLAGS='--cfg getrandom_backend="wasm_js"' wasm-pack build --target nodejs --release --out-dir "$TARGET_DIR" -- --features wasm
