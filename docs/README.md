@@ -38,9 +38,9 @@ const passwordHash = crypto.kdf.argon2('p@ssw0rd');
 
 // Ed25519 signature
 const { ed25519 } = crypto;
-const ed = ed25519.generateKeypair();
-const sig = ed25519.sign(ed.privateKey, 'hello');
-console.log('ed25519 ok?', ed25519.verify(ed.publicKey, 'hello', sig));
+const ed = ed25519.generateKeypair(); // 32B secret/public
+const sig = ed25519.sign(ed.privateKey, 'hello'); // 64B signature
+console.log('ed25519 ok?', ed25519.verify(ed.publicKey, 'hello', sig)); // boolean
 ```
 
 ## 📚 What's Inside

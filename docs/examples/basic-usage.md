@@ -144,24 +144,16 @@ console.log('Signature valid:', isValid); // true
 // Generate secure key and IV
 const nodeCrypto = require('crypto');
 const key = nodeCrypto.randomBytes(32); // 32 bytes for AES-256
-const iv = nodeCrypto.randomBytes(16);  // 16 bytes for AES
+const iv = nodeCrypto.randomBytes(12);  // 12 bytes nonce for AES-GCM
 
-// Encrypt data
+// Encrypt data (AES-GCM)
 const plaintext = 'Hello World';
-const encrypted = crypto.cipher.aes.encrypt(plaintext, {
-  key: key,
-  iv: iv,
-  mode: 'cbc'
-});
+const encrypted = crypto.cipher.aes.encrypt(plaintext, { key, iv, mode: 'gcm' });
 
 console.log('Encrypted:', encrypted.toString('hex'));
 
 // Decrypt data
-const decrypted = crypto.cipher.aes.decrypt(encrypted, {
-  key: key,
-  iv: iv,
-  mode: 'cbc'
-});
+const decrypted = crypto.cipher.aes.decrypt(encrypted, { key, iv, mode: 'gcm' });
 
 console.log('Decrypted:', decrypted.toString()); // 'Hello World'
 ```
@@ -312,11 +304,15 @@ console.log('Match:', original === decrypted);
 
 ```javascript
 // Ed25519
+// Generate keypair for EdDSA over Curve25519 (ed25519). Secret/public are 32 bytes each.
 const ed = crypto.ed25519.generateKeypair();
+// Sign any message-like input; returns 64-byte signature
 const sigEd = crypto.ed25519.sign(ed.privateKey, 'hello');
+// Verify returns boolean
 console.log('ed25519 ok?', crypto.ed25519.verify(ed.publicKey, 'hello', sigEd));
 
 // ECDSA secp256r1 (aka P-256)
+// Public key is uncompressed SEC1 (65 bytes). Library hashes with SHA-256 internally.
 const kp = crypto.ecdsa.generateKeypair('secp256r1');
 const sigP = crypto.ecdsa.sign('hello', { curve: 'secp256r1', privateKey: kp.privateKey });
 console.log('ecdsa secp256r1 ok?', crypto.ecdsa.verify('hello', { curve: 'secp256r1', publicKey: kp.publicKey, signature: sigP }));

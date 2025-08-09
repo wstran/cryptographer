@@ -40,12 +40,12 @@ const hmacMd5 = crypto.hmac.md5('data', { key: 'secret' });
 ### 3. Symmetric Encryption (AES, ChaCha20, DES/3DES)
 
 ```javascript
-// AES-256-CBC
+// AES-256-GCM
 const nodeCrypto = require('crypto');
 const key = nodeCrypto.randomBytes(32);
-const iv = nodeCrypto.randomBytes(16);
-const enc = crypto.cipher.aes.encrypt('Hello World', { key, iv, mode: 'cbc' });
-const dec = crypto.cipher.aes.decrypt(enc, { key, iv, mode: 'cbc' });
+const iv = nodeCrypto.randomBytes(12);
+const enc = crypto.cipher.aes.encrypt('Hello World', { key, iv, mode: 'gcm' });
+const dec = crypto.cipher.aes.decrypt(enc, { key, iv, mode: 'gcm' });
 console.log(dec.toString()); // 'Hello World'
 
 // ChaCha20 (CTR-like stream)

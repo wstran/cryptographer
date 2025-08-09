@@ -16,9 +16,9 @@ Cipher functions provide symmetric encryption and decryption. They're used for:
 
 | Algorithm | Key Sizes | Modes | Status | Use Case |
 |-----------|-----------|-------|--------|----------|
-| **AES-128** | 128 bits | CBC, ECB, CTR | ✅ Recommended | General purpose |
-| **AES-192** | 192 bits | CBC, ECB, CTR | ✅ Recommended | Higher security |
-| **AES-256** | 256 bits | CBC, ECB, CTR | ✅ Recommended | Maximum security |
+| **AES-128** | 128 bits | GCM, CCM, CTR, SIV, (CBC/ECB mapped) | ✅ Recommended | General purpose |
+| **AES-192** | 192 bits | GCM, CCM, CTR, (CBC/ECB mapped) | ✅ Recommended | Higher security |
+| **AES-256** | 256 bits | GCM, CCM, CTR, SIV, (CBC/ECB mapped) | ✅ Recommended | Maximum security |
 | **ChaCha20** | 256 bits | CTR (nonce=12B), AEAD | ✅ Recommended | Performance/portable |
 | **ChaCha20-Poly1305** | 256 bits | AEAD | ✅ Recommended | Authenticated encryption |
 | DES | 56-bit | CBC, CTR | ❌ Legacy (avoid) | Interop only |
@@ -57,8 +57,10 @@ const unwrapped = crypto.rsa_oaep.decrypt(wrapped, prv, { hash: 'sha256' });
 - Generate keypair and derive shared secret; then HKDF → symmetric key
 ```javascript
 import { hkdfSync } from 'crypto';
+// Each keypair returns 32B secret + 32B public key
 const a = crypto.x25519.generateKeypair();
 const b = crypto.x25519.generateKeypair();
+// Each side derives the same shared secret
 const ssA = crypto.x25519.deriveSharedSecret(a.privateKey, b.publicKey);
 const ssB = crypto.x25519.deriveSharedSecret(b.privateKey, a.publicKey);
 const keyA = hkdfSync('sha256', ssA, Buffer.alloc(0), Buffer.from('x25519 hkdf'), 32);
@@ -69,6 +71,7 @@ const keyB = hkdfSync('sha256', ssB, Buffer.alloc(0), Buffer.from('x25519 hkdf')
 - Choose curve per compliance/perf; keys uncompressed: secp256r1 (pub 65B), P-384 (pub 97B)
 ```javascript
 import { hkdfSync } from 'crypto';
+// P-256 (aka secp256r1). Public key is uncompressed SEC1 (65 bytes)
 const e1 = crypto.ecdh.generateKeypair('p256');
 const e2 = crypto.ecdh.generateKeypair('p256');
 const s1 = crypto.ecdh.deriveSharedSecret('p256', e1.privateKey, e2.publicKey);
@@ -79,7 +82,7 @@ const k2 = hkdfSync('sha256', s2, Buffer.alloc(0), Buffer.from('ecdh secp256r1 h
 
 ## Basic Usage
 
-### AES: Simple Encryption/Decryption
+### AES: Simple Encryption/Decryption (GCM)
 
 ```javascript
 import crypto from 'cryptographer.js';
@@ -87,20 +90,20 @@ import crypto from 'cryptographer.js';
 // Generate secure key and IV
 import { randomBytes } from 'crypto';
 const key = randomBytes(32); // 32 bytes for AES-256
-const iv = randomBytes(16);  // 16 bytes for AES
+const iv = randomBytes(12);  // 12 bytes nonce for AES-GCM
 
-// Encrypt data
+// Encrypt (AES-GCM)
 const encrypted = crypto.cipher.aes.encrypt('Hello World', {
   key: key,
   iv: iv,
-  mode: 'cbc' // CBC, ECB, or CTR
+  mode: 'gcm'
 });
 
 // Decrypt data
 const decrypted = crypto.cipher.aes.decrypt(encrypted, {
   key: key,
   iv: iv,
-  mode: 'cbc'
+  mode: 'gcm'
 });
 
 console.log(decrypted.toString()); // 'Hello World'
@@ -123,6 +126,30 @@ const encrypted256 = crypto.cipher.aes.encrypt('data', { key: key256, iv });
 ```
 
 ### AES: Different Modes
+```javascript
+import { randomBytes } from 'crypto';
+const key = randomBytes(32);
+
+// GCM (AEAD) - recommended, 12-byte nonce
+const n12 = randomBytes(12);
+const encG = crypto.cipher.aes.encrypt('data', { key, iv: n12, mode: 'gcm' });
+const decG = crypto.cipher.aes.decrypt(encG, { key, iv: n12, mode: 'gcm' });
+
+// CTR - 16-byte IV
+const n16 = randomBytes(16);
+const encCtr = crypto.cipher.aes.encrypt('data', { key, iv: n16, mode: 'ctr' });
+const decCtr = crypto.cipher.aes.decrypt(encCtr, { key, iv: n16, mode: 'ctr' });
+
+// CCM (AEAD) - 13-byte nonce
+const n13 = randomBytes(13);
+const encCcm = crypto.cipher.aes.encrypt('data', { key, iv: n13, mode: 'ccm' });
+const decCcm = crypto.cipher.aes.decrypt(encCcm, { key, iv: n13, mode: 'ccm' });
+
+// SIV (misuse-resistant AEAD) - 16-byte nonce, 32B or 64B key
+const sivKey = randomBytes(32);
+const encSiv = crypto.cipher.aes.encrypt('data', { key: sivKey, iv: n16, mode: 'siv' });
+const decSiv = crypto.cipher.aes.decrypt(encSiv, { key: sivKey, iv: n16, mode: 'siv' });
+```
 ### ChaCha20 / ChaCha20-Poly1305
 
 ```javascript
@@ -142,8 +169,8 @@ const pt = crypto.cipher.chacha20.decrypt(ct, { key, iv: aeadNonce, mode: 'cbc' 
 ```
 
 Notes:
-- For ChaCha20: nonce must be 12 bytes. Avoid nonce reuse.
-- For ChaCha20-Poly1305 AEAD: we map `mode: 'cbc'` to AEAD under the hood to keep the same API.
+- AES-GCM nonce must be 12 bytes; AES-CCM nonce must be 13 bytes; AES-SIV nonce must be 16 bytes.
+- CBC/ECB selectors are maintained for compatibility and internally map to AEAD/CTR.
 
 ### DES / 3DES (Legacy)
 
@@ -568,12 +595,16 @@ interface CipherOptions {
 
 ### IV/Nonce Sizes
 
-- **AES CBC/CTR**: 16 bytes IV/nonce
-- **ChaCha20**: 12 bytes nonce (required)
-- **ChaCha20-Poly1305**: 12 bytes nonce (required)
-- **DES/3DES CBC/CTR**: 8 bytes IV/nonce
-- **ECB modes**: No IV required (emulated via CTR with zero IV; avoid for security)
+- **AES-GCM**: 12-byte nonce (required)
+- **AES-CCM**: 13-byte nonce (required)
+- **AES-SIV**: 16-byte nonce (required). Key must be 32B (AES-128-SIV) or 64B (AES-256-SIV)
+- **AES-CTR**: 16-byte IV
+- **AES-CBC**: Use GCM instead; if specified, mapped to GCM internally (nonce 12B)
+- **ChaCha20**: 12-byte nonce (required)
+- **ChaCha20-Poly1305**: 12-byte nonce (required)
+- **DES/3DES CBC/CTR**: 8-byte IV/nonce
+- **ECB**: No IV (internally emulated using CTR with zero IV; avoid)
 
 ### Block Size
 
-All AES modes use 16-byte blocks internally.
+- AES block size: 16 bytes (applies to CTR/CBC). AEAD modes (GCM/CCM/SIV) are message-oriented with tags.

@@ -4,8 +4,8 @@
  * @module cryptographer.js
  */
 
-// Export types (commented out to avoid module resolution issues)
-// export * from './types';
+// Export types for TypeScript consumers
+export * from './types';
 
 // Import all modules
 import { hash } from './hash';
@@ -13,6 +13,9 @@ import { cipher, aes, chacha20, des, rsa_oaep, x25519, ecdh } from './cipher';
 import { hmac } from './hmac';
 import { kdf } from './kdf';
 import { dsa, ed25519, ecdsa, rsa } from './dsa';
+import { randomBytes as nodeRandomBytes, timingSafeEqual as nodeTimingSafeEqual } from 'crypto';
+import type { CryptoInput } from './types';
+import { convertToBuffer, timeSafeEqual as fallbackTimingSafeEqual } from './utils/validation';
 
 // Re-export individual functions for convenience
 export {
@@ -56,6 +59,24 @@ export {
   bcrypt
 } from './kdf';
 
+// Utility helpers
+export function randomBytes(size: number): Buffer {
+  if (!Number.isInteger(size) || size <= 0) {
+    throw new Error('randomBytes size must be a positive integer');
+  }
+  return nodeRandomBytes(size);
+}
+
+export function timingSafeEqual(a: CryptoInput, b: CryptoInput): boolean {
+  const ab = convertToBuffer(a);
+  const bb = convertToBuffer(b);
+  if (typeof nodeTimingSafeEqual === 'function') {
+    if (ab.length !== bb.length) return false;
+    return nodeTimingSafeEqual(ab, bb);
+  }
+  return fallbackTimingSafeEqual(ab, bb);
+}
+
 // Export grouped modules
 export {
   hash,
@@ -81,6 +102,8 @@ const cryptographer: {
   ed25519: typeof ed25519;
   ecdsa: typeof ecdsa;
   rsa: typeof rsa;
+  randomBytes: typeof randomBytes;
+  timingSafeEqual: typeof timingSafeEqual;
 } = {
   hash,
   cipher,
@@ -92,7 +115,9 @@ const cryptographer: {
   dsa,
   ed25519,
   ecdsa,
-  rsa
+  rsa,
+  randomBytes,
+  timingSafeEqual
 };
 
 export default cryptographer;

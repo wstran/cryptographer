@@ -56,7 +56,7 @@ export interface HmacOptions extends HashOptions {
   key: CryptoInput;
 }
 
-export type CipherMode = 'cbc' | 'ecb' | 'ctr';
+export type CipherMode = 'cbc' | 'ecb' | 'ctr' | 'gcm' | 'ccm' | 'siv';
 
 export type Argon2Variant = 'id' | 'i' | 'd';
 
@@ -81,7 +81,7 @@ export interface CipherOptions {
   /**
    * Cipher mode
    */
-  mode?: 'cbc' | 'ecb' | 'ctr' | 'gcm';
+  mode?: CipherMode;
 
   /**
    * Padding scheme
@@ -131,12 +131,12 @@ export interface Argon2Options extends KDFOptions {
   /**
    * Parallelism factor
    */
-  parallelism?: number;
 
   /**
    * Argon2 variant
    */
-  variant?: 'argon2i' | 'argon2d' | 'argon2id';
+  /** Short variants supported in docs: 'i' | 'd' | 'id' */
+  variant?: 'argon2i' | 'argon2d' | 'argon2id' | 'i' | 'd' | 'id';
 }
 
 /**
@@ -181,6 +181,13 @@ export interface HashInstance {
   /**
    * Reset the hash instance
    */
+  reset(): this;
+}
+
+/** Streaming HMAC instance (used by crypto.hmac.X.create()) */
+export interface HmacInstance {
+  update(data: CryptoInput): this;
+  digest(format?: HashOutput): string | Buffer;
   reset(): this;
 }
 

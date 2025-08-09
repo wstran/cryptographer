@@ -6,8 +6,11 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.rsa = exports.ecdsa = exports.ed25519 = exports.dsa = exports.kdf = exports.hmac = exports.cipher = exports.hash = exports.bcrypt = exports.argon2 = exports.pbkdf2 = exports.hmacMD5 = exports.hmacSHA512 = exports.hmacSHA256 = exports.hmacSHA1 = exports.ecdh = exports.x25519 = exports.rsa_oaep = exports.des = exports.chacha20 = exports.aes = exports.ripemd160 = exports.whirlpool = exports.blake3 = exports.blake2s = exports.blake2b = exports.md5 = exports.md4 = exports.sha3_512 = exports.sha3_256 = exports.sha512 = exports.sha256 = exports.sha1 = void 0;
-// Export types (commented out to avoid module resolution issues)
-// export * from './types';
+exports.randomBytes = randomBytes;
+exports.timingSafeEqual = timingSafeEqual;
+const tslib_1 = require("tslib");
+// Export types for TypeScript consumers
+tslib_1.__exportStar(require("./types"), exports);
 // Import all modules
 const hash_1 = require("./hash");
 Object.defineProperty(exports, "hash", { enumerable: true, get: function () { return hash_1.hash; } });
@@ -22,6 +25,8 @@ Object.defineProperty(exports, "dsa", { enumerable: true, get: function () { ret
 Object.defineProperty(exports, "ed25519", { enumerable: true, get: function () { return dsa_1.ed25519; } });
 Object.defineProperty(exports, "ecdsa", { enumerable: true, get: function () { return dsa_1.ecdsa; } });
 Object.defineProperty(exports, "rsa", { enumerable: true, get: function () { return dsa_1.rsa; } });
+const crypto_1 = require("crypto");
+const validation_1 = require("./utils/validation");
 // Re-export individual functions for convenience
 var hash_2 = require("./hash");
 // Hash functions
@@ -56,6 +61,23 @@ var kdf_2 = require("./kdf");
 Object.defineProperty(exports, "pbkdf2", { enumerable: true, get: function () { return kdf_2.pbkdf2; } });
 Object.defineProperty(exports, "argon2", { enumerable: true, get: function () { return kdf_2.argon2; } });
 Object.defineProperty(exports, "bcrypt", { enumerable: true, get: function () { return kdf_2.bcrypt; } });
+// Utility helpers
+function randomBytes(size) {
+    if (!Number.isInteger(size) || size <= 0) {
+        throw new Error('randomBytes size must be a positive integer');
+    }
+    return (0, crypto_1.randomBytes)(size);
+}
+function timingSafeEqual(a, b) {
+    const ab = (0, validation_1.convertToBuffer)(a);
+    const bb = (0, validation_1.convertToBuffer)(b);
+    if (typeof crypto_1.timingSafeEqual === 'function') {
+        if (ab.length !== bb.length)
+            return false;
+        return (0, crypto_1.timingSafeEqual)(ab, bb);
+    }
+    return (0, validation_1.timeSafeEqual)(ab, bb);
+}
 // Default export with all modules
 const cryptographer = {
     hash: hash_1.hash,
@@ -68,7 +90,9 @@ const cryptographer = {
     dsa: dsa_1.dsa,
     ed25519: dsa_1.ed25519,
     ecdsa: dsa_1.ecdsa,
-    rsa: dsa_1.rsa
+    rsa: dsa_1.rsa,
+    randomBytes,
+    timingSafeEqual
 };
 exports.default = cryptographer;
 //# sourceMappingURL=index.js.map

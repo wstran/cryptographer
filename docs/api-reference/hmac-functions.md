@@ -45,27 +45,27 @@ const hmacMd5 = crypto.hmac.md5('data', { key: 'secret' });
 
 ```javascript
 // Hex output (default)
-const hexHmac = crypto.hmac.sha256('data', { 
+const hexHmac = crypto.hmac.sha256('data', {
   key: 'secret',
-  outputFormat: 'hex' 
+  outputFormat: 'hex'
 });
 
 // Base64 output
-const base64Hmac = crypto.hmac.sha256('data', { 
+const base64Hmac = crypto.hmac.sha256('data', {
   key: 'secret',
-  outputFormat: 'base64' 
+  outputFormat: 'base64'
 });
 
 // Buffer output
-const bufferHmac = crypto.hmac.sha256('data', { 
+const bufferHmac = crypto.hmac.sha256('data', {
   key: 'secret',
-  outputFormat: 'buffer' 
+  outputFormat: 'buffer'
 });
 
 // Binary string output
-const binaryHmac = crypto.hmac.sha256('data', { 
+const binaryHmac = crypto.hmac.sha256('data', {
   key: 'secret',
-  outputFormat: 'binary' 
+  outputFormat: 'binary'
 });
 ```
 
@@ -79,8 +79,8 @@ const hmac1 = crypto.hmac.sha256('data', { key: 'secret' });
 const hmac2 = crypto.hmac.sha256(Buffer.from('data'), { key: Buffer.from('secret') });
 
 // Uint8Array input
-const hmac3 = crypto.hmac.sha256(new Uint8Array([1, 2, 3]), { 
-  key: new Uint8Array([4, 5, 6]) 
+const hmac3 = crypto.hmac.sha256(new Uint8Array([1, 2, 3]), {
+  key: new Uint8Array([4, 5, 6])
 });
 ```
 
@@ -89,17 +89,21 @@ const hmac3 = crypto.hmac.sha256(new Uint8Array([1, 2, 3]), {
 For large data or streaming scenarios:
 
 ```javascript
-// Create HMAC instance
-const hmac = crypto.hmac.sha256.create({ key: 'secret' });
+// Create HMAC instance (streaming)
+const h = crypto.hmac.sha256.create({ key: 'secret' });
 
 // Update with data chunks
-hmac.update('Hello');
-hmac.update(' ');
-hmac.update('World');
+h.update('Hello');
+h.update(' ');
+h.update('World');
 
-// Get final HMAC
-const result = hmac.digest('hex');
+// Get final HMAC (hex | base64 | binary | buffer)
+const result = h.digest('hex');
 console.log(result); // HMAC of 'Hello World'
+
+// Reset and reuse with new data
+h.reset().update('New data');
+const next = h.digest('hex');
 ```
 
 ### Streaming with Files
@@ -169,8 +173,8 @@ class SecureMessage {
 
   // Verify signed message
   verifySignedMessage(signedMessage) {
-    const expectedHmac = crypto.hmac.sha256(signedMessage.message, { 
-      key: this.secretKey 
+    const expectedHmac = crypto.hmac.sha256(signedMessage.message, {
+      key: this.secretKey
     });
     return crypto.timingSafeEqual(signedMessage.signature, expectedHmac);
   }
@@ -195,11 +199,11 @@ class SimpleToken {
     const header = { alg: 'HS256', typ: 'JWT' };
     const encodedHeader = Buffer.from(JSON.stringify(header)).toString('base64url');
     const encodedPayload = Buffer.from(JSON.stringify(payload)).toString('base64url');
-    
+
     const data = `${encodedHeader}.${encodedPayload}`;
     const signature = crypto.hmac.sha256(data, { key: this.secretKey });
     const encodedSignature = Buffer.from(signature, 'hex').toString('base64url');
-    
+
     return `${data}.${encodedSignature}`;
   }
 
@@ -210,12 +214,12 @@ class SimpleToken {
 
     const [header, payload, signature] = parts;
     const data = `${header}.${payload}`;
-    
+
     const expectedSignature = crypto.hmac.sha256(data, { key: this.secretKey });
     const expectedEncoded = Buffer.from(expectedSignature, 'hex').toString('base64url');
-    
+
     if (signature !== expectedEncoded) return null;
-    
+
     return JSON.parse(Buffer.from(payload, 'base64url').toString());
   }
 }
@@ -306,9 +310,9 @@ import crypto, { CryptoInput, HmacOptions, HmacOutput } from 'cryptographer.js';
 
 // Type-safe function calls
 const hmac: string = crypto.hmac.sha256('data', { key: 'secret' });
-const hmacBuffer: Buffer = crypto.hmac.sha256('data', { 
+const hmacBuffer: Buffer = crypto.hmac.sha256('data', {
   key: 'secret',
-  outputFormat: 'buffer' 
+  outputFormat: 'buffer'
 });
 
 // Type-safe options
@@ -368,4 +372,4 @@ const hmac: HmacInstance = crypto.hmac.sha256.create({ key: 'secret' });
 function timingSafeEqual(a: string | Buffer, b: string | Buffer): boolean
 ```
 
-This function compares two strings/buffers in a timing-safe manner to prevent timing attacks. 
+This function compares two strings/buffers in a timing-safe manner to prevent timing attacks.

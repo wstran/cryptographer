@@ -1,4 +1,4 @@
-use argon2::{Argon2, PasswordHash, PasswordHasher, PasswordVerifier};
+use argon2::{Algorithm, Argon2, Params, PasswordHash, PasswordHasher, PasswordVerifier, Version};
 use argon2::password_hash::SaltString;
 use js_sys::Uint8Array;
 use serde::Deserialize;
@@ -8,6 +8,16 @@ use wasm_bindgen::JsValue;
 #[derive(Deserialize)]
 struct HashOptions {
     salt: Option<String>,
+    #[serde(default)]
+    time_cost: Option<u32>,
+    #[serde(default)]
+    memory_cost: Option<u32>,
+    #[serde(default)]
+    parallelism: Option<u32>,
+    #[serde(default)]
+    variant: Option<String>, // 'id' | 'i' | 'd' | 'argon2id' | ...
+    #[serde(default)]
+    key_length: Option<u32>,
 }
 
 #[wasm_bindgen]
@@ -28,7 +38,26 @@ pub fn hash_password(password: Uint8Array, options: JsValue) -> Result<String, J
         None => return Err(JsValue::from_str("Salt is required. Please generate in JS")),
     };
 
-    let argon2 = Argon2::default();
+    // Map algorithm variant
+    let alg = match opts.variant.as_deref() {
+        Some("i") | Some("argon2i") => Algorithm::Argon2i,
+        Some("d") | Some("argon2d") => Algorithm::Argon2d,
+        _ => Algorithm::Argon2id,
+    };
+
+    // Map parameters with sensible defaults
+    let t_cost = opts.time_cost.unwrap_or(3);
+    let m_cost = opts.memory_cost.unwrap_or(65536);
+    let p = opts.parallelism.unwrap_or(4);
+    let params = Params::new(
+        m_cost,
+        t_cost,
+        p,
+        Some(opts.key_length.unwrap_or(32) as usize),
+    )
+        .map_err(|e| JsValue::from_str(&format!("Invalid params: {}", e)))?;
+
+    let argon2 = Argon2::new(alg, Version::V0x13, params);
 
     let hash = argon2
         .hash_password(password_bytes, &salt)

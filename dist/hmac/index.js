@@ -93,7 +93,7 @@ class HMAC {
  */
 function createHMACFunction(algorithm) {
     let wasmModule;
-    return function (data, options) {
+    const createImmediate = function (data, options) {
         if (!wasmModule) {
             const resolvedPath = path_1.default.join(__dirname, '..', 'hmac', 'hmac_wasm', 'hmac_wasm.js');
             // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -102,6 +102,53 @@ function createHMACFunction(algorithm) {
         const hmac = new HMAC(wasmModule, options.key, algorithm);
         return hmac.digest(data, options.outputFormat || 'hex');
     };
+    createImmediate.create = (options) => {
+        if (!wasmModule) {
+            const resolvedPath = path_1.default.join(__dirname, '..', 'hmac', 'hmac_wasm', 'hmac_wasm.js');
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            wasmModule = require(resolvedPath);
+        }
+        const Algo = wasmModule.HashAlgorithm;
+        const algoEnum = algorithm === 'sha1' ? Algo.Sha1 :
+            algorithm === 'sha256' ? Algo.Sha256 :
+                algorithm === 'sha512' ? Algo.Sha512 :
+                    algorithm === 'md5' ? Algo.Md5 : undefined;
+        if (!algoEnum)
+            throw new Error(`Unsupported HMAC algorithm: ${algorithm}`);
+        let stream = new wasmModule.StreamingHmac(new HMAC(wasmModule, options.key, algorithm)['toBuffer'](options.key), algoEnum);
+        const format = options.outputFormat || 'hex';
+        const instance = {
+            update(data) {
+                const buf = new HMAC(wasmModule, options.key, algorithm)['toBuffer'](data);
+                // wasm method throws on error; surface as JS error
+                stream.update(buf);
+                return this;
+            },
+            digest(outFormat) {
+                const out = stream.finalize();
+                const chosen = outFormat || format;
+                switch (chosen) {
+                    case 'hex':
+                        return Buffer.from(out).toString('hex');
+                    case 'base64':
+                        return Buffer.from(out).toString('base64');
+                    case 'binary':
+                        return Buffer.from(out).toString('binary');
+                    case 'buffer':
+                        return Buffer.from(out);
+                    default:
+                        throw new Error(`Unknown output format: ${chosen}`);
+                }
+            },
+            reset() {
+                // Recreate stream to reset
+                stream = new wasmModule.StreamingHmac(new HMAC(wasmModule, options.key, algorithm)['toBuffer'](options.key), algoEnum);
+                return this;
+            },
+        };
+        return instance;
+    };
+    return createImmediate;
 }
 // Export HMAC functions for different algorithms
 exports.hmacSHA1 = createHMACFunction('sha1');

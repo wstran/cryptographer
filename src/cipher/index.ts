@@ -47,7 +47,7 @@ class AESCipher extends BaseCipher implements CipherFunction {
     // Validate key length (16, 24, or 32 bytes for AES-128, AES-192, AES-256)
     this.validateKeyLength(keyBuffer, [16, 24, 32]);
 
-    const mode = (options.mode || 'cbc').toUpperCase() as 'CBC' | 'ECB' | 'CTR';
+    const mode = (options.mode || 'cbc').toUpperCase() as 'CBC' | 'ECB' | 'CTR' | 'GCM' | 'CCM' | 'SIV';
     let result: Uint8Array;
 
     switch (mode) {
@@ -61,12 +61,45 @@ class AESCipher extends BaseCipher implements CipherFunction {
           throw new Error('IV must be 16 bytes (docs)');
         }
         const ivBuffer = ivInput.length === 12 ? ivInput : ivInput.subarray(0, 12);
-        // Map to GCM
+        // Map CBC request to AEAD (GCM) in WASM (safe default)
         let algorithm: number;
         if (keyBuffer.length === 16) algorithm = this.wasmModule.AesAlgorithm.Aes128Gcm;
         else if (keyBuffer.length === 24) algorithm = this.wasmModule.AesAlgorithm.Aes192Gcm;
         else algorithm = this.wasmModule.AesAlgorithm.Aes256Gcm;
         result = this.wasmModule.encrypt(dataBuffer, keyBuffer, ivBuffer, algorithm);
+        break;
+      }
+      case 'GCM': {
+        if (!options.iv) throw new Error('Nonce is required for AES-GCM');
+        const nonce = this.toBuffer(options.iv);
+        if (nonce.length !== 12) throw new Error('AES-GCM nonce must be 12 bytes');
+        let algorithm: number;
+        if (keyBuffer.length === 16) algorithm = this.wasmModule.AesAlgorithm.Aes128Gcm;
+        else if (keyBuffer.length === 24) algorithm = this.wasmModule.AesAlgorithm.Aes192Gcm;
+        else algorithm = this.wasmModule.AesAlgorithm.Aes256Gcm;
+        result = this.wasmModule.encrypt(dataBuffer, keyBuffer, nonce, algorithm);
+        break;
+      }
+      case 'CCM': {
+        if (!options.iv) throw new Error('Nonce is required for AES-CCM');
+        const nonce = this.toBuffer(options.iv);
+        if (nonce.length !== 13) throw new Error('AES-CCM nonce must be 13 bytes');
+        let algorithm: number;
+        if (keyBuffer.length === 16) algorithm = this.wasmModule.AesAlgorithm.Aes128Ccm;
+        else if (keyBuffer.length === 24) algorithm = this.wasmModule.AesAlgorithm.Aes192Ccm;
+        else algorithm = this.wasmModule.AesAlgorithm.Aes256Ccm;
+        result = this.wasmModule.encrypt(dataBuffer, keyBuffer, nonce, algorithm);
+        break;
+      }
+      case 'SIV': {
+        if (!options.iv) throw new Error('Nonce is required for AES-SIV');
+        const nonce = this.toBuffer(options.iv);
+        if (nonce.length !== 16) throw new Error('AES-SIV nonce must be 16 bytes');
+        let algorithm: number;
+        if (keyBuffer.length === 32) algorithm = this.wasmModule.AesAlgorithm.Aes128Siv;
+        else if (keyBuffer.length === 64) algorithm = this.wasmModule.AesAlgorithm.Aes256Siv;
+        else throw new Error('AES-SIV requires 32-byte (AES-128-SIV) or 64-byte (AES-256-SIV) key');
+        result = this.wasmModule.encrypt(dataBuffer, keyBuffer, nonce, algorithm);
         break;
       }
       case 'ECB': {
@@ -105,7 +138,7 @@ class AESCipher extends BaseCipher implements CipherFunction {
     // Validate key length
     this.validateKeyLength(keyBuffer, [16, 24, 32]);
 
-    const mode = (options.mode || 'cbc').toUpperCase() as 'CBC' | 'ECB' | 'CTR';
+    const mode = (options.mode || 'cbc').toUpperCase() as 'CBC' | 'ECB' | 'CTR' | 'GCM' | 'CCM' | 'SIV';
     let result: Uint8Array;
 
     switch (mode) {
@@ -123,6 +156,39 @@ class AESCipher extends BaseCipher implements CipherFunction {
         else if (keyBuffer.length === 24) algorithm = this.wasmModule.AesAlgorithm.Aes192Gcm;
         else algorithm = this.wasmModule.AesAlgorithm.Aes256Gcm;
         result = this.wasmModule.decrypt(dataBuffer, keyBuffer, ivBuffer, algorithm);
+        break;
+      }
+      case 'GCM': {
+        if (!options.iv) throw new Error('Nonce is required for AES-GCM');
+        const nonce = this.toBuffer(options.iv);
+        if (nonce.length !== 12) throw new Error('AES-GCM nonce must be 12 bytes');
+        let algorithm: number;
+        if (keyBuffer.length === 16) algorithm = this.wasmModule.AesAlgorithm.Aes128Gcm;
+        else if (keyBuffer.length === 24) algorithm = this.wasmModule.AesAlgorithm.Aes192Gcm;
+        else algorithm = this.wasmModule.AesAlgorithm.Aes256Gcm;
+        result = this.wasmModule.decrypt(dataBuffer, keyBuffer, nonce, algorithm);
+        break;
+      }
+      case 'CCM': {
+        if (!options.iv) throw new Error('Nonce is required for AES-CCM');
+        const nonce = this.toBuffer(options.iv);
+        if (nonce.length !== 13) throw new Error('AES-CCM nonce must be 13 bytes');
+        let algorithm: number;
+        if (keyBuffer.length === 16) algorithm = this.wasmModule.AesAlgorithm.Aes128Ccm;
+        else if (keyBuffer.length === 24) algorithm = this.wasmModule.AesAlgorithm.Aes192Ccm;
+        else algorithm = this.wasmModule.AesAlgorithm.Aes256Ccm;
+        result = this.wasmModule.decrypt(dataBuffer, keyBuffer, nonce, algorithm);
+        break;
+      }
+      case 'SIV': {
+        if (!options.iv) throw new Error('Nonce is required for AES-SIV');
+        const nonce = this.toBuffer(options.iv);
+        if (nonce.length !== 16) throw new Error('AES-SIV nonce must be 16 bytes');
+        let algorithm: number;
+        if (keyBuffer.length === 32) algorithm = this.wasmModule.AesAlgorithm.Aes128Siv;
+        else if (keyBuffer.length === 64) algorithm = this.wasmModule.AesAlgorithm.Aes256Siv;
+        else throw new Error('AES-SIV requires 32-byte (AES-128-SIV) or 64-byte (AES-256-SIV) key');
+        result = this.wasmModule.decrypt(dataBuffer, keyBuffer, nonce, algorithm);
         break;
       }
       case 'ECB': {
@@ -440,19 +506,17 @@ class RSAOAEP extends BaseCipher {
   encrypt(plaintext: CryptoInput, publicKeyDer: CryptoInput, options?: { hash?: 'sha1' | 'sha256' | 'sha384' | 'sha512'; label?: CryptoInput }): Buffer {
     const data = this.toBuffer(plaintext);
     const pk = this.toBuffer(publicKeyDer);
-    const hash = (options?.hash ?? 'sha256').toUpperCase();
-    const hashEnum = this.wasm.HashAlg[hash === 'SHA1' ? 'Sha1' : hash === 'SHA384' ? 'Sha384' : hash === 'SHA512' ? 'Sha512' : 'Sha256'];
+    const hashValue = (options?.hash ?? 'sha256');
     const label = options?.label ? this.toBuffer(options.label) : undefined;
-    const out: Uint8Array = this.wasm.rsa_oaep_encrypt(data, pk, hashEnum, label);
+    const out: Uint8Array = this.wasm.rsa_oaep_encrypt(data, pk, hashValue, label);
     return Buffer.from(out);
   }
   decrypt(ciphertext: CryptoInput, privateKeyDer: CryptoInput, options?: { hash?: 'sha1' | 'sha256' | 'sha384' | 'sha512'; label?: CryptoInput }): Buffer {
     const ct = this.toBuffer(ciphertext);
     const sk = this.toBuffer(privateKeyDer);
-    const hash = (options?.hash ?? 'sha256').toUpperCase();
-    const hashEnum = this.wasm.HashAlg[hash === 'SHA1' ? 'Sha1' : hash === 'SHA384' ? 'Sha384' : hash === 'SHA512' ? 'Sha512' : 'Sha256'];
+    const hashValue = (options?.hash ?? 'sha256');
     const label = options?.label ? this.toBuffer(options.label) : undefined;
-    const out: Uint8Array = this.wasm.rsa_oaep_decrypt(ct, sk, hashEnum, label);
+    const out: Uint8Array = this.wasm.rsa_oaep_decrypt(ct, sk, hashValue, label);
     return Buffer.from(out);
   }
 }

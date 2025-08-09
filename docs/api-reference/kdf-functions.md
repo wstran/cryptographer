@@ -30,7 +30,7 @@ Key Derivation Functions (KDF) are used for:
 import crypto from 'cryptographer.js';
 
 // Argon2id (recommended for password hashing)
-const passwordHash = crypto.kdf.argon2('password', {
+const passwordHash = await crypto.kdf.argon2('password', {
   salt: crypto.randomBytes(16),
   timeCost: 3,
   memoryCost: 65536, // 64MB
@@ -39,7 +39,7 @@ const passwordHash = crypto.kdf.argon2('password', {
 });
 
 // Argon2i (side-channel resistant)
-const passwordHashI = crypto.kdf.argon2('password', {
+const passwordHashI = await crypto.kdf.argon2('password', {
   salt: crypto.randomBytes(16),
   timeCost: 3,
   memoryCost: 65536,
@@ -48,7 +48,7 @@ const passwordHashI = crypto.kdf.argon2('password', {
 });
 
 // Argon2d (faster but vulnerable to side-channel attacks)
-const passwordHashD = crypto.kdf.argon2('password', {
+const passwordHashD = await crypto.kdf.argon2('password', {
   salt: crypto.randomBytes(16),
   timeCost: 3,
   memoryCost: 65536,
@@ -129,7 +129,7 @@ class PasswordManager {
   // Verify password
   async verifyPassword(password, storedHash) {
     const salt = Buffer.from(storedHash.salt, 'hex');
-    
+
     const computedHash = await crypto.kdf.argon2(password, {
       ...storedHash.options,
       salt: salt
@@ -142,7 +142,7 @@ class PasswordManager {
   async migratePassword(password, oldHash, oldAlgorithm) {
     // Verify with old algorithm
     let isValid = false;
-    
+
     if (oldAlgorithm === 'bcrypt') {
       isValid = crypto.kdf.bcrypt.verify(password, oldHash);
     } else if (oldAlgorithm === 'pbkdf2') {
@@ -151,14 +151,14 @@ class PasswordManager {
       const iterations = parseInt(parts[1]);
       const salt = parts[2];
       const hash = parts[3];
-      
+
       const computedHash = crypto.kdf.pbkdf2(password, {
         salt: salt,
         iterations: iterations,
         keyLength: 32,
         outputFormat: 'hex'
       });
-      
+
       isValid = crypto.timingSafeEqual(computedHash, hash);
     }
 
@@ -166,7 +166,7 @@ class PasswordManager {
       // Hash with new algorithm
       return await this.hashPassword(password);
     }
-    
+
     return null;
   }
 }
@@ -246,10 +246,10 @@ class MFASystem {
   // Hash password with multiple factors
   async hashPasswordWithFactors(password, factors) {
     const salt = crypto.randomBytes(16);
-    
+
     // Combine password with factors
     const combined = `${password}:${factors.join(':')}`;
-    
+
     const hash = await crypto.kdf.argon2(combined, {
       ...this.argon2Options,
       salt: salt
@@ -267,7 +267,7 @@ class MFASystem {
   async verifyPasswordWithFactors(password, factors, storedHash) {
     const salt = Buffer.from(storedHash.salt, 'hex');
     const combined = `${password}:${factors.join(':')}`;
-    
+
     const computedHash = await crypto.kdf.argon2(combined, {
       ...this.argon2Options,
       salt: salt
@@ -397,11 +397,11 @@ try {
 ## TypeScript Support
 
 ```typescript
-import crypto, { 
-  CryptoInput, 
-  Argon2Options, 
-  BcryptOptions, 
-  Pbkdf2Options 
+import crypto, {
+  CryptoInput,
+  Argon2Options,
+  BcryptOptions,
+  Pbkdf2Options
 } from 'cryptographer.js';
 
 // Type-safe Argon2
@@ -493,4 +493,4 @@ interface Pbkdf2Options {
 
 #### PBKDF2
 - **iterations**: 100000 (minimum), 200000+ for higher security
-- **hash**: 'sha256' (recommended), 'sha512' for higher security 
+- **hash**: 'sha256' (recommended), 'sha512' for higher security
