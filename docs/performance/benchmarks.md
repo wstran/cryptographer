@@ -158,7 +158,7 @@ function benchmarkHash(algorithm, iterations = 100000) {
   const start = process.hrtime.bigint();
 
   for (let i = 0; i < iterations; i++) {
-    crypto.hash[algorithm](data);
+    crypto.sha[algorithm](data);
   }
 
   const end = process.hrtime.bigint();
