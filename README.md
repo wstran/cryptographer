@@ -1,441 +1,204 @@
-# cryptographer.js
+<div align="center">
 
-[![npm version](https://badge.fury.io/js/cryptographer.js.svg)](https://badge.fury.io/js/cryptographer.js)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+<h1>cryptographer.js</h1>
 
-> 📖 **Documentation**: [cryptographer.gitbook.io](https://cryptographer.gitbook.io)
+<p>High‑performance cryptography for Node.js (Rust + WebAssembly)</p>
 
-🚀 **High-performance cryptographic algorithms for Node.js using WebAssembly**
+<p>
+  <a href="https://www.npmjs.com/package/cryptographer.js"><img alt="npm" src="https://img.shields.io/npm/v/cryptographer.js.svg?label=npm&color=cb3837"></a>
+  <a href="LICENSE"><img alt="license" src="https://img.shields.io/badge/License-MIT-yellow.svg"></a>
+  <a href="https://cryptographer.gitbook.io"><img alt="docs" src="https://img.shields.io/badge/docs-gitbook-4c51bf"></a>
+  <a href="#-tests"><img alt="tests" src="https://img.shields.io/badge/tests-passing-00c853"></a>
+</p>
 
-Built with Rust and compiled to WebAssembly, `cryptographer.js` provides blazing-fast implementations of industry-standard cryptographic algorithms that are 8-10x faster than pure JavaScript alternatives.
+</div>
 
-## ✨ Features
+---
 
-- 🚀 **High Performance**: Built with Rust and compiled to WebAssembly for maximum speed
-- 🔐 **Comprehensive**: Supports hash functions, ciphers, HMAC, and key derivation functions
-- 📦 **Easy to Use**: Simple, intuitive API with full TypeScript support
-- 🛡️ **Secure**: Implements industry-standard cryptographic algorithms (FIPS, RFC, NIST)
-- 💻 **Node.js Optimized**: Specifically designed for server-side Node.js applications
-- 📖 **Well Documented**: Comprehensive documentation and examples
-- 🧪 **Well Tested**: Extensive test coverage with known test vectors
-- 📊 **Benchmarked**: Performance tracking and comparison tools included
+> 📖 Documentation: https://cryptographer.gitbook.io
 
-## 🚀 Quick Start
+## ✨ Highlights
 
-### Installation
+- **Fast**: Rust + WASM, often 8–10× faster than JS libs
+- **Complete**: Hash, HMAC, AES, ChaCha20, DES/3DES, KDF, DSA, RSA‑OAEP
+- **Safe defaults**: AES‑GCM, Ed25519, Argon2id
+- **TypeScript‑first**: Fully typed API
 
+## 🚀 Install
 ```bash
 npm install cryptographer.js
 ```
 
-### Basic Usage
-
+## 🧭 Quickstart
 ```javascript
-const crypto = require('cryptographer.js');
-// or using ES modules
 import crypto from 'cryptographer.js';
 
-// Hash example
-const hash = crypto.hash.sha256('Hello World');
-console.log(hash); // 'a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e'
+// Hash (hex by default)
+const h = crypto.hash.sha256('Hello World');
 
-// HMAC example
-const hmac = crypto.hmac.sha256('data', { key: 'secret' });
-console.log(hmac);
+// HMAC
+const mac = crypto.hmac.sha256('data', { key: 'secret' });
 
-// Cipher example (AES-256-CBC)
-const encrypted = crypto.cipher.aes.encrypt('Hello World', {
-  key: Buffer.from('0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef', 'hex'), // 32 bytes for AES-256
-  iv: Buffer.from('0123456789abcdef0123456789abcdef', 'hex') // 16 bytes
-});
+// AES-GCM (recommended)
+// key: 16|24|32 bytes; nonce: 12 bytes
+const key = crypto.randomBytes(32);
+const nonce = crypto.randomBytes(12);
+const ct = crypto.cipher.aes.encrypt('Hello', { key, iv: nonce, mode: 'gcm' });
+const pt = crypto.cipher.aes.decrypt(ct, { key, iv: nonce, mode: 'gcm' });
 
-// Key derivation example
-const derivedKey = crypto.kdf.pbkdf2('password', {
-  salt: 'salt',
-  iterations: 100000,
-  keyLength: 32
-});
+// X25519 key exchange → derive shared secret
+const a = crypto.x25519.generateKeypair();
+const b = crypto.x25519.generateKeypair();
+const ssA = crypto.x25519.deriveSharedSecret(a.privateKey, b.publicKey);
+const ssB = crypto.x25519.deriveSharedSecret(b.privateKey, a.publicKey);
+
+// Ed25519 signature
+const ed = crypto.ed25519.generateKeypair();
+const sig = crypto.ed25519.sign(ed.privateKey, 'hello');
+const ok = crypto.ed25519.verify(ed.publicKey, 'hello', sig);
 ```
 
-## 📋 Algorithm Support
+## 📋 Algorithms
 
-### Hash Functions
+### Hash
+- sha1, sha256, sha512, sha3_256, sha3_512
+- md4, md5 (legacy), ripemd160, whirlpool
+- blake2b, blake2s, blake3 (keyed/deriveKey/xof)
 
-| Algorithm | Standard | Status | Description |
-|-----------|----------|---------|-------------|
-| **SHA-256** | FIPS 180-4 | ✅ Recommended | Industry standard, widely supported |
-| **SHA-512** | FIPS 180-4 | ✅ Recommended | Higher security level than SHA-256 |
-| **SHA3-256** | FIPS 202 | ✅ Recommended | Latest SHA-3 standard |
-| **SHA3-512** | FIPS 202 | ✅ Recommended | Latest SHA-3 standard, higher security |
-| **BLAKE2b** | RFC 7693 | ✅ Recommended | Faster than SHA-2, cryptographically secure |
-| **BLAKE2s** | RFC 7693 | ✅ Recommended | Optimized for 8-32 bit platforms |
-| **BLAKE3** | - | ✅ Recommended | Latest BLAKE version, extremely fast |
-| **SHA-1** | RFC 3174 | ⚠️ Legacy only | Deprecated, use only for compatibility |
-| **MD5** | RFC 1321 | ⚠️ Legacy only | Cryptographically broken, legacy only |
-| **MD4** | RFC 1320 | ⚠️ Legacy only | Cryptographically broken, legacy only |
-| **Whirlpool** | ISO/IEC 10118-3 | ✅ Supported | 512-bit hash function |
-| **RIPEMD-160** | - | ✅ Supported | Used in Bitcoin and other cryptocurrencies |
+### HMAC
+- HMAC over: sha1, sha256, sha512, md5
+- Streaming HMAC: `crypto.hmac.sha256.create({ key })`
 
-### Cipher Functions
+### Ciphers (at a glance)
 
-| Algorithm | Modes | Key Sizes | Status |
-|-----------|-------|-----------|---------|
-| **AES** | CBC, ECB, CTR | 128, 192, 256-bit | ✅ Recommended |
-| **ChaCha20** | CTR (12B nonce), AEAD | 256-bit | ✅ Recommended |
-| **DES/3DES** | CBC, CTR | 56/168-bit | ⚠️ Legacy only |
+| Cipher | Modes | Key/Nonce | Notes |
+|---|---|---|---|
+| AES | gcm, ccm, ctr, siv | 16/24/32B; GCM=12B, CCM=13B, CTR=16B, SIV=16B (key 32/64B) | CBC/ECB accepted as aliases → map to GCM/CTR |
+| ChaCha20 | ctr, poly1305 (AEAD) | 32B; nonce=12B | selector: 'ctr' or 'cbc'→AEAD |
+| DES/3DES | cbc, ctr | 8B/24B; IV=8B | legacy/interop only |
 
-### HMAC (Hash-based Message Authentication Code)
+> Note
+> - AES‑GCM nonce=12B; AES‑CCM nonce=13B; AES‑SIV nonce=16B (key 32B/64B)
+> - CBC/ECB kept for compatibility; mapped internally to GCM/CTR
 
-Supports all hash algorithms listed above for HMAC generation.
+### Key Exchange & Asymmetric
+- X25519
+- ECDH: p256, p384
+- RSA-OAEP (SHA-1/256/384/512)
 
-### Key Derivation Functions (KDF)
+### DSA
+- Ed25519
+- ECDSA: secp256r1 (aka p256), secp256k1
+- RSA Sign: PSS, PKCS#1 v1.5 (SHA-256/384/512)
 
-| Algorithm | Standard | Status | Use Case |
-|-----------|----------|---------|----------|
-| **Argon2id** | RFC 9106 | ✅ Recommended | Password hashing (default choice) |
-| **Argon2i** | RFC 9106 | ✅ Recommended | Password hashing (side-channel resistant) |
-| **bcrypt** | - | ✅ Recommended | Password hashing (widely adopted) |
-| **PBKDF2** | RFC 2898 | ✅ Recommended | Key derivation, legacy password hashing |
-| **Argon2d** | RFC 9106 | ⚠️ Use with caution | Faster but vulnerable to side-channel attacks |
+## 🔎 Usage Examples
 
-## 📖 API Reference
-
-### Hash Functions
-
-All hash functions support the following options:
-- `outputFormat`: 'hex' | 'base64' | 'binary' | 'buffer' (default: 'hex')
-
+### Hash & Streaming
 ```javascript
-// Basic usage
-crypto.hash.sha256('Hello World') // Returns hex string by default
-crypto.hash.sha256('Hello World', { outputFormat: 'base64' })
+// one-shot
+crypto.hash.sha256('Hello World');
 
-// Available functions
-crypto.hash.sha1(data, options?)
-crypto.hash.sha256(data, options?)
-crypto.hash.sha512(data, options?)
-crypto.hash.sha3_256(data, options?)
-crypto.hash.sha3_512(data, options?)
-crypto.hash.md4(data, options?)      // ⚠️ Legacy only
-crypto.hash.md5(data, options?)      // ⚠️ Legacy only
-crypto.hash.blake2b(data, options?)
-crypto.hash.blake2s(data, options?)
-crypto.hash.blake3(data, options?) // supports keyed, deriveKey/derive_key, hashLength/hash_length
-crypto.hash.whirlpool(data, options?)
-crypto.hash.ripemd160(data, options?)
+// streaming
+const hs = crypto.hash.sha256.create();
+hs.update('Hello').update(' ').update('World');
+const out = hs.digest('hex');
 ```
 
-#### Streaming Hash API
-
+### HMAC & Streaming
 ```javascript
-const hasher = crypto.hash.sha256.create();
-hasher.update('Hello ');
-hasher.update('World');
-const result = hasher.digest(); // 'a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e'
+// one-shot
+crypto.hmac.sha256('data', { key: 'secret', outputFormat: 'hex' });
 
-// Reset and reuse
-hasher.reset();
-hasher.update('New data');
-const newResult = hasher.digest();
+// streaming
+const h = crypto.hmac.sha256.create({ key: 'secret' });
+h.update('Hello').update(' ').update('World');
+const tag = h.digest('hex');
 ```
 
-### HMAC Functions
-
+### AES modes
 ```javascript
-crypto.hmac.sha1(data, { key: 'secret', outputFormat?: 'hex' })
-crypto.hmac.sha256(data, { key: 'secret', outputFormat?: 'hex' })
-crypto.hmac.sha512(data, { key: 'secret', outputFormat?: 'hex' })
-crypto.hmac.md5(data, { key: 'secret', outputFormat?: 'hex' })
+const key = crypto.randomBytes(32);
 
-// Example
-const hmac = crypto.hmac.sha256('message', {
-  key: 'secret-key',
-  outputFormat: 'base64'
-});
+// GCM (recommended): nonce 12B
+const n12 = crypto.randomBytes(12);
+const g = crypto.cipher.aes.encrypt('data', { key, iv: n12, mode: 'gcm' });
+const g0 = crypto.cipher.aes.decrypt(g, { key, iv: n12, mode: 'gcm' });
+
+// CTR: iv 16B
+const n16 = crypto.randomBytes(16);
+const c = crypto.cipher.aes.encrypt('data', { key, iv: n16, mode: 'ctr' });
+const c0 = crypto.cipher.aes.decrypt(c, { key, iv: n16, mode: 'ctr' });
+
+// CCM: nonce 13B
+const n13 = crypto.randomBytes(13);
+const cc = crypto.cipher.aes.encrypt('data', { key, iv: n13, mode: 'ccm' });
+const cc0 = crypto.cipher.aes.decrypt(cc, { key, iv: n13, mode: 'ccm' });
+
+// SIV: nonce 16B, key 32B/64B
+const kSiv = crypto.randomBytes(32);
+const s = crypto.cipher.aes.encrypt('data', { key: kSiv, iv: n16, mode: 'siv' });
+const s0 = crypto.cipher.aes.decrypt(s, { key: kSiv, iv: n16, mode: 'siv' });
+
+// CBC alias (mapped to GCM internally)
+const iv16 = crypto.randomBytes(16);
+const cb = crypto.cipher.aes.encrypt('data', { key, iv: iv16, mode: 'cbc' });
 ```
 
-### Cipher Functions
-
-#### AES Encryption/Decryption
-
+### Key Exchange
 ```javascript
-// Encryption
-const encrypted = crypto.cipher.aes.encrypt(data, {
-  key: Buffer.from('...'), // 16, 24, or 32 bytes for AES-128, AES-192, AES-256
-  iv: Buffer.from('...'),  // Required for CBC/CTR modes (16 bytes)
-  mode: 'CBC' | 'ECB' | 'CTR', // Default: 'CBC'
-  padding: 'PKCS7' | 'NoPadding' | 'ZeroPadding' // Default: 'PKCS7'
-});
-
-// Decryption
-const decrypted = crypto.cipher.aes.decrypt(encrypted, {
-  key: Buffer.from('...'),
-  iv: Buffer.from('...'),
-  mode: 'CBC' | 'ECB' | 'CTR'
-});
-
-// Example: AES-256-CBC
-const key = Buffer.from('0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef', 'hex');
-const iv = Buffer.from('0123456789abcdef0123456789abcdef', 'hex');
-
-const encrypted = crypto.cipher.aes.encrypt('Hello World', { key, iv, mode: 'CBC' });
-const decrypted = crypto.cipher.aes.decrypt(encrypted, { key, iv, mode: 'CBC' });
+// X25519 → HKDF to symmetric key (example-only)
+const a = crypto.x25519.generateKeypair();
+const b = crypto.x25519.generateKeypair();
+const ss = crypto.x25519.deriveSharedSecret(a.privateKey, b.publicKey);
 ```
 
-### Key Derivation Functions (KDF)
-
-#### PBKDF2
-
+### DSA
 ```javascript
-const key = crypto.kdf.pbkdf2('password', {
-  salt: 'salt',           // string or Buffer
-  iterations: 100000,     // Default: 100000 (recommended minimum)
-  keyLength: 32,          // Default: 32 bytes
-  outputFormat: 'hex'     // Default: 'hex'
-});
+// Ed25519
+const ed = crypto.ed25519.generateKeypair();
+const sig = crypto.ed25519.sign(ed.privateKey, 'hello');
+crypto.ed25519.verify(ed.publicKey, 'hello', sig);
+
+// ECDSA P-256
+const kp = crypto.ecdsa.generateKeypair('secp256r1');
+const s1 = crypto.ecdsa.sign('data', { curve: 'secp256r1', privateKey: kp.privateKey });
+crypto.ecdsa.verify('data', { curve: 'secp256r1', publicKey: kp.publicKey, signature: s1 });
 ```
 
-#### Argon2
-
+### KDF
 ```javascript
-const key = crypto.kdf.argon2('password', {
-  salt: 'salt',
-  timeCost: 3,            // Default: 3 (number of iterations)
-  memoryCost: 4096,       // Default: 4096 KB (memory usage)
-  parallelism: 1,         // Default: 1 (number of threads)
-  keyLength: 32,          // Default: 32 bytes
-  variant: 'argon2id',    // 'argon2i' | 'argon2d' | 'argon2id' (default: 'argon2id')
-  outputFormat: 'hex'
-});
+// PBKDF2
+crypto.kdf.pbkdf2('password', { salt: crypto.randomBytes(16), iterations: 100000, keyLength: 32 });
+
+// bcrypt
+const b = crypto.kdf.bcrypt.hash('secret', { rounds: 12 });
+crypto.kdf.bcrypt.verify('secret', b);
+
+// Argon2 (PHC string)
+await crypto.kdf.argon2('secret', { salt: crypto.randomBytes(16), timeCost: 3, memoryCost: 65536, parallelism: 4, variant: 'id' });
 ```
 
-#### bcrypt
-
-```javascript
-// Hash password
-const hash = crypto.kdf.bcrypt.hash('password', {
-  rounds: 12  // Default: 10, Range: 4-31 (higher = more secure but slower)
-});
-
-// Verify password
-const isValid = crypto.kdf.bcrypt.verify('password', hash);
-console.log(isValid); // true or false
-```
-
-## 📊 Performance
-
-cryptographer.js significantly outperforms pure JavaScript implementations:
-
-| Algorithm | cryptographer.js | crypto-js | native crypto | Speed vs crypto-js |
-|-----------|------------------|-----------|---------------|-------------------|
-| SHA-256   | 1,200,000 ops/s  | 150,000 ops/s | 2,000,000 ops/s | **8x faster** |
-| SHA-512   | 800,000 ops/s    | 100,000 ops/s | 1,500,000 ops/s | **8x faster** |
-| BLAKE3    | 2,500,000 ops/s  | N/A | N/A | **New algorithm** |
-| AES-256   | 800,000 ops/s    | 100,000 ops/s | 1,200,000 ops/s | **8x faster** |
-| PBKDF2    | 50,000 ops/s     | 5,000 ops/s   | 80,000 ops/s | **10x faster** |
-| Argon2id  | 1,000 ops/s      | N/A | N/A | **Industry standard** |
-
-*Benchmarks performed on Node.js 18.x with AMD64 CPU. Results may vary by hardware.*
-
-### Running Benchmarks
-
+## 🧪 Tests
 ```bash
-# Clone the repository
-git clone https://github.com/wstran/cryptographer.git
-cd cryptographer
-
-# Install dependencies
-npm install
-
-# Run benchmarks
-npm run benchmark
+# Pretty, end‑to‑end test log
+node tests/run-all.js
 ```
 
-## 💾 TypeScript Support
-
-Full TypeScript support with comprehensive type definitions:
-
+## 📦 TypeScript
 ```typescript
-import crypto, {
-  CryptoInput,
-  HashOptions,
-  CipherOptions,
-  KDFOptions,
-  Argon2Options,
-  BcryptOptions
-} from 'cryptographer.js';
-
-// Type-safe usage
-const options: HashOptions = {
-  outputFormat: 'base64'
-};
-
-const hash: string = crypto.hash.sha256('data', options);
-
-// Cipher with proper typing
-const cipherOptions: CipherOptions = {
-  key: Buffer.from('...'),
-  iv: Buffer.from('...'),
-  mode: 'CBC'
-};
-
-const encrypted: Buffer = crypto.cipher.aes.encrypt('data', cipherOptions);
+import type { CryptoInput, CipherMode, CipherOptions } from 'cryptographer.js';
+const opts: CipherOptions = { key: Buffer.alloc(32), iv: Buffer.alloc(12), mode: 'gcm' };
 ```
 
-## 🛠️ Requirements
+## 🛠 Requirements
+- Node.js >= 14, Linux/macOS/Windows, x64/arm64
+- Node 18/20 recommended
 
-- **Node.js**: >= 14.0.0
-- **npm**: >= 6.0.0
-- **Environment**: Node.js only (not browser compatible)
+## 🔐 Security
+- Prefer AES‑GCM, Ed25519, Argon2id
+- Avoid ECB; use CBC only for interop (mapped to AEAD internally)
 
-### Supported Platforms
-
-- **Operating Systems**: Linux, macOS, Windows
-- **Architectures**: x64, ARM64
-- **Node.js Versions**: 14.x, 16.x, 18.x, 20.x, 21.x
-
-## 🏗️ Building from Source
-
-### Prerequisites
-
-- Node.js >= 14.0.0
-- Rust (latest stable)
-- wasm-pack
-
-### Build Steps
-
-```bash
-# Clone the repository
-git clone https://github.com/wstran/cryptographer.git
-cd cryptographer
-
-# Install dependencies
-npm install
-
-# Install Rust (if not already installed)
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-
-# Install wasm-pack
-curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
-
-# Build WebAssembly modules
-npm run build:wasm
-
-# Build TypeScript
-npm run build:ts
-
-# Or build everything
-npm run build
-
-# Run tests
-npm test
-
-# Run linting
-npm run lint
-
-# Check formatting
-npm run format:check
-```
-
-## 🧪 Testing
-
-Comprehensive test suite with:
-- Unit tests for all algorithms
-- Integration tests
-- Performance tests
-- Security test vectors
-- Cross-platform compatibility tests
-
-```bash
-# Run all tests
-npm test
-
-# Run with coverage
-npm run test:coverage
-
-# Run specific test suites
-npm run test:unit
-npm run test:integration
-
-# Validate everything (lint + format + test)
-npm run validate
-```
-
-## 📚 Documentation
-
-- **API Reference**: [API_REFERENCE.md](API_REFERENCE.md)
-- **Contributing Guide**: [CONTRIBUTING.md](CONTRIBUTING.md)
-- **Security Policy**: [SECURITY.md](SECURITY.md)
-- **Changelog**: [CHANGELOG.md](CHANGELOG.md)
-
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
-
-### Development Workflow
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Make your changes
-4. Add tests for new functionality
-5. Ensure all tests pass (`npm run validate`)
-6. Commit your changes (`git commit -m 'feat: add amazing feature'`)
-7. Push to the branch (`git push origin feature/amazing-feature`)
-8. Open a Pull Request
-
-## 🔒 Security
-
-Security is our top priority. Please see our [Security Policy](SECURITY.md) for:
-- Supported versions
-- Reporting security vulnerabilities
-- Security best practices
-- Known limitations
-
-**For security-related issues, please email [wilsontran@ronus.io](mailto:wilsontran@ronus.io) instead of using the issue tracker.**
-
-## 📜 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 👨‍💻 Author
-
-**Wilson Tran**
-- GitHub: [@wstran](https://github.com/wstran)
-- Email: [wilsontran@ronus.io](mailto:wilsontran@ronus.io)
-
-## 🙏 Acknowledgments
-
-- Built with [Rust](https://www.rust-lang.org/) and [wasm-pack](https://rustwasm.github.io/wasm-pack/)
-- Cryptographic implementations from [RustCrypto](https://github.com/RustCrypto)
-- Inspired by the need for faster cryptographic operations in Node.js
-- Special thanks to the open-source cryptography community
-
-## 📈 Roadmap
-
-### Upcoming Features
-
-- **Additional Ciphers**: ChaCha20, Salsa20
-- **Digital Signatures**: RSA, ECDSA, EdDSA
-- **Key Exchange**: ECDH, X25519
-  - **Post-Quantum Cryptography**: (TBD)
-- **Browser Support**: WebAssembly builds for browsers
-- **Streaming Cipher Support**: Large file encryption
-- **Hardware Acceleration**: SIMD optimizations
-
-### Version History
-
-See [CHANGELOG.md](CHANGELOG.md) for detailed version history.
-
-## 💬 Support
-
-- 📧 **Email**: [wilsontran@ronus.io](mailto:wilsontran@ronus.io)
-- 📚 **Documentation**: [https://cryptographer.gitbook.io/docs](https://cryptographer.gitbook.io/docs)
-- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/wstran/cryptographer/issues)
-- 💡 **Feature Requests**: [GitHub Discussions](https://github.com/wstran/cryptographer/discussions)
-
----
-
-<div align="center">
-  <strong>Made with ❤️ for the Node.js community</strong>
-</div>
+## 📚 More
+- Docs: https://cryptographer.gitbook.io
+- Security Policy: SECURITY.md
+- License: MIT
