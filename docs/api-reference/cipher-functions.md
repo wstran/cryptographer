@@ -170,7 +170,7 @@ const pt = crypto.cipher.chacha20.decrypt(ct, { key, iv: aeadNonce, mode: 'cbc' 
 
 Notes:
 - AES-GCM nonce must be 12 bytes; AES-CCM nonce must be 13 bytes; AES-SIV nonce must be 16 bytes.
-- CBC/ECB selectors are maintained for compatibility and internally map to AEAD/CTR.
+- CBC/ECB/CTR are classic block/stream modes. Prefer AEAD (GCM/CCM/SIV, or ChaCha20-Poly1305) when possible.
 
 ### DES / 3DES (Legacy)
 
@@ -508,15 +508,12 @@ function decryptWithAuth(packet, key) {
 
 ## Performance
 
-Sample performance on M2 Max / Node 18:
+Sample performance (Linux x64 / Node 20; only overlapping modes with crypto-js):
 
 | Algorithm | Mode | ops/s | vs crypto-js | Use Case |
 |-----------|------|-------|--------------|----------|
-| AES-256 | CBC | 0.9 M | 9× faster | General purpose |
-| AES-256 | CTR | 1.1 M | 10× faster | Parallel processing |
-| AES-256 | ECB | 1.2 M | 11× faster | Specific use cases |
-| AES-128 | CBC | 1.3 M | 12× faster | Standard security |
-| AES-192 | CBC | 1.0 M | 9× faster | Higher security |
+| AES-256 | CBC | 0.052 M | 5.6× faster | General purpose |
+| AES-256 | CTR | 0.072 M | 8× faster | Parallel processing |
 
 ## Error Handling
 

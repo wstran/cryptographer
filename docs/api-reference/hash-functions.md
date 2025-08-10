@@ -180,15 +180,18 @@ const ripemd160Hash = crypto.sha.ripemd160('data');
 
 ## Performance Comparison
 
-Sample performance on M2 Max / Node 18 (higher = better):
+Sample performance (Linux x64 / Node 20; higher = better):
+
+Note: crypto-js does not implement BLAKE2b/BLAKE2s/BLAKE3. Mark these "vs crypto-js" as N/A.
 
 | Algorithm | ops/s | vs crypto-js | Use Case |
 |-----------|-------|--------------|----------|
-| BLAKE3 | 2.1 M | N/A | General purpose, speed critical |
-| BLAKE2b | 1.8 M | 10× faster | General purpose, high security |
-| SHA-256 | 1.3 M | 8× faster | Digital signatures, compatibility |
-| SHA-512 | 0.9 M | 6× faster | Higher security requirements |
-| SHA3-256 | 0.8 M | 5× faster | Latest standard, future-proof |
+| BLAKE3 | 0.010 M | N/A | General purpose, speed critical |
+| BLAKE2b | 0.66 M | N/A | General purpose, high security |
+| BLAKE2s | 0.65 M | N/A | Optimized for small platforms |
+| SHA-256 | 0.54 M | 3.3× faster | Digital signatures, compatibility |
+| SHA-512 | 0.59 M | 16× faster | Higher security requirements |
+| SHA3-256 | 0.55 M | 33.5× faster | Latest standard, future-proof |
 
 ## Security Considerations
 

@@ -276,14 +276,14 @@ const hmacKey = 'my-password'; // Weak!
 
 ## Performance
 
-Sample performance on M2 Max / Node 18:
+Sample performance (Linux x64 / Node 20):
 
 | Algorithm | ops/s | vs crypto-js | Use Case |
 |-----------|-------|--------------|----------|
-| HMAC-SHA-256 | 1.2 M | 8× faster | General purpose |
-| HMAC-SHA-512 | 0.8 M | 6× faster | Higher security |
-| HMAC-SHA-1 | 1.5 M | 9× faster | Legacy compatibility |
-| HMAC-MD5 | 2.0 M | 10× faster | Legacy compatibility |
+| HMAC-SHA-256 | 0.37 M | 6.5× faster | General purpose |
+| HMAC-SHA-512 | 0.41 M | 28× faster | Higher security |
+| HMAC-SHA-1 | 0.49 M | 9.2× faster | Legacy compatibility |
+| HMAC-MD5 | 0.54 M | 10.8× faster | Legacy compatibility |
 
 ## Error Handling
 

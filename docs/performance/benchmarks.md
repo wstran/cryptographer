@@ -8,12 +8,12 @@ cryptographer.js is designed for high performance, leveraging Rust and WebAssemb
 
 ## Benchmark Environment
 
-- **Hardware**: Apple M2 Max (10-core CPU, 32GB RAM)
-- **Node.js**: v18.17.0
-- **OS**: macOS 13.5
-- **Test Data**: 1KB random data for hash/HMAC, 1KB for encryption
-- **Iterations**: 100,000 operations per algorithm
-- **Measurement**: High-resolution timestamps using `process.hrtime.bigint()`
+- Hardware: Linux x64 (container)
+- Node.js: v20.x
+- OS: Linux
+- Test Data: 1KB buffer for hash/HMAC, 1KB for encryption
+- Iterations: 100,000 Ops (hash/HMAC), 5,000 Ops (encryption)
+- Measurement: `process.hrtime.bigint()` high-resolution timers
 
 ## Hash Functions Performance
 
@@ -21,64 +21,70 @@ cryptographer.js is designed for high performance, leveraging Rust and WebAssemb
 
 | Algorithm | cryptographer.js | crypto-js | native crypto | Speed vs crypto-js |
 |-----------|------------------|-----------|---------------|-------------------|
-| SHA-1 | 1.5 M ops/s | 180 K ops/s | 2.1 M ops/s | **8.3× faster** |
-| SHA-256 | 1.3 M ops/s | 160 K ops/s | 1.8 M ops/s | **8.1× faster** |
-| SHA-512 | 0.9 M ops/s | 120 K ops/s | 1.2 M ops/s | **7.5× faster** |
+| SHA-1 | 0.49 M ops/s | 0.17 M ops/s | 0.86 M ops/s | **2.9× faster** |
+| SHA-256 | 0.54 M ops/s | 0.17 M ops/s | 1.08 M ops/s | **3.3× faster** |
+| SHA-512 | 0.59 M ops/s | 0.037 M ops/s | 0.80 M ops/s | **16× faster** |
 
 ### Modern Hash Functions
 
-Note: crypto-js does not include BLAKE3. We compare where the competitor supports the algorithm; for BLAKE3 we only report our throughput.
+Note: crypto-js does not implement BLAKE2b, BLAKE2s, or BLAKE3. Where a competitor lacks an algorithm, values are marked N/A and no speed comparison is provided.
 
 | Algorithm | cryptographer.js | crypto-js | Speed vs crypto-js |
 |-----------|------------------|-----------|-------------------|
-| BLAKE2b | 1.8 M ops/s | 150 K ops/s | **12× faster** |
-| BLAKE2s | 2.0 M ops/s | 160 K ops/s | **12.5× faster** |
-| BLAKE3 | 2.1 M ops/s | — | — |
-| SHA3-256 | 0.8 M ops/s | 100 K ops/s | **8× faster** |
-| SHA3-512 | 0.6 M ops/s | 80 K ops/s | **7.5× faster** |
+| BLAKE2b | 0.66 M ops/s | N/A | 0.63 M ops/s |
+| BLAKE2s | 0.65 M ops/s | N/A | 0.70 M ops/s |
+| BLAKE3 | 0.010 M ops/s | N/A | N/A |
+| SHA3-256 | 0.55 M ops/s | 0.016 M ops/s | N/A |
+| SHA3-512 | 0.57 M ops/s | 0.008 M ops/s | N/A |
 
 ### Legacy Hash Functions
 
 | Algorithm | cryptographer.js | crypto-js | Speed vs crypto-js |
 |-----------|------------------|-----------|-------------------|
-| MD4 | 2.5 M ops/s | 200 K ops/s | **12.5× faster** |
-| MD5 | 2.2 M ops/s | 180 K ops/s | **12.2× faster** |
-| RIPEMD-160 | 1.2 M ops/s | 140 K ops/s | **8.6× faster** |
-| Whirlpool | 0.7 M ops/s | 90 K ops/s | **7.8× faster** |
+| MD4 | 0.74 M ops/s | N/A | N/A |
+| MD5 | 0.45 M ops/s | 0.12 M ops/s | **3.6× faster** |
+| RIPEMD-160 | 0.35 M ops/s | 0.085 M ops/s | **4.1× faster** |
+| Whirlpool | 0.24 M ops/s | N/A | N/A |
 
 ## HMAC Performance
 
 | Algorithm | cryptographer.js | crypto-js | Speed vs crypto-js |
 |-----------|------------------|-----------|-------------------|
-| HMAC-SHA-1 | 1.5 M ops/s | 170 K ops/s | **8.8× faster** |
-| HMAC-SHA-256 | 1.2 M ops/s | 150 K ops/s | **8× faster** |
-| HMAC-SHA-512 | 0.8 M ops/s | 110 K ops/s | **7.3× faster** |
-| HMAC-MD5 | 2.0 M ops/s | 160 K ops/s | **12.5× faster** |
+| HMAC-SHA-1 | 0.49 M ops/s | 0.053 M ops/s | **9.2× faster** |
+| HMAC-SHA-256 | 0.37 M ops/s | 0.057 M ops/s | **6.5× faster** |
+| HMAC-SHA-512 | 0.41 M ops/s | 0.015 M ops/s | **28× faster** |
+| HMAC-MD5 | 0.54 M ops/s | 0.050 M ops/s | **10.8× faster** |
 
 ## Encryption Performance
 
 ### AES Performance
 
+Note: crypto-js supports AES block modes (CBC, CFB, CTR, OFB) and padding; it does not implement AEAD modes (e.g., GCM/CCM/SIV). Comparisons below are only for overlapping modes.
+
 | Algorithm | Mode | cryptographer.js | crypto-js | Speed vs crypto-js |
 |-----------|------|------------------|-----------|-------------------|
-| AES-128 | CBC | 1.4 M ops/s | 150 K ops/s | **9.3× faster** |
-| AES-128 | ECB | 1.6 M ops/s | 160 K ops/s | **10× faster** |
-| AES-128 | CTR | 1.5 M ops/s | 155 K ops/s | **9.7× faster** |
-| AES-192 | CBC | 1.2 M ops/s | 130 K ops/s | **9.2× faster** |
-| AES-192 | ECB | 1.4 M ops/s | 140 K ops/s | **10× faster** |
-| AES-192 | CTR | 1.3 M ops/s | 135 K ops/s | **9.6× faster** |
-| AES-256 | CBC | 0.9 M ops/s | 100 K ops/s | **9× faster** |
-| AES-256 | ECB | 1.2 M ops/s | 110 K ops/s | **10.9× faster** |
-| AES-256 | CTR | 1.1 M ops/s | 105 K ops/s | **10.5× faster** |
+| AES-128 | CBC | 0.039 M ops/s | 0.006 M ops/s | **6.2× faster** |
+| AES-192 | CBC | 0.038 M ops/s | 0.006 M ops/s | **6.0× faster** |
+| AES-256 | CBC | 0.036 M ops/s | 0.006 M ops/s | **5.7× faster** |
+| AES-128 | CTR | 0.072 M ops/s | 0.007 M ops/s | **10.5× faster** |
+| AES-192 | CTR | 0.066 M ops/s | 0.007 M ops/s | **10.0× faster** |
+| AES-256 | CTR | 0.057 M ops/s | 0.006 M ops/s | **9.0× faster** |
+| AES-128 | GCM | 0.038 M ops/s | N/A | N/A |
+| AES-192 | GCM | 0.038 M ops/s | N/A | N/A |
+| AES-256 | GCM | 0.028 M ops/s | N/A | N/A |
+
+Note: GCM rows are included for completeness; `crypto-js` does not provide AEAD modes to compare against.
 
 ## Key Derivation Performance
 
 ### Password Hashing
 
+Note: bcryptjs is only applicable to bcrypt. It does not implement Argon2 variants.
+
 | Algorithm | Parameters | cryptographer.js | bcryptjs | Speed vs bcryptjs |
 |-----------|------------|------------------|----------|-------------------|
-| Argon2id | t=3, m=64MB, p=4 | 10 ops/s | 8 ops/s | **1.25× faster** |
-| Argon2i | t=3, m=64MB, p=4 | 8.3 ops/s | 7 ops/s | **1.19× faster** |
+| Argon2id | t=3, m=64MB, p=4 | 10 ops/s | N/A | N/A |
+| Argon2i | t=3, m=64MB, p=4 | 8.3 ops/s | N/A | N/A |
 | bcrypt | rounds=12 | 5 ops/s | 4.5 ops/s | **1.11× faster** |
 
 ### Key Derivation
@@ -96,7 +102,7 @@ Note: crypto-js does not include BLAKE3. We compare where the competitor support
 | Algorithm | cryptographer.js | crypto-js | Memory Efficiency |
 |-----------|------------------|-----------|-------------------|
 | SHA-256 | 2.1 MB | 8.5 MB | ~4× lower |
-| BLAKE3 | 1.8 MB | — | — |
+| BLAKE3 | 1.8 MB | N/A | N/A |
 | SHA3-256 | 2.5 MB | 9.2 MB | ~3.7× lower |
 
 ### Encryption

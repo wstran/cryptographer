@@ -12,6 +12,7 @@
 
 ### Nonce/IV management
 
+- AES-GCM requires a 12-byte nonce. Never reuse a nonce with the same key.
 - AES CBC/CTR require a 16-byte IV. Never reuse an IV with the same key.
 - ChaCha20 and ChaCha20-Poly1305 require a 12-byte nonce. Never reuse a nonce with the same key.
 - DES/3DES CBC/CTR use an 8-byte IV; treat reuse as catastrophic.
@@ -64,24 +65,36 @@ const hash = crypto.sha.sha256(password); // Vulnerable!
 ### Encryption
 
 ```javascript
-// ✅ Recommended for most use cases
-const encrypted = crypto.cipher.aes.encrypt(data, {
+// ✅ Recommended for most use cases (AEAD)
+const n12 = crypto.randomBytes(12);
+const encGcm = crypto.cipher.aes.encrypt(data, {
   key: key,
-  iv: iv,
-  mode: 'cbc'
+  iv: n12,          // 12-byte nonce
+  mode: 'gcm'
 });
 
-// ⚠️ Use for parallel processing
-const encrypted = crypto.cipher.aes.encrypt(data, {
+j// ⚠️ CTR mode (no integrity). Pair with HMAC if you must use it
+const n16 = crypto.randomBytes(16);
+const encCtr = crypto.cipher.aes.encrypt(data, {
   key: key,
-  iv: iv, // Used as nonce
+  iv: n16,          // 16-byte IV/nonce
   mode: 'ctr'
 });
+const mac = crypto.hmac.sha256(Buffer.concat([n16, encCtr]), { key });
 
-// ❌ Avoid for most use cases
-const encrypted = crypto.cipher.aes.encrypt(data, {
+// ⚠️ CBC mode requires separate MAC. Prefer GCM/ChaCha20-Poly1305 instead
+const iv16 = crypto.randomBytes(16);
+const encCbc = crypto.cipher.aes.encrypt(data, {
   key: key,
-  mode: 'ecb' // No IV needed, but less secure
+  iv: iv16,         // 16-byte IV
+  mode: 'cbc'
+});
+const mac2 = crypto.hmac.sha256(Buffer.concat([iv16, encCbc]), { key });
+
+// ❌ Avoid ECB (no IV, reveals patterns)
+const encEcb = crypto.cipher.aes.encrypt(data, {
+  key: key,
+  mode: 'ecb'
 });
 ```
 

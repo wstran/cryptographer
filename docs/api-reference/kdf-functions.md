@@ -362,17 +362,14 @@ const key = crypto.kdf.pbkdf2(password, pbkdf2Options);
 const hash = await crypto.kdf.argon2(password, { ...options, variant: 'd' });
 ```
 
-## Performance Comparison
+## Performance (Linux x64 / Node 20)
 
-Sample performance on M2 Max / Node 18:
-
-| Algorithm | Parameters | Time (ms) | Memory | Security |
-|-----------|------------|-----------|---------|----------|
-| Argon2id | t=3, m=64MB, p=4 | 100 | 64MB | Very High |
-| Argon2i | t=3, m=64MB, p=4 | 120 | 64MB | Very High |
-| Argon2d | t=3, m=64MB, p=4 | 80 | 64MB | High |
-| bcrypt | rounds=12 | 200 | 4KB | High |
-| PBKDF2 | 100k iterations | 50 | 1KB | Medium |
+| Algorithm | Parameters | ops/s | vs crypto-js/bcryptjs | Notes |
+|-----------|------------|-------|------------------------|-------|
+| Argon2id | t=3, m=64MB, p=1 | ~7 | N/A | Password hashing (recommended) |
+| Argon2i | t=3, m=64MB, p=1 | ~7 | N/A | Side-channel resistance |
+| PBKDF2-SHA256 | 100k iterations | ~28 | ~28× vs crypto-js (≈1) | Key derivation |
+| bcrypt | rounds=12 | ~4 | N/A | Legacy compatibility |
 
 ## Error Handling
 
