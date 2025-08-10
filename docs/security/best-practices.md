@@ -7,8 +7,8 @@
 
 ### Asymmetric
 
-- Use RSA-OAEP (SHA-256+) để mã hóa payload nhỏ như session keys; không dùng cho dữ liệu lớn.
-- Dùng X25519 hoặc ECDH P-256/P-384 cho key exchange; dẫn xuất khóa đối xứng qua HKDF.
+- Use RSA-OAEP (SHA-256+) to encrypt small payloads such as session keys; do not use it for large data.
+- Use X25519 or ECDH P-256/P-384 for key exchange; derive symmetric keys via HKDF.
 
 ### Nonce/IV management
 
@@ -73,7 +73,7 @@ const encGcm = crypto.cipher.aes.encrypt(data, {
   mode: 'gcm'
 });
 
-j// ⚠️ CTR mode (no integrity). Pair with HMAC if you must use it
+// ⚠️ CTR mode (no integrity). Pair with HMAC if you must use it
 const n16 = crypto.randomBytes(16);
 const encCtr = crypto.cipher.aes.encrypt(data, {
   key: key,
