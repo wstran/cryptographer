@@ -30,7 +30,7 @@ Key Derivation Functions (KDF) are used for:
 import crypto from 'cryptographer.js';
 
 // Argon2id (recommended for password hashing)
-const passwordHash = await crypto.kdf.argon2('password', {
+const passwordHash = crypto.kdf.argon2('password', {
   salt: crypto.randomBytes(16),
   timeCost: 3,
   memoryCost: 65536, // 64MB
@@ -39,7 +39,7 @@ const passwordHash = await crypto.kdf.argon2('password', {
 });
 
 // Argon2i (side-channel resistant)
-const passwordHashI = await crypto.kdf.argon2('password', {
+const passwordHashI = crypto.kdf.argon2('password', {
   salt: crypto.randomBytes(16),
   timeCost: 3,
   memoryCost: 65536,
@@ -48,7 +48,7 @@ const passwordHashI = await crypto.kdf.argon2('password', {
 });
 
 // Argon2d (faster but vulnerable to side-channel attacks)
-const passwordHashD = await crypto.kdf.argon2('password', {
+const passwordHashD = crypto.kdf.argon2('password', {
   salt: crypto.randomBytes(16),
   timeCost: 3,
   memoryCost: 65536,
@@ -113,7 +113,7 @@ class PasswordManager {
   // Hash password with Argon2id
   async hashPassword(password) {
     const salt = crypto.randomBytes(16);
-    const hash = await crypto.kdf.argon2(password, {
+    const hash = crypto.kdf.argon2(password, {
       ...this.defaultArgon2Options,
       salt: salt
     });
@@ -130,7 +130,7 @@ class PasswordManager {
   async verifyPassword(password, storedHash) {
     const salt = Buffer.from(storedHash.salt, 'hex');
 
-    const computedHash = await crypto.kdf.argon2(password, {
+    const computedHash = crypto.kdf.argon2(password, {
       ...storedHash.options,
       salt: salt
     });
@@ -250,7 +250,7 @@ class MFASystem {
     // Combine password with factors
     const combined = `${password}:${factors.join(':')}`;
 
-    const hash = await crypto.kdf.argon2(combined, {
+    const hash = crypto.kdf.argon2(combined, {
       ...this.argon2Options,
       salt: salt
     });
@@ -268,7 +268,7 @@ class MFASystem {
     const salt = Buffer.from(storedHash.salt, 'hex');
     const combined = `${password}:${factors.join(':')}`;
 
-    const computedHash = await crypto.kdf.argon2(combined, {
+    const computedHash = crypto.kdf.argon2(combined, {
       ...this.argon2Options,
       salt: salt
     });
@@ -321,7 +321,7 @@ const salt = crypto.randomBytes(16);
 
 // ✅ Good: Use unique salt per password
 const userSalt = crypto.randomBytes(16);
-const hash = await crypto.kdf.argon2(password, { salt: userSalt });
+const hash = crypto.kdf.argon2(password, { salt: userSalt });
 
 // ❌ Bad: Use weak salt
 const weakSalt = 'salt123';
@@ -350,7 +350,7 @@ function verifyPasswordBad(password, storedHash) {
 
 ```javascript
 // ✅ Good: Use Argon2id for new applications
-const hash = await crypto.kdf.argon2(password, argon2Options);
+const hash = crypto.kdf.argon2(password, argon2Options);
 
 // ✅ Good: Use bcrypt for legacy compatibility
 const hash = crypto.kdf.bcrypt.hash(password, { rounds: 12 });
@@ -359,7 +359,7 @@ const hash = crypto.kdf.bcrypt.hash(password, { rounds: 12 });
 const key = crypto.kdf.pbkdf2(password, pbkdf2Options);
 
 // ⚠️ Use Argon2d only when speed is critical
-const hash = await crypto.kdf.argon2(password, { ...options, variant: 'd' });
+const hash = crypto.kdf.argon2(password, { ...options, variant: 'd' });
 ```
 
 ## Performance (Linux x64 / Node 20)
@@ -375,7 +375,7 @@ const hash = await crypto.kdf.argon2(password, { ...options, variant: 'd' });
 
 ```javascript
 try {
-  const hash = await crypto.kdf.argon2(password, options);
+  const hash = crypto.kdf.argon2(password, options);
 } catch (error) {
   if (error.message.includes('Invalid salt')) {
     console.error('Invalid salt length or format');

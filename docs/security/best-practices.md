@@ -40,7 +40,7 @@ const hash = crypto.sha.md4(data);        // Cryptographically broken
 
 ```javascript
 // ✅ Recommended for password hashing
-const hash = await crypto.kdf.argon2(password, {
+const hash = crypto.kdf.argon2(password, {
   salt: crypto.randomBytes(16),
   timeCost: 3,
   memoryCost: 65536, // 64MB
@@ -172,7 +172,7 @@ const key = 'my-secret-key-123';
 ```javascript
 // ✅ Good: Generate unique salt for each password
 const salt = crypto.randomBytes(16);
-const hash = await crypto.kdf.argon2(password, { salt });
+const hash = crypto.kdf.argon2(password, { salt });
 
 // ✅ Good: Store salt with hash
 const storedData = {
@@ -270,7 +270,7 @@ const highSecurityBcrypt = {
 ```javascript
 // ✅ Good: Use timing-safe comparison
 function verifyPassword(password, storedHash) {
-  const computedHash = await crypto.kdf.argon2(password, options);
+  const computedHash = crypto.kdf.argon2(password, options);
   return crypto.timingSafeEqual(computedHash, storedHash);
 }
 
@@ -282,7 +282,7 @@ function verifyHmac(message, key, signature) {
 
 // ❌ Bad: Use regular comparison (vulnerable to timing attacks)
 function verifyPasswordBad(password, storedHash) {
-  const computedHash = await crypto.kdf.argon2(password, options);
+  const computedHash = crypto.kdf.argon2(password, options);
   return computedHash === storedHash; // Vulnerable!
 }
 ```
@@ -360,7 +360,7 @@ function processData(input) {
 ```javascript
 // ✅ Good: Generic error messages
 try {
-  const hash = await crypto.kdf.argon2(password, options);
+  const hash = crypto.kdf.argon2(password, options);
 } catch (error) {
   console.error('Password hashing failed');
   // Log error internally for debugging
@@ -369,7 +369,7 @@ try {
 
 // ❌ Bad: Expose sensitive information
 try {
-  const hash = await crypto.kdf.argon2(password, options);
+  const hash = crypto.kdf.argon2(password, options);
 } catch (error) {
   console.error('Failed to hash password:', password); // Exposes password!
 }

@@ -267,7 +267,7 @@ async function benchmarkKdf(algorithm, iterations = 1000) {
 
   for (let i = 0; i < iterations; i++) {
     if (algorithm === 'argon2') {
-      await crypto.kdf.argon2(password, {
+      crypto.kdf.argon2(password, {
         salt: salt,
         timeCost: 3,
         memoryCost: 65536,

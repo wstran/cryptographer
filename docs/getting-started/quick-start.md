@@ -164,7 +164,7 @@ fs.writeFileSync('decrypted.txt', decrypted);
 class PasswordManager {
   static async hashPassword(password) {
     const salt = crypto.randomBytes(16);
-    const hash = await crypto.kdf.argon2(password, {
+    const hash = crypto.kdf.argon2(password, {
       salt: salt,
       timeCost: 3,
       memoryCost: 65536,
@@ -174,7 +174,7 @@ class PasswordManager {
   }
 
   static async verifyPassword(password, hash, salt) {
-    const computedHash = await crypto.kdf.argon2(password, {
+    const computedHash = crypto.kdf.argon2(password, {
       salt: Buffer.from(salt, 'hex'),
       timeCost: 3,
       memoryCost: 65536,

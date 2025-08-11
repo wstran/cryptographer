@@ -332,7 +332,7 @@ console.log('ecdsa secp256k1 ok?', crypto.dsa.ecdsa.verify('hello', { curve: 'se
 const password = 'mySecurePassword';
 const salt = crypto.randomBytes(16);
 
-const passwordHash = await crypto.kdf.argon2(password, {
+const passwordHash = crypto.kdf.argon2(password, {
   salt: salt,
   timeCost: 3,
   memoryCost: 65536, // 64MB
