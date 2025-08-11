@@ -14,6 +14,7 @@
 * [Cipher Functions](api-reference/cipher-functions.md)
 * [DSA Functions](api-reference/dsa-functions.md)
 * [Key Derivation Functions](api-reference/kdf-functions.md)
+* [ZK Functions](api-reference/zk-functions.md)
 
 ## Examples
 

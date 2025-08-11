@@ -102,6 +102,27 @@ const bcryptHash = crypto.kdf.bcrypt.hash('password', { rounds: 12 });
 const isValid = crypto.kdf.bcrypt.verify('password', bcryptHash);
 ```
 
+### 6. Zero-Knowledge (Groth16) — synchronous
+
+```javascript
+const fs = require('fs');
+
+// Generate proof
+const { proof, publicSignals } = crypto.zk.groth16.generateProof(
+  fs.readFileSync('./circuit.wasm'),
+  fs.readFileSync('./proving_key.zkey'),
+  { a: 3, b: 11 } // all input signals
+);
+
+// Verify proof
+const verificationKey = JSON.parse(fs.readFileSync('./verification_key.json', 'utf8'));
+const isValid = crypto.zk.groth16.verifyProof(verificationKey, proof, publicSignals);
+
+// Serialize/deserialize
+const serialized = crypto.zk.groth16.serializeProof({ proof, publicSignals }, 'base64');
+const deserialized = crypto.zk.groth16.deserializeProof(serialized);
+```
+
 ## Advanced Usage
 
 ### Streaming Hash Operations
@@ -223,6 +244,27 @@ try {
     console.error('Unexpected error:', error.message);
   }
 }
+```
+
+### 6. Zero-Knowledge Proofs (ZK)
+
+```javascript
+// Generate Groth16 proof
+const { proof, publicSignals } = crypto.zk.groth16.generateProof(
+  fs.readFileSync('./circuit.wasm'),
+  fs.readFileSync('./proving_key.zkey'),
+  { a: 3, b: 11 } // public signals
+);
+
+// Verify proof
+const isValid = crypto.zk.groth16.verifyProof(
+  verificationKey,
+  proof,
+  publicSignals
+);
+
+// Serialize for storage/transmission
+const serialized = crypto.zk.groth16.serializeProof({ proof, publicSignals }, 'base64');
 ```
 
 ## Next Steps

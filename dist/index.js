@@ -5,7 +5,7 @@
  * @module cryptographer.js
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.rsa = exports.ecdsa = exports.ed25519 = exports.dsa = exports.kdf = exports.hmac = exports.cipher = exports.sha = exports.bcrypt = exports.argon2 = exports.pbkdf2 = exports.hmacMD5 = exports.hmacSHA512 = exports.hmacSHA256 = exports.hmacSHA1 = exports.ecdh = exports.x25519 = exports.rsa_oaep = exports.des = exports.chacha20 = exports.aes = exports.ripemd160 = exports.whirlpool = exports.blake3 = exports.blake2s = exports.blake2b = exports.md5 = exports.md4 = exports.sha3_512 = exports.sha3_256 = exports.sha512 = exports.sha256 = exports.sha1 = void 0;
+exports.zk = exports.rsa = exports.ecdsa = exports.ed25519 = exports.dsa = exports.kdf = exports.hmac = exports.cipher = exports.sha = exports.bcrypt = exports.argon2 = exports.pbkdf2 = exports.hmacMD5 = exports.hmacSHA512 = exports.hmacSHA256 = exports.hmacSHA1 = exports.ecdh = exports.x25519 = exports.rsa_oaep = exports.des = exports.chacha20 = exports.aes = exports.ripemd160 = exports.whirlpool = exports.blake3 = exports.blake2s = exports.blake2b = exports.md5 = exports.md4 = exports.sha3_512 = exports.sha3_256 = exports.sha512 = exports.sha256 = exports.sha1 = void 0;
 exports.randomBytes = randomBytes;
 exports.timingSafeEqual = timingSafeEqual;
 const tslib_1 = require("tslib");
@@ -27,6 +27,8 @@ Object.defineProperty(exports, "ecdsa", { enumerable: true, get: function () { r
 Object.defineProperty(exports, "rsa", { enumerable: true, get: function () { return dsa_1.rsa; } });
 const crypto_1 = require("crypto");
 const validation_1 = require("./utils/validation");
+const zk_1 = require("./zk");
+Object.defineProperty(exports, "zk", { enumerable: true, get: function () { return zk_1.zk; } });
 // Re-export individual functions for convenience
 var hash_2 = require("./hash");
 // Hash functions
@@ -92,7 +94,8 @@ const cryptographer = {
     ecdsa: dsa_1.ecdsa,
     rsa: dsa_1.rsa,
     randomBytes,
-    timingSafeEqual
+    timingSafeEqual,
+    zk: zk_1.zk
 };
 exports.default = cryptographer;
 //# sourceMappingURL=index.js.map

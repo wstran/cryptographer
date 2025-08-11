@@ -221,3 +221,27 @@ export interface BenchmarkResult {
   totalTime: number;
   iterations: number;
 }
+
+// =========================
+// ZK/Groth16 Types
+// =========================
+
+/** Input accepted for URLs or binary blobs */
+export type UrlOrBin = string | Buffer | Uint8Array | URL;
+
+/** Standard snarkjs proof JSON shape for Groth16 */
+export interface Groth16Proof {
+  pi_a: [string, string, string?];
+  pi_b: [[string, string], [string, string], [string, string]?];
+  pi_c: [string, string, string?];
+  protocol?: 'groth16';
+  curve?: string;
+  [key: string]: unknown;
+}
+
+export interface Groth16ProveResult {
+  proof: Groth16Proof;
+  publicSignals: string[];
+}
+
+export type Groth16SerializeFormat = 'buffer' | 'base64' | 'hex' | 'json';

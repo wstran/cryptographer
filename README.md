@@ -116,6 +116,14 @@ Supports all hash algorithms listed above for HMAC generation.
 | **RSA-PSS** | ≥2048-bit | SHA-256/384/512 | ASN.1 | ✅ | Prefer over PKCS#1 v1.5 |
 | **RSA PKCS#1 v1.5** | ≥2048-bit | SHA-256/384/512 | ASN.1 | ✅ | Legacy compatibility |
 
+### Zero-Knowledge (zk)
+
+| Protocol | Engine | Status | Notes |
+|----------|--------|--------|-------|
+| **Groth16** | snarkjs (Node) | ✅ | Synchronous API: generate/verify/serialize/deserialize |
+
+See docs: [ZK Functions](docs/api-reference/zk-functions.md)
+
 ## 📖 API Reference
 
 ### Hash Functions

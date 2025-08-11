@@ -262,6 +262,35 @@ function hex(buf, len = 32) {
     { mode: 'randomBytes', n: 16, sample: hex(rb) + '…' },
   ]);
 
+  // ZK (Zero-Knowledge)
+  section('ZK');
+  const mockProof = {
+    pi_a: ['123', '456'],
+    pi_b: [['789', '012'], ['345', '678']],
+    pi_c: ['901', '234'],
+    protocol: 'groth16',
+    curve: 'bn128'
+  };
+  const mockPublicSignals = ['21', '42'];
+  const mockData = { proof: mockProof, publicSignals: mockPublicSignals };
+
+  // Test serialization
+  const serialized = lib.zk.groth16.serializeProof(mockData, 'base64');
+  assert(typeof serialized === 'string', 'ZK serialization works');
+
+  // Test deserialization
+  const deserialized = lib.zk.groth16.deserializeProof(serialized);
+  assert(deserialized.proof && deserialized.publicSignals, 'ZK deserialization works');
+
+  // Test data integrity
+  const proofMatch = JSON.stringify(deserialized.proof) === JSON.stringify(mockProof);
+  const signalsMatch = JSON.stringify(deserialized.publicSignals) === JSON.stringify(mockPublicSignals);
+  assert(proofMatch && signalsMatch, 'ZK data integrity verified');
+
+  console.table([
+    { mode: 'groth16', n: 12, sample: hex(serialized) + '…', len: serialized.length },
+  ]);
+
   hr();
   console.log('All comprehensive tests passed.');
   console.log('✅ Ready for production');

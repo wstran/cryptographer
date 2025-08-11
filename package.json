@@ -1,6 +1,6 @@
 {
   "name": "cryptographer.js",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "High-performance cryptographic algorithms for Node.js using WebAssembly",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -99,11 +99,12 @@
     "registry": "https://registry.npmjs.org/"
   },
   "devDependencies": {
-    "c8": "^9.1.0",
+    "@semaphore-protocol/circuits": "^4.6.3",
     "@types/jest": "^29.5.0",
     "@types/node": "^20.0.0",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
+    "c8": "^9.1.0",
     "eslint": "^8.0.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",
@@ -113,8 +114,11 @@
     "prettier": "^3.0.0",
     "semantic-release": "^22.0.0",
     "ts-jest": "^29.1.0",
-    "tslib": "^2.6.0",
+    "tslib": "^2.8.1",
     "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "snarkjs": "^0.7.3"
   },
   "peerDependencies": {
     "node": ">=14.0.0"

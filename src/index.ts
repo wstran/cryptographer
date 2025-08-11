@@ -16,6 +16,7 @@ import { dsa, ed25519, ecdsa, rsa } from './dsa';
 import { randomBytes as nodeRandomBytes, timingSafeEqual as nodeTimingSafeEqual } from 'crypto';
 import type { CryptoInput } from './types';
 import { convertToBuffer, timeSafeEqual as fallbackTimingSafeEqual } from './utils/validation';
+import { zk } from './zk';
 
 // Re-export individual functions for convenience
 export {
@@ -86,7 +87,8 @@ export {
   dsa,
   ed25519,
   ecdsa,
-  rsa
+  rsa,
+  zk
 };
 
 // Default export with all modules
@@ -104,6 +106,7 @@ const cryptographer: {
   rsa: typeof rsa;
   randomBytes: typeof randomBytes;
   timingSafeEqual: typeof timingSafeEqual;
+  zk: typeof zk;
 } = {
   sha,
   cipher,
@@ -117,7 +120,8 @@ const cryptographer: {
   ecdsa,
   rsa,
   randomBytes,
-  timingSafeEqual
+  timingSafeEqual,
+  zk
 };
 
 export default cryptographer;

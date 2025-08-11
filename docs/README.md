@@ -46,7 +46,7 @@ console.log('ed25519 ok?', ed25519.verify(ed.publicKey, 'hello', sig)); // boole
 ## 📚 What's Inside
 
 - **Getting Started** - Installation and basic setup
-- **API Reference** - Complete function documentation
+- **API Reference** - Complete function documentation (Hash, HMAC, Cipher, DSA, KDF, ZK)
 - **Examples** - Real-world usage examples
 - **Security Guide** - Best practices and security considerations
 - **Performance** - Benchmarks and optimization tips
