@@ -12,5 +12,8 @@ export declare const cipher: {
     aes: CipherFunction;
     chacha20: CipherFunction;
     des: CipherFunction;
+    rsa_oaep: any;
+    x25519: any;
+    ecdh: any;
 };
 //# sourceMappingURL=index.d.ts.map

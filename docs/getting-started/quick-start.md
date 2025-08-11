@@ -73,10 +73,10 @@ const decDes = crypto.cipher.des.decrypt(encDes, { key: kdes, iv: iv8, mode: 'cb
 
 ```javascript
 // X25519 key exchange
-const a = crypto.x25519.generateKeypair();
-const b = crypto.x25519.generateKeypair();
-const ssA = crypto.x25519.deriveSharedSecret(a.privateKey, b.publicKey);
-const ssB = crypto.x25519.deriveSharedSecret(b.privateKey, a.publicKey);
+const a = crypto.cipher.x25519.generateKeypair();
+const b = crypto.cipher.x25519.generateKeypair();
+const ssA = crypto.cipher.x25519.deriveSharedSecret(a.privateKey, b.publicKey);
+const ssB = crypto.cipher.x25519.deriveSharedSecret(b.privateKey, a.publicKey);
 
 // (PQC KEM removed in this build)
 ```

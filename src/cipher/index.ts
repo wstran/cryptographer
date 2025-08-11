@@ -576,4 +576,7 @@ export const cipher = {
   aes,
   chacha20,
   des,
+  rsa_oaep,
+  x25519,
+  ecdh,
 };

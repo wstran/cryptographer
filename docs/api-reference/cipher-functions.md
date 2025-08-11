@@ -49,8 +49,8 @@ const prv = fs.readFileSync('private_key.der');
 // Wrap a random 32-byte key
 import { randomBytes } from 'crypto';
 const dataKey = randomBytes(32);
-const wrapped = crypto.rsa_oaep.encrypt(dataKey, pub, { hash: 'sha256' });
-const unwrapped = crypto.rsa_oaep.decrypt(wrapped, prv, { hash: 'sha256' });
+const wrapped = crypto.cipher.rsa_oaep.encrypt(dataKey, pub, { hash: 'sha256' });
+const unwrapped = crypto.cipher.rsa_oaep.decrypt(wrapped, prv, { hash: 'sha256' });
 ```
 
 #### X25519 usage
@@ -58,11 +58,11 @@ const unwrapped = crypto.rsa_oaep.decrypt(wrapped, prv, { hash: 'sha256' });
 ```javascript
 import { hkdfSync } from 'crypto';
 // Each keypair returns 32B secret + 32B public key
-const a = crypto.x25519.generateKeypair();
-const b = crypto.x25519.generateKeypair();
+const a = crypto.cipher.x25519.generateKeypair();
+const b = crypto.cipher.x25519.generateKeypair();
 // Each side derives the same shared secret
-const ssA = crypto.x25519.deriveSharedSecret(a.privateKey, b.publicKey);
-const ssB = crypto.x25519.deriveSharedSecret(b.privateKey, a.publicKey);
+const ssA = crypto.cipher.x25519.deriveSharedSecret(a.privateKey, b.publicKey);
+const ssB = crypto.cipher.x25519.deriveSharedSecret(b.privateKey, a.publicKey);
 const keyA = hkdfSync('sha256', ssA, Buffer.alloc(0), Buffer.from('x25519 hkdf'), 32);
 const keyB = hkdfSync('sha256', ssB, Buffer.alloc(0), Buffer.from('x25519 hkdf'), 32);
 ```
@@ -72,10 +72,10 @@ const keyB = hkdfSync('sha256', ssB, Buffer.alloc(0), Buffer.from('x25519 hkdf')
 ```javascript
 import { hkdfSync } from 'crypto';
 // P-256 (aka secp256r1). Public key is uncompressed SEC1 (65 bytes)
-const e1 = crypto.ecdh.generateKeypair('p256');
-const e2 = crypto.ecdh.generateKeypair('p256');
-const s1 = crypto.ecdh.deriveSharedSecret('p256', e1.privateKey, e2.publicKey);
-const s2 = crypto.ecdh.deriveSharedSecret('p256', e2.privateKey, e1.publicKey);
+const e1 = crypto.cipher.ecdh.generateKeypair('p256');
+const e2 = crypto.cipher.ecdh.generateKeypair('p256');
+const s1 = crypto.cipher.ecdh.deriveSharedSecret('p256', e1.privateKey, e2.publicKey);
+const s2 = crypto.cipher.ecdh.deriveSharedSecret('p256', e2.privateKey, e1.publicKey);
 const k1 = hkdfSync('sha256', s1, Buffer.alloc(0), Buffer.from('ecdh secp256r1 hkdf'), 32);
 const k2 = hkdfSync('sha256', s2, Buffer.alloc(0), Buffer.from('ecdh secp256r1 hkdf'), 32);
 ```

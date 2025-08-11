@@ -607,5 +607,8 @@ exports.cipher = {
     aes: exports.aes,
     chacha20: exports.chacha20,
     des: exports.des,
+    rsa_oaep: exports.rsa_oaep,
+    x25519: exports.x25519,
+    ecdh: exports.ecdh,
 };
 //# sourceMappingURL=index.js.map

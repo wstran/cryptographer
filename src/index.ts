@@ -7,58 +7,19 @@
 // Export types for TypeScript consumers
 export * from './types';
 
-// Import all modules
+// Import all modules (namespaced only)
 import { hash as _hashInternal, sha } from './hash';
-import { cipher, aes, chacha20, des, rsa_oaep, x25519, ecdh } from './cipher';
+import { cipher } from './cipher';
 import { hmac } from './hmac';
 import { kdf } from './kdf';
-import { dsa, ed25519, ecdsa, rsa } from './dsa';
+import { dsa } from './dsa';
 import { randomBytes as nodeRandomBytes, timingSafeEqual as nodeTimingSafeEqual } from 'crypto';
 import type { CryptoInput } from './types';
 import { convertToBuffer, timeSafeEqual as fallbackTimingSafeEqual } from './utils/validation';
 import { zk } from './zk';
 
-// Re-export individual functions for convenience
-export {
-  // Hash functions
-  sha1,
-  sha256,
-  sha512,
-  sha3_256,
-  sha3_512,
-  md4,
-  md5,
-  blake2b,
-  blake2s,
-  blake3,
-  whirlpool,
-  ripemd160
-} from './hash';
-
-export {
-  // Cipher functions
-  aes,
-  chacha20,
-  des,
-  rsa_oaep,
-  x25519,
-  ecdh
-} from './cipher';
-
-export {
-  // HMAC functions
-  hmacSHA1,
-  hmacSHA256,
-  hmacSHA512,
-  hmacMD5
-} from './hmac';
-
-export {
-  // KDF functions
-  pbkdf2,
-  argon2,
-  bcrypt
-} from './kdf';
+// Do NOT re-export individual leaf functions. Consumers must use namespaced
+// access patterns like cryptographer.sha.sha256, cryptographer.cipher.aes, etc.
 
 // Utility helpers
 export function randomBytes(size: number): Buffer {
@@ -85,9 +46,6 @@ export {
   hmac,
   kdf,
   dsa,
-  ed25519,
-  ecdsa,
-  rsa,
   zk
 };
 
@@ -97,13 +55,7 @@ const cryptographer: {
   cipher: typeof cipher;
   hmac: typeof hmac;
   kdf: typeof kdf;
-  rsa_oaep: typeof rsa_oaep;
-  x25519: typeof x25519;
-  ecdh: typeof ecdh;
   dsa: typeof dsa;
-  ed25519: typeof ed25519;
-  ecdsa: typeof ecdsa;
-  rsa: typeof rsa;
   randomBytes: typeof randomBytes;
   timingSafeEqual: typeof timingSafeEqual;
   zk: typeof zk;
@@ -112,13 +64,7 @@ const cryptographer: {
   cipher,
   hmac,
   kdf,
-  rsa_oaep,
-  x25519,
-  ecdh,
   dsa,
-  ed25519,
-  ecdsa,
-  rsa,
   randomBytes,
   timingSafeEqual,
   zk

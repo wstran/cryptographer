@@ -164,23 +164,23 @@ function hex(buf, len = 32) {
 
   // Key exchange
   section('Key Exchange');
-  const x1 = lib.x25519.generateKeypair();
-  const x2 = lib.x25519.generateKeypair();
-  const xs1 = lib.x25519.deriveSharedSecret(x1.privateKey, x2.publicKey);
-  const xs2 = lib.x25519.deriveSharedSecret(x2.privateKey, x1.publicKey);
+  const x1 = lib.cipher.x25519.generateKeypair();
+  const x2 = lib.cipher.x25519.generateKeypair();
+  const xs1 = lib.cipher.x25519.deriveSharedSecret(x1.privateKey, x2.publicKey);
+  const xs2 = lib.cipher.x25519.deriveSharedSecret(x2.privateKey, x1.publicKey);
   assert(Buffer.compare(xs1, xs2) === 0, 'X25519 shared secret matches');
   console.table([{ algo: 'x25519', shared: hex(xs1, 48) + '…' }]);
 
   // ECDH
-  const e1 = lib.ecdh.generateKeypair('p256');
-  const e2 = lib.ecdh.generateKeypair('p256');
-  const es1 = lib.ecdh.deriveSharedSecret('p256', e1.privateKey, e2.publicKey);
-  const es2 = lib.ecdh.deriveSharedSecret('p256', e2.privateKey, e1.publicKey);
+  const e1 = lib.cipher.ecdh.generateKeypair('p256');
+  const e2 = lib.cipher.ecdh.generateKeypair('p256');
+  const es1 = lib.cipher.ecdh.deriveSharedSecret('p256', e1.privateKey, e2.publicKey);
+  const es2 = lib.cipher.ecdh.deriveSharedSecret('p256', e2.privateKey, e1.publicKey);
   assert(Buffer.compare(es1, es2) === 0, 'ECDH P-256 shared secret matches');
-  const r1 = lib.ecdh.generateKeypair('p384');
-  const r2 = lib.ecdh.generateKeypair('p384');
-  const rs1 = lib.ecdh.deriveSharedSecret('p384', r1.privateKey, r2.publicKey);
-  const rs2 = lib.ecdh.deriveSharedSecret('p384', r2.privateKey, r1.publicKey);
+  const r1 = lib.cipher.ecdh.generateKeypair('p384');
+  const r2 = lib.cipher.ecdh.generateKeypair('p384');
+  const rs1 = lib.cipher.ecdh.deriveSharedSecret('p384', r1.privateKey, r2.publicKey);
+  const rs2 = lib.cipher.ecdh.deriveSharedSecret('p384', r2.privateKey, r1.publicKey);
   assert(Buffer.compare(rs1, rs2) === 0, 'ECDH P-384 shared secret matches');
   console.table([
     { algo: 'x25519', shared: hex(xs1, 48) + '…' },
@@ -191,21 +191,21 @@ function hex(buf, len = 32) {
   // DSA – Ed25519 / ECDSA / RSA
   section('DSA');
   // Ed25519
-  const ed = lib.ed25519.generateKeypair();
-  const sigEd = lib.ed25519.sign(ed.privateKey, msg);
-  assert(lib.ed25519.verify(ed.publicKey, msg, sigEd), 'Ed25519 verify ok');
-  assert(!lib.ed25519.verify(ed.publicKey, 'tamper', sigEd), 'Ed25519 verify fails on tamper');
+  const ed = lib.dsa.ed25519.generateKeypair();
+  const sigEd = lib.dsa.ed25519.sign(ed.privateKey, msg);
+  assert(lib.dsa.ed25519.verify(ed.publicKey, msg, sigEd), 'Ed25519 verify ok');
+  assert(!lib.dsa.ed25519.verify(ed.publicKey, 'tamper', sigEd), 'Ed25519 verify fails on tamper');
 
   // ECDSA secp256r1
-  const kpR1 = lib.ecdsa.generateKeypair('secp256r1');
-  const sigR1 = lib.ecdsa.sign(msg, { curve: 'secp256r1', privateKey: kpR1.privateKey, hash: 'sha256' });
-  assert(lib.ecdsa.verify(msg, { curve: 'secp256r1', publicKey: kpR1.publicKey, signature: sigR1 }), 'ECDSA r1 verify ok');
-  assert(!lib.ecdsa.verify('bad', { curve: 'secp256r1', publicKey: kpR1.publicKey, signature: sigR1 }), 'ECDSA r1 verify fails on tamper');
+  const kpR1 = lib.dsa.ecdsa.generateKeypair('secp256r1');
+  const sigR1 = lib.dsa.ecdsa.sign(msg, { curve: 'secp256r1', privateKey: kpR1.privateKey, hash: 'sha256' });
+  assert(lib.dsa.ecdsa.verify(msg, { curve: 'secp256r1', publicKey: kpR1.publicKey, signature: sigR1 }), 'ECDSA r1 verify ok');
+  assert(!lib.dsa.ecdsa.verify('bad', { curve: 'secp256r1', publicKey: kpR1.publicKey, signature: sigR1 }), 'ECDSA r1 verify fails on tamper');
 
   // ECDSA secp256k1
-  const kpK1 = lib.ecdsa.generateKeypair('secp256k1');
-  const sigK1 = lib.ecdsa.sign(msg, { curve: 'secp256k1', privateKey: kpK1.privateKey, hash: 'sha256' });
-  assert(lib.ecdsa.verify(msg, { curve: 'secp256k1', publicKey: kpK1.publicKey, signature: sigK1 }), 'ECDSA k1 verify ok');
+  const kpK1 = lib.dsa.ecdsa.generateKeypair('secp256k1');
+  const sigK1 = lib.dsa.ecdsa.sign(msg, { curve: 'secp256k1', privateKey: kpK1.privateKey, hash: 'sha256' });
+  assert(lib.dsa.ecdsa.verify(msg, { curve: 'secp256k1', publicKey: kpK1.publicKey, signature: sigK1 }), 'ECDSA k1 verify ok');
 
   // RSA (Generate keys in DER)
   const { publicKey, privateKey } = generateKeyPairSync('rsa', {
@@ -214,10 +214,10 @@ function hex(buf, len = 32) {
     privateKeyEncoding: { type: 'pkcs8', format: 'der' },
   });
   const msgBuf = Buffer.from('hello-rsa');
-  const sPss = lib.rsa.signPSS(msgBuf, privateKey, { hash: 'sha256' });
-  assert(lib.rsa.verifyPSS(msgBuf, publicKey, sPss, { hash: 'sha256' }), 'RSA-PSS verify ok');
-  const sPkcs = lib.rsa.signPKCS1v15(msgBuf, privateKey, { hash: 'sha256' });
-  assert(lib.rsa.verifyPKCS1v15(msgBuf, publicKey, sPkcs, { hash: 'sha256' }), 'RSA-PKCS1v15 verify ok');
+  const sPss = lib.dsa.rsa.signPSS(msgBuf, privateKey, { hash: 'sha256' });
+  assert(lib.dsa.rsa.verifyPSS(msgBuf, publicKey, sPss, { hash: 'sha256' }), 'RSA-PSS verify ok');
+  const sPkcs = lib.dsa.rsa.signPKCS1v15(msgBuf, privateKey, { hash: 'sha256' });
+  assert(lib.dsa.rsa.verifyPKCS1v15(msgBuf, publicKey, sPkcs, { hash: 'sha256' }), 'RSA-PKCS1v15 verify ok');
   console.table([
     { mode: 'ed25519', n: 12, signature: hex(sigEd) + '…',len: sigEd.length },
     { mode: 'ecdsa (secp256r1)', n: 12, signature: hex(sigR1) + '…',len: sigR1.length },
@@ -229,8 +229,8 @@ function hex(buf, len = 32) {
   // RSA-OAEP
   section('RSA-OAEP');
   const dataKey = nodeRandomBytes(32);
-  const wrapped = lib.rsa_oaep.encrypt(dataKey, publicKey, { hash: 'sha256' });
-  const unwrapped = lib.rsa_oaep.decrypt(wrapped, privateKey, { hash: 'sha256' });
+  const wrapped = lib.cipher.rsa_oaep.encrypt(dataKey, publicKey, { hash: 'sha256' });
+  const unwrapped = lib.cipher.rsa_oaep.decrypt(wrapped, privateKey, { hash: 'sha256' });
   assert(unwrapped.equals(dataKey), 'RSA-OAEP unwrap matches');
   console.table([
     { mode: 'rsa-oaep', n: 12, sample: hex(wrapped) + '…' },

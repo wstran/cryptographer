@@ -206,16 +206,16 @@ const aeadDec = crypto.cipher.chacha20.decrypt(aeadEnc, { key: ck, iv: aeadNonce
 
 ```javascript
 // X25519
-const a = crypto.x25519.generateKeypair();
-const b = crypto.x25519.generateKeypair();
-const ssA = crypto.x25519.deriveSharedSecret(a.privateKey, b.publicKey);
-const ssB = crypto.x25519.deriveSharedSecret(b.privateKey, a.publicKey);
+const a = crypto.cipher.x25519.generateKeypair();
+const b = crypto.cipher.x25519.generateKeypair();
+const ssA = crypto.cipher.x25519.deriveSharedSecret(a.privateKey, b.publicKey);
+const ssB = crypto.cipher.x25519.deriveSharedSecret(b.privateKey, a.publicKey);
 
 // ECDH secp256r1 (aka P-256)
-const e1 = crypto.ecdh.generateKeypair('p256');
-const e2 = crypto.ecdh.generateKeypair('p256');
-const es1 = crypto.ecdh.deriveSharedSecret('p256', e1.privateKey, e2.publicKey);
-const es2 = crypto.ecdh.deriveSharedSecret('p256', e2.privateKey, e1.publicKey);
+const e1 = crypto.cipher.ecdh.generateKeypair('p256');
+const e2 = crypto.cipher.ecdh.generateKeypair('p256');
+const es1 = crypto.cipher.ecdh.deriveSharedSecret('p256', e1.privateKey, e2.publicKey);
+const es2 = crypto.cipher.ecdh.deriveSharedSecret('p256', e2.privateKey, e1.publicKey);
 
 // (PQC KEM removed in this build)
 ```
@@ -305,22 +305,22 @@ console.log('Match:', original === decrypted);
 ```javascript
 // Ed25519
 // Generate keypair for EdDSA over Curve25519 (ed25519). Secret/public are 32 bytes each.
-const ed = crypto.ed25519.generateKeypair();
+const ed = crypto.dsa.ed25519.generateKeypair();
 // Sign any message-like input; returns 64-byte signature
-const sigEd = crypto.ed25519.sign(ed.privateKey, 'hello');
+const sigEd = crypto.dsa.ed25519.sign(ed.privateKey, 'hello');
 // Verify returns boolean
-console.log('ed25519 ok?', crypto.ed25519.verify(ed.publicKey, 'hello', sigEd));
+console.log('ed25519 ok?', crypto.dsa.ed25519.verify(ed.publicKey, 'hello', sigEd));
 
 // ECDSA secp256r1 (aka P-256)
 // Public key is uncompressed SEC1 (65 bytes). Library hashes with SHA-256 internally.
-const kp = crypto.ecdsa.generateKeypair('secp256r1');
-const sigP = crypto.ecdsa.sign('hello', { curve: 'secp256r1', privateKey: kp.privateKey });
-console.log('ecdsa secp256r1 ok?', crypto.ecdsa.verify('hello', { curve: 'secp256r1', publicKey: kp.publicKey, signature: sigP }));
+const kp = crypto.dsa.ecdsa.generateKeypair('secp256r1');
+const sigP = crypto.dsa.ecdsa.sign('hello', { curve: 'secp256r1', privateKey: kp.privateKey });
+console.log('ecdsa secp256r1 ok?', crypto.dsa.ecdsa.verify('hello', { curve: 'secp256r1', publicKey: kp.publicKey, signature: sigP }));
 
 // ECDSA secp256k1
-const kk = crypto.ecdsa.generateKeypair('secp256k1');
-const sigK = crypto.ecdsa.sign('hello', { curve: 'secp256k1', privateKey: kk.privateKey });
-console.log('ecdsa secp256k1 ok?', crypto.ecdsa.verify('hello', { curve: 'secp256k1', publicKey: kk.publicKey, signature: sigK }));
+const kk = crypto.dsa.ecdsa.generateKeypair('secp256k1');
+const sigK = crypto.dsa.ecdsa.sign('hello', { curve: 'secp256k1', privateKey: kk.privateKey });
+console.log('ecdsa secp256k1 ok?', crypto.dsa.ecdsa.verify('hello', { curve: 'secp256k1', publicKey: kk.publicKey, signature: sigK }));
 ```
 
 ## Key Derivation Functions

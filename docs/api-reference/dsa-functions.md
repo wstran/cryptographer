@@ -26,11 +26,11 @@ ed25519.verify(publicKey: CryptoInput, message: CryptoInput, signature: CryptoIn
 - Example
 ```ts
 // Generate a fresh Ed25519 keypair (32B secret key, 32B public key)
-const ed = crypto.ed25519.generateKeypair();
+const ed = crypto.dsa.ed25519.generateKeypair();
 // Sign any message-like input (string | Buffer | Uint8Array)
-const sig = crypto.ed25519.sign(ed.privateKey, 'hello');
+const sig = crypto.dsa.ed25519.sign(ed.privateKey, 'hello');
 // Verify signature returns boolean
-const ok = crypto.ed25519.verify(ed.publicKey, 'hello', sig);
+const ok = crypto.dsa.ed25519.verify(ed.publicKey, 'hello', sig);
 ```
 
 ## ECDSA
@@ -48,11 +48,11 @@ ecdsa.verify(message: CryptoInput, { curve?: 'secp256r1'|'secp256k1', publicKey:
 - Example
 ```ts
 // Generate P-256 keypair (aka secp256r1). Public key is uncompressed SEC1 (65B)
-const kp = crypto.ecdsa.generateKeypair('secp256r1');
+const kp = crypto.dsa.ecdsa.generateKeypair('secp256r1');
 // Library hashes the message with SHA-256 internally before signing
-const sig = crypto.ecdsa.sign('data', { curve: 'secp256r1', privateKey: kp.privateKey });
+const sig = crypto.dsa.ecdsa.sign('data', { curve: 'secp256r1', privateKey: kp.privateKey });
 // Verify DER-encoded ECDSA signature
-const ok = crypto.ecdsa.verify('data', { curve: 'secp256r1', publicKey: kp.publicKey, signature: sig });
+const ok = crypto.dsa.ecdsa.verify('data', { curve: 'secp256r1', publicKey: kp.publicKey, signature: sig });
 ```
 
 ## RSA Signatures
@@ -74,8 +74,8 @@ const msg = Buffer.from('hello');
 const prv = fs.readFileSync('private_key.der');
 const pub = fs.readFileSync('public_key.der');
 // PSS (recommended)
-const s = crypto.rsa.signPSS(msg, prv, { hash: 'sha256' });
-const ok = crypto.rsa.verifyPSS(msg, pub, s, { hash: 'sha256' });
+const s = crypto.dsa.rsa.signPSS(msg, prv, { hash: 'sha256' });
+const ok = crypto.dsa.rsa.verifyPSS(msg, pub, s, { hash: 'sha256' });
 ```
 
 ## Security Guidance
@@ -87,7 +87,7 @@ const ok = crypto.rsa.verifyPSS(msg, pub, s, { hash: 'sha256' });
 ## Error Handling
 ```ts
 try {
-  const sig = crypto.ecdsa.sign('msg', { curve: 'secp256r1', privateKey });
+  const sig = crypto.dsa.ecdsa.sign('msg', { curve: 'secp256r1', privateKey });
 } catch (e) {
   if (String(e).includes('Invalid')) {
     // invalid key/curve/encoding
