@@ -7,8 +7,6 @@ Synchronous Groth16 proof generation and verification using snarkjs under the ho
 The ZK module provides a clean, synchronous API for Groth16 zk-SNARK operations. It internally handles all snarkjs operations using the current Node.js process, keeping the library self-contained and easy to use.
 
 ## Requirements
-
-- The `snarkjs` package must be installed in the user's project (`npm install snarkjs`)
 - All inputs must be provided as binary data (Buffer/Uint8Array)
 - No external runner scripts or additional setup required
 
