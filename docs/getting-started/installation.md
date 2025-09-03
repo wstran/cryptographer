@@ -60,12 +60,6 @@ import crypto, {
 } from 'cryptographer.js';
 ```
 
-### Individual Functions
-
-```javascript
-import { sha256, aes, pbkdf2 } from 'cryptographer.js';
-```
-
 ## Verification
 
 To verify the installation, run this code:
