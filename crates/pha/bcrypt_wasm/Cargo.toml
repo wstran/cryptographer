@@ -12,7 +12,7 @@ wasm-bindgen = { version = "0.2.100", optional = true }
 js-sys = { version = "0.3.72", optional = true }
 serde = { version = "1.0.219", features = ["derive"], optional = true }
 serde-wasm-bindgen = { version = "0.6.5", optional = true }
-getrandom = { version = "0.3.3", features = ["wasm_js"] }
+getrandom = { version = "0.4.1", features = ["wasm_js"] }
 
 [features]
 default = []
