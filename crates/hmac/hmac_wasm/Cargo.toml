@@ -8,7 +8,7 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 hmac = "0.12.1"
-digest = "0.10.7"
+digest = "0.11.0"
 md4 = "0.10.2"
 md-5 = "0.10.6"
 ripemd = "0.1.3"
